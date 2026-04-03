@@ -1,0 +1,263 @@
+[
+  {
+    "rule_id": "rule-001",
+    "issue_type": "lack_of_result_evidence",
+    "issue_name": "缺少结果证据",
+    "definition": "经历只写了做过什么，没有体现结果、影响、产出或复盘价值。",
+    "trigger_signals": [
+      "负责",
+      "参与",
+      "协助",
+      "配合",
+      "执行"
+    ],
+    "typical_bad_patterns": [
+      "负责活动策划与执行，配合团队完成相关工作。",
+      "参与项目推进与落地，协助完成后续整理。"
+    ],
+    "priority_level": "high",
+    "applicable_roles": [
+      "内容运营",
+      "用户运营",
+      "活动运营",
+      "产品运营",
+      "市场",
+      "项目运营"
+    ],
+    "source_level": "A",
+    "notes": "高频、高价值、高可解释性规则。非常适合免费版前 3 个核心优化项，优先级应长期维持高。"
+  },
+  {
+    "rule_id": "rule-002",
+    "issue_type": "keyword_alignment_weak",
+    "issue_name": "岗位关键词连接不够直接",
+    "definition": "简历内容与目标岗位并非无关，但没有显性对齐岗位要求中的核心能力点或关键词。",
+    "trigger_signals": [
+      "JD关键词命中弱",
+      "简历动作词较多但岗位能力词较少",
+      "岗位相关能力没有被明确表达"
+    ],
+    "typical_bad_patterns": [
+      "参与项目推进、负责沟通协调、支持团队完成相关任务。",
+      "协助团队完成活动工作，推进日常安排。"
+    ],
+    "priority_level": "high",
+    "applicable_roles": [
+      "内容运营",
+      "用户运营",
+      "产品助理",
+      "产品运营",
+      "市场",
+      "项目助理"
+    ],
+    "source_level": "A",
+    "notes": "适合结合 JD 一起判断。非常符合 OfferPilot 的核心价值：判断是表达问题、匹配问题还是方向问题。"
+  },
+  {
+    "rule_id": "rule-003",
+    "issue_type": "weak_role_boundary",
+    "issue_name": "项目角色边界不清",
+    "definition": "简历没有明确区分自己主导了什么、参与了什么、配合了什么，导致个人贡献感被削弱。",
+    "trigger_signals": [
+      "推进相关工作",
+      "配合团队完成整体落地",
+      "协助项目推进"
+    ],
+    "typical_bad_patterns": [
+      "负责推进项目相关工作，配合团队完成整体落地。",
+      "支持团队完成项目安排，跟进执行进度。"
+    ],
+    "priority_level": "high",
+    "applicable_roles": [
+      "内容运营",
+      "用户运营",
+      "产品助理",
+      "项目运营",
+      "市场"
+    ],
+    "source_level": "A",
+    "notes": "这条规则对“内行视角”和“面试追问”都特别有帮助，因为一旦角色边界不清，面试官会立刻往下追问。"
+  },
+  {
+    "rule_id": "rule-004",
+    "issue_type": "weak_expression_pattern",
+    "issue_name": "经历表述偏泛",
+    "definition": "经历大量使用泛化、弱化的动作表述，无法让筛选者快速判断具体能力与贡献。",
+    "trigger_signals": [
+      "参与",
+      "协助",
+      "支持",
+      "配合",
+      "跟进"
+    ],
+    "typical_bad_patterns": [
+      "参与活动执行，协助完成复盘整理，支持团队推进相关安排。",
+      "配合团队完成日常运营工作，跟进项目进展。"
+    ],
+    "priority_level": "high",
+    "applicable_roles": [
+      "内容运营",
+      "用户运营",
+      "活动运营",
+      "产品运营",
+      "项目运营"
+    ],
+    "source_level": "A",
+    "notes": "与“缺少结果证据”不同，这条更强调表达方式本身过弱。两者会同时出现，但规则定义要分开。"
+  },
+  {
+    "rule_id": "rule-005",
+    "issue_type": "relevant_experience_not_emphasized",
+    "issue_name": "最相关经历没有放大",
+    "definition": "与目标岗位最接近的一段经历没有被前置、展开或突出，导致第一印象阶段就丢失相关性。",
+    "trigger_signals": [
+      "最相关经历位置靠后",
+      "相关经历描述长度明显不足",
+      "不相关经历比相关经历更长"
+    ],
+    "typical_bad_patterns": [
+      "最相关项目只用一句话带过，而无关经历写得很长。",
+      "与目标岗位最接近的经历被放在后半部分。"
+    ],
+    "priority_level": "medium",
+    "applicable_roles": [
+      "内容运营",
+      "用户运营",
+      "产品助理",
+      "项目助理",
+      "市场"
+    ],
+    "source_level": "A",
+    "notes": "这条规则对结果页很有价值，因为它能引导“先改哪一段”。但它比前四条更依赖简历整体结构判断，所以放 medium。"
+  },
+  {
+    "rule_id": "rule-006",
+    "issue_type": "lack_of_quantification",
+    "issue_name": "数字化表达偏少",
+    "definition": "简历中缺少人数、规模、次数、提升幅度、结果指标等量化信息，导致成果难以被快速建立可信度。",
+    "trigger_signals": [
+      "效果良好",
+      "推进顺利",
+      "反响不错",
+      "取得较好效果"
+    ],
+    "typical_bad_patterns": [
+      "活动效果良好，用户反馈不错。",
+      "推进顺利，取得较好结果。"
+    ],
+    "priority_level": "medium",
+    "applicable_roles": [
+      "内容运营",
+      "用户运营",
+      "活动运营",
+      "市场",
+      "数据相关初级岗位"
+    ],
+    "source_level": "A",
+    "notes": "非常常见，也很容易让用户产生顿悟。但它通常是“缺少结果证据”的补充问题，不一定永远排在最前。"
+  },
+  {
+    "rule_id": "rule-007",
+    "issue_type": "advantage_not_front_loaded",
+    "issue_name": "优势没有前置",
+    "definition": "简历中最能代表个人价值的能力或经历没有被优先呈现，导致亮点不容易在初筛阶段被看见。",
+    "trigger_signals": [
+      "亮点信息出现在后半段",
+      "最强经历不在前面",
+      "前面内容平淡、后面才出现重点"
+    ],
+    "typical_bad_patterns": [
+      "开头几段都是基础执行内容，真正有价值的项目放在后面。",
+      "最能体现能力的经历没有被放在前两段。"
+    ],
+    "priority_level": "medium",
+    "applicable_roles": [
+      "内容运营",
+      "用户运营",
+      "产品助理",
+      "市场",
+      "项目运营"
+    ],
+    "source_level": "A",
+    "notes": "这条规则适合强化结果页里的‘为什么没反馈’。它和简历结构、阅读顺序强相关。"
+  },
+  {
+    "rule_id": "rule-008",
+    "issue_type": "task_only_no_business_value",
+    "issue_name": "只写任务，没有业务价值",
+    "definition": "简历描述停留在任务层，没有体现这项工作对团队、项目、用户或业务带来了什么价值。",
+    "trigger_signals": [
+      "完成活动相关工作",
+      "负责内容发布",
+      "跟进项目执行",
+      "整理相关资料"
+    ],
+    "typical_bad_patterns": [
+      "负责内容发布与日常维护。",
+      "整理活动资料并跟进执行。"
+    ],
+    "priority_level": "high",
+    "applicable_roles": [
+      "内容运营",
+      "用户运营",
+      "活动运营",
+      "产品运营",
+      "市场"
+    ],
+    "source_level": "A",
+    "notes": "和“缺少结果证据”接近，但这里更强调‘价值解释缺失’，适合内行视角里指出“为什么这句看起来像执行支持”。"
+  },
+  {
+    "rule_id": "rule-009",
+    "issue_type": "jd_direction_mismatch",
+    "issue_name": "目标岗位方向不够聚焦",
+    "definition": "用户投递的目标岗位方向与简历主轴之间存在明显偏移，导致问题不仅是表达，还可能包含方向选择问题。",
+    "trigger_signals": [
+      "JD要求与简历主经历领域偏差较大",
+      "核心经历无法支撑目标岗位主能力",
+      "相关性只能通过很弱的迁移解释成立"
+    ],
+    "typical_bad_patterns": [
+      "简历主经历集中在执行与校园活动，但目标岗位要求明显偏数据分析或强产品能力。",
+      "目标岗位强调策略与分析，简历却几乎没有相关支撑。"
+    ],
+    "priority_level": "high",
+    "applicable_roles": [
+      "内容运营",
+      "用户运营",
+      "产品助理",
+      "数据分析初级岗",
+      "市场"
+    ],
+    "source_level": "A",
+    "notes": "这条规则非常符合 OfferPilot 的差异化价值：帮用户判断问题是表达、匹配还是方向。建议谨慎触发，避免滥用。"
+  },
+  {
+    "rule_id": "rule-010",
+    "issue_type": "overclaim_risk",
+    "issue_name": "表述容易引发追问风险",
+    "definition": "简历中出现较强结论或能力表述，但缺少足够支撑，一旦进入面试容易被继续深挖并暴露短板。",
+    "trigger_signals": [
+      "精通",
+      "独立负责全流程",
+      "主导",
+      "深度参与",
+      "熟练掌握"
+    ],
+    "typical_bad_patterns": [
+      "精通高并发架构。",
+      "主导项目全流程推进。",
+      "独立负责整体策略制定。"
+    ],
+    "priority_level": "medium",
+    "applicable_roles": [
+      "产品助理",
+      "技术类初级岗",
+      "内容运营",
+      "用户运营",
+      "市场"
+    ],
+    "source_level": "A",
+    "notes": "这条规则对‘面试里可能会被问到’模块特别有用。不是所有简历都会触发，但一旦触发，用户体感会很强。"
+  }
+]

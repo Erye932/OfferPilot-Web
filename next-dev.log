@@ -1,0 +1,222 @@
+▲ Next.js 16.2.1 (Turbopack)
+- Local:         http://localhost:3000
+- Network:       http://100.72.147.9:3000
+- Environments: .env.local
+✓ Ready in 232ms
+
+开始免费版诊断工作流 V1
+标准化输入完成，简历句子数: 17
+
+=== [Diagnose Debug] normalized_input ===
+{
+  "resume_text": "张三\n前端开发工程师\n工作经历：\n2022.01 - 至今  ABC科技有限公司\n负责公司官网前端开发，使用React和TypeScript技术栈。\n参与团队代码评审，协助新人快速上手项目。\n优化页面加载速度，提升用户体验。\n独立负责用户管理模块开发，实现权限控制功能。\n\n项目经验：\n电商后台管理系统\n- 使用React + Ant Design开发后台管理界面\n- 负责商品管理、订单管理模块的前端实现\n- 与后端API对接，处理数据交互\n- 优化页面性能，减少首屏加载时间30%\n\n教育背景：\n2020年 - 2024年  某某大学  计算机科学与技术  本科",
+  "target_role": "高级前端开发工程师",
+  "jd_text": "岗位职责：\n1. 负责公司核心产品的前端架构设计和开发\n2. 使用React、TypeScript等现代前端技术栈\n3. 优化前端性能，提升用户体验\n4. 与产品、设计、后端团队紧密协作\n5. 指导初级工程师，参与技术分享\n\n任职要求：\n1. 3年以上前端开发经验，精通React和TypeScript\n2. 熟悉前端工程化，有Webpack、Vite等构建工具使用经验\n3. 有性能优化、大型项目架构经验者优先\n4. 良好的沟通能力和团队协作精神",
+  "tier": "free",
+  "resume_sentences": [
+    "张三",
+    "前端开发工程师",
+    "工作经历：",
+    "2022",
+    "01 - 至今  ABC科技有限公司",
+    "负责公司官网前端开发，使用React和TypeScript技术栈",
+    "参与团队代码评审，协助新人快速上手项目",
+    "优化页面加载速度，提升用户体验",
+    "独立负责用户管理模块开发，实现权限控制功能",
+    "项目经验：",
+    "电商后台管理系统",
+    "- 使用React + Ant Design开发后台管理界面",
+    "- 负责商品管理、订单管理模块的前端实现",
+    "- 与后端API对接，处理数据交互",
+    "- 优化页面性能，减少首屏加载时间30%",
+    "教育背景：",
+    "2020年 - 2024年  某某大学  计算机科学与技术  本科"
+  ],
+  "jd_keywords": [
+    "岗位职责：",
+    "负责公司核心产品的前端架构设计和开发",
+    "使用React、TypeScript等现代前端技术栈",
+    "优化前端性能",
+    "提升用户体验",
+    "与产品、设计、后端团队紧密协作",
+    "指导初级工程师",
+    "参与技术分享",
+    "任职要求：",
+    "3年以上前端开发经验",
+    "精通React和TypeScript",
+    "熟悉前端工程化",
+    "有Webpack、Vite等构建工具使用经验",
+    "有性能优化、大型项目架构经验者优先",
+    "良好的沟通能力和团队协作精神"
+  ]
+}
+=== End normalized_input ===
+
+规则预分析完成，匹配问题数: 2
+
+=== [Diagnose Debug] rule_match_result ===
+{
+  "matches": [
+    {
+      "issue_type": "keyword_alignment_weak",
+      "issue_name": "岗位关键词连接不够直接",
+      "confidence": 0.9333333333333333,
+      "matched_signals": [
+        "JD关键词在简历中匹配度较低"
+      ],
+      "evidence_snippets": [
+        "简历中提到了JD关键词：提升用户体验",
+        "JD中提到的岗位职责：、负责公司核心产品的前端架构设计和开发、使用React、TypeScript等现代前端技术栈等关键词未在简历中直接体现",
+        "JD关键词涉及方向：岗位职责：、负责公司核心产品的前端架构设计和开发、使用React、TypeScript等现代前端技术栈、优化前端性能、提升用户体验"
+      ]
+    },
+    {
+      "issue_type": "lack_of_result_evidence",
+      "issue_name": "缺少结果证据",
+      "confidence": 0.5,
+      "matched_signals": [
+        "负责",
+        "参与",
+        "协助"
+      ],
+      "evidence_snippets": [
+        "负责公司官网前端开发，使用React和TypeScript技术栈",
+        "参与团队代码评审，协助新人快速上手项目"
+      ]
+    }
+  ],
+  "total_matched": 2
+}
+=== End rule_match_result ===
+
+三库映射完成，增强问题数: 2
+
+=== [Diagnose Debug] issue_enrichment_result ===
+{
+  "enrichments": [
+    {
+      "issue_type": "keyword_alignment_weak",
+      "issue_name": "岗位关键词连接不够直接",
+      "definition": "简历内容与目标岗位并非无关，但没有显性对齐岗位要求中的核心能力点或关键词。",
+      "insider_view": "这段经历不一定和岗位无关，但它没有把岗位最关心的能力点主动说出来。对我来说，这会增加理解成本，也会降低我第一眼判断你匹配度的速度。",
+      "rewrite_logic": "把泛化动作改成更贴岗位语境的表达，优先把 JD 里的核心能力词显性写出来。",
+      "before_text": "参与项目推进、负责沟通协调、支持团队完成相关任务。",
+      "after_text": "围绕用户增长项目推进执行节奏，负责跨团队沟通与需求同步，支持活动上线与后续反馈整理。"
+    },
+    {
+      "issue_type": "lack_of_result_evidence",
+      "issue_name": "缺少结果证据",
+      "definition": "经历只写了做过什么，没有体现结果、影响、产出或复盘价值。",
+      "insider_view": "我能看出你参与了执行，但我看不到体量、结果和你的实际贡献。这会让我默认你更偏支持角色，而不是能独立承担结果的人。",
+      "rewrite_logic": "把纯动作表述改成“动作 + 结果/复盘 + 影响”的结构，让经历不只停留在执行层。",
+      "before_text": "负责活动策划与执行，跟进现场落地，配合团队完成活动相关工作。",
+      "after_text": "负责活动策划与落地执行，协同团队推进现场流程，并在活动结束后整理复盘信息，帮助团队定位后续优化方向。"
+    }
+  ]
+}
+=== End issue_enrichment_result ===
+
+DeepSeek API 调用完成
+
+=== [Diagnose Debug] ai_response_raw ===
+{
+  "main_judgment": "简历与目标岗位的关键词匹配度低，且缺乏结果导向的表述。",
+  "core_issues": [
+    {
+      "title": "岗位关键词连接不够直接",
+      "summary": "简历未显性对齐岗位要求中的核心能力点，如前端架构设计、性能优化等。",
+      "evidence": "JD中提到的岗位职责：、负责公司核心产品的前端架构设计和开发、使用React、TypeScript等现代前端技术栈等关键词未在简历中直接体现",
+      "insider_view": "这段经历不一定和岗位无关，但它没有把岗位最关心的能力点主动说出来。对我来说，这会增加理解成本，也会降低我第一眼判断你匹配度的速度。",
+      "suggestion": "把泛化动作改成更贴岗位语境的表达，优先把JD里的核心能力词显性写出来。",
+      "follow_up_question": "你在项目中具体负责了哪些前端架构设计工作？",
+      "priority": 1
+    },
+    {
+      "title": "缺少结果证据",
+      "summary": "经历只写了执行动作，没有体现结果、影响或产出价值。",
+      "evidence": "负责公司官网前端开发，使用React和TypeScript技术栈",
+      "insider_view": "我能看出你参与了执行，但我看不到体量、结果和你的实际贡献。这会让我默认你更偏支持角色，而不是能独立承担结果的人。",
+      "suggestion": "把纯动作表述改成“动作 + 结果/复盘 + 影响”的结构，让经历不只停留在执行层。",
+      "follow_up_question": "这个项目上线后，前端性能提升了多少？",
+      "priority": 2
+    }
+  ],
+  "core_issues_summary": {
+    "total_count": 2,
+    "shown_count": 2
+  },
+  "priority_actions": [
+    {
+      "title": "强化关键词匹配",
+      "description": "在简历中显性添加岗位要求中的核心关键词，如前端架构设计、性能优化等。"
+    },
+    {
+      "title": "补充结果数据",
+      "description": "为每段经历添加具体的结果或影响描述，避免只写执行动作。"
+    }
+  ],
+  "rewrite_direction": "将简历中的泛化表述替换为更贴合高级前端开发岗位的语境，例如从“负责开发”改为“主导前端架构设计，使用React和TypeScript优化性能”。同时，为每项职责补充可量化的结果或影响，如“通过优化代码，将页面加载时间减少30%”。",
+  "metadata": {
+    "target_role": "高级前端开发工程师",
+    "has_jd": true,
+    "generated_at": "2024-12-01T10:00:00Z",
+    "tier": "free"
+  }
+}
+=== End ai_response_raw ===
+
+后处理完成，最终问题数: 2
+
+=== [Diagnose Debug] final_response ===
+{
+  "main_judgment": "简历与目标岗位的关键词匹配度低，且缺乏结果导向的表述。",
+  "core_issues": [
+    {
+      "title": "岗位关键词连接不够直接",
+      "summary": "简历未显性对齐岗位要求中的核心能力点，如前端架构设计、性能优化等。",
+      "evidence": "JD中提到的岗位职责：、负责公司核心产品的前端架构设计和开发、使用React、TypeScript等现代前端技术栈等关键词未在简历中直接体现",
+      "insider_view": "这段经历不一定和岗位无关，但它没有把岗位最关心的能力点主动说出来。对我来说，这会增加理解成本，也会降低我第一眼判断你匹配度的速度。",
+      "suggestion": "把泛化动作改成更贴岗位语境的表达，优先把JD里的核心能力词显性写出来。",
+      "follow_up_question": "你在项目中具体负责了哪些前端架构设计工作？",
+      "priority": 1
+    },
+    {
+      "title": "缺少结果证据",
+      "summary": "经历只写了执行动作，没有体现结果、影响或产出价值。",
+      "evidence": "负责公司官网前端开发，使用React和TypeScript技术栈",
+      "insider_view": "我能看出你参与了执行，但我看不到体量、结果和你的实际贡献。这会让我默认你更偏支持角色，而不是能独立承担结果的人。",
+      "suggestion": "把纯动作表述改成“动作 + 结果/复盘 + 影响”的结构，让经历不只停留在执行层。",
+      "follow_up_question": "这个项目上线后，前端性能提升了多少？",
+      "priority": 2
+    }
+  ],
+  "core_issues_summary": {
+    "total_count": 2,
+    "shown_count": 2
+  },
+  "priority_actions": [
+    {
+      "title": "强化关键词匹配",
+      "description": "在简历中显性添加岗位要求中的核心关键词，如前端架构设计、性能优化等。"
+    },
+    {
+      "title": "补充结果数据",
+      "description": "为每段经历添加具体的结果或影响描述，避免只写执行动作。"
+    },
+    {
+      "title": "先改最相关的一段经历",
+      "description": "不要整份简历一起大改，先改最影响反馈的那一段。"
+    }
+  ],
+  "rewrite_direction": "将简历中的泛化表述替换为更贴合高级前端开发岗位的语境，例如从“负责开发”改为“主导前端架构设计，使用React和TypeScript优化性能”。同时，为每项职责补充可量化的结果或影响，如“通过优化代码，将页面加载时间减少30%”。",
+  "metadata": {
+    "target_role": "高级前端开发工程师",
+    "has_jd": true,
+    "generated_at": "2024-12-01T10:00:00Z",
+    "tier": "free"
+  }
+}
+=== End final_response ===
+
+ POST /api/diagnose 200 in 20.8s (next.js: 92ms, application-code: 20.7s)
+[?25h

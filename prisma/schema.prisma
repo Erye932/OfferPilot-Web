@@ -1,0 +1,448 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+// ─── Users ───────────────────────────────────────────────────
+model User {
+  id        String   @id @default(cuid())
+  email     String?  @unique
+  name      String?
+  provider  String   @default("anonymous") // anonymous | email | github | google
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  sessions    DiagnoseSession[]
+  uploads     UploadedFile[]
+  usageRecords UsageRecord[]
+
+  @@map("users")
+}
+
+// ─── Diagnose Sessions ──────────────────────────────────────
+model DiagnoseSession {
+  id            String   @id @default(cuid())
+  userId        String?  @map("user_id")
+  targetRole    String   @map("target_role")
+  jdText        String?  @map("jd_text")
+  resumeText    String   @map("resume_text")
+  sourceType    String   @default("paste") @map("source_type") // paste | pdf
+  uploadedFileId String?  @map("uploaded_file_id")
+  jdQuality     String?  @map("jd_quality") // none | weak | strong
+  inputQuality  String?  @map("input_quality") // sufficient | insufficient
+  scenario      String   @default("normal") // normal | excellent | insufficient_input
+  schemaVersion String   @default("1.0") @map("schema_version")
+  tier          String   @default("free") // free | paid
+  createdAt     DateTime @default(now()) @map("created_at")
+
+  user    User?            @relation(fields: [userId], references: [id])
+  uploadedFile UploadedFile? @relation(fields: [uploadedFileId], references: [id])
+  reports DiagnoseReport[]
+  serviceCases ServiceCase[]
+
+  @@index([createdAt])
+  @@index([scenario])
+  @@map("diagnose_sessions")
+}
+
+// ─── Diagnose Reports ───────────────────────────────────────
+model DiagnoseReport {
+  id            String   @id @default(cuid())
+  sessionId     String   @map("session_id")
+  mainJudgment  String   @map("main_judgment")
+  reportJson    Json     @map("report_json")
+  modelName     String   @default("deepseek-chat") @map("model_name")
+  confidence    Float?
+  createdAt     DateTime @default(now()) @map("created_at")
+
+  session DiagnoseSession @relation(fields: [sessionId], references: [id])
+  serviceCases ServiceCase[]
+
+  @@index([sessionId])
+  @@map("diagnose_reports")
+}
+
+// ─── Uploaded Files ─────────────────────────────────────────
+model UploadedFile {
+  id                  String   @id @default(cuid())
+  userId              String?  @map("user_id")
+  originalName        String   @map("original_name")
+  mimeType            String   @map("mime_type")
+  size                Int
+  pageCount           Int?     @map("page_count")
+  extractedTextLength Int?     @map("extracted_text_length")
+  parseStatus         String   @default("success") @map("parse_status") // success | failed | no_text
+  createdAt           DateTime @default(now()) @map("created_at")
+
+  user User? @relation(fields: [userId], references: [id])
+  diagnoseSessions DiagnoseSession[]
+
+  @@map("uploaded_files")
+}
+
+// ─── Usage Records ──────────────────────────────────────────
+model UsageRecord {
+  id               String   @id @default(cuid())
+  userId           String?  @map("user_id")
+  anonymousSessionId String?  @map("anonymous_session_id") // 匿名会话标识，用于限流
+  actionType       String   @map("action_type") // diagnose | pdf_parse | explain
+  quotaType        String   @default("free") @map("quota_type") // free | paid
+  createdAt        DateTime @default(now()) @map("created_at")
+
+  user User? @relation(fields: [userId], references: [id])
+
+  @@index([anonymousSessionId, actionType, createdAt])
+  @@map("usage_records")
+}
+
+// 数据保留策略扩展点（未来实现）：
+// 1. DiagnoseSession / DiagnoseReport: 匿名数据保留30天，用户数据保留6个月
+// 2. UploadedFile: 原始文件保留7天，元数据保留30天
+// 3. UsageRecord: 保留90天用于分析
+// 实现方式：定期运行 pruneOldData() 清理函数
+
+// ─── Corpus Sources ─────────────────────────────────────────
+model CorpusSource {
+  id         String   @id @default(cuid())
+  fileName   String   @map("file_name")
+  category   String   // raw | cleaned | distilled
+  sourceType String   @map("source_type") // bilibili | douyin | xiaohongshu | zhihu | consulting-notes
+  rawText    String?  @map("raw_text")
+  status     String   @default("pending") // pending | cleaned | distilled | imported
+  createdAt  DateTime @default(now()) @map("created_at")
+
+  documents CorpusDocument[]
+
+  @@map("corpus_sources")
+}
+
+// ─── Corpus Documents ───────────────────────────────────────
+model CorpusDocument {
+  id            String   @id @default(cuid())
+  sourceId      String?  @map("source_id")
+  title         String
+  category      String   // diagnosis-rules | insider-views | rewrite-patterns | role-templates
+  issueType     String?  @map("issue_type")
+  roleTag       String?  @map("role_tag")
+  scenarioTag   String?  @map("scenario_tag")
+  content       String
+  exampleBefore String?  @map("example_before")
+  exampleAfter  String?  @map("example_after")
+  riskLevel     String?  @map("risk_level") // high | medium | low
+  tags          String[] @default([])
+  version       String   @default("1.0")
+  isActive      Boolean  @default(true) @map("is_active")
+  createdAt     DateTime @default(now()) @map("created_at")
+
+  source CorpusSource? @relation(fields: [sourceId], references: [id])
+
+  @@index([category])
+  @@index([issueType])
+  @@index([isActive])
+  @@map("corpus_documents")
+}
+
+// ─── 学习型数据库：服务沉淀层与知识学习层 ────────────────────────────────
+// 目标：让每一次服务数据进入数据库后，都能提升产品的诊断质量、改写质量和 deep 报告质量
+
+// ─── 枚举定义 ─────────────────────────────────────────────────────
+enum LeadSourceChannel {
+  xiaohongshu
+  xianyu
+  referral
+  direct
+  wechat
+  douyin
+  bilibili
+  zhihu
+  other
+}
+
+enum LeadStatus {
+  new
+  contacted
+  paid
+  delivered
+  closed
+  lost
+}
+
+enum ServiceType {
+  free_check
+  basic_fix
+  deep_fix
+  custom
+  consultation
+}
+
+enum CaseStatus {
+  intake
+  diagnosing
+  revising
+  delivered
+  followup
+  closed
+}
+
+enum CandidateStage {
+  fresh_grad
+  internship_poor
+  early_career
+  mid_career
+  senior
+  unknown
+}
+
+enum AtsRiskLevel {
+  low
+  medium
+  high
+  unknown
+}
+
+enum HrRiskLevel {
+  low
+  medium
+  high
+  unknown
+}
+
+enum DirectionMismatchLevel {
+  none
+  weak
+  medium
+  strong
+  unknown
+}
+
+enum ConfidenceLevel {
+  low
+  medium
+  high
+}
+
+enum SnapshotType {
+  raw_resume
+  cleaned_resume
+  final_resume
+  jd
+  final_delivery
+  other
+}
+
+enum FeedbackStage {
+  after_delivery
+  day7
+  day30
+}
+
+enum PatternType {
+  diagnosis
+  rewrite
+  interview_risk
+  jd_match
+  career_path
+  skill_gap
+}
+
+enum PatternStatus {
+  draft
+  validated
+  deprecated
+}
+
+// ─── Lead（线索） ────────────────────────────────────────────────
+model Lead {
+  id              String          @id @default(cuid())
+  sourceChannel   LeadSourceChannel @map("source_channel")
+  platformHandle  String?         @map("platform_handle")
+  nickname        String?
+  contactNote     String?         @map("contact_note")
+  firstContactAt  DateTime        @default(now()) @map("first_contact_at")
+  status          LeadStatus      @default(new)
+  createdAt       DateTime        @default(now()) @map("created_at")
+  updatedAt       DateTime        @updatedAt @map("updated_at")
+
+  serviceCases ServiceCase[]
+
+  @@index([sourceChannel])
+  @@index([status])
+  @@index([firstContactAt])
+  @@map("leads")
+}
+
+// ─── ServiceCase（服务案例） ──────────────────────────────────────
+model ServiceCase {
+  id                 String         @id @default(cuid())
+  leadId             String?        @map("lead_id")
+  diagnoseSessionId  String?        @map("diagnose_session_id")
+  diagnoseReportId   String?        @map("diagnose_report_id")
+  serviceType        ServiceType    @map("service_type")
+  caseStatus         CaseStatus     @default(intake) @map("case_status")
+  targetRole         String?        @map("target_role")
+  roleFamily         String?        @map("role_family")
+  candidateStage     CandidateStage @default(unknown) @map("candidate_stage")
+  jdProvided         Boolean        @default(false) @map("jd_provided")
+  consentSaveRaw     Boolean        @default(false) @map("consent_save_raw")
+  consentUseAnonymized Boolean      @default(false) @map("consent_use_anonymized")
+  createdAt          DateTime       @default(now()) @map("created_at")
+  updatedAt          DateTime       @updatedAt @map("updated_at")
+
+  lead            Lead?                @relation(fields: [leadId], references: [id])
+  diagnoseSession DiagnoseSession?     @relation(fields: [diagnoseSessionId], references: [id])
+  diagnoseReport  DiagnoseReport?      @relation(fields: [diagnoseReportId], references: [id])
+  snapshots       CaseSnapshot[]
+  diagnosisLabels DiagnosisLabel[]
+  rewritePairs    RewritePair[]
+  feedbackEvents  FeedbackEvent[]
+  patternEvidences PatternEvidence[]
+
+  @@index([leadId])
+  @@index([diagnoseSessionId])
+  @@index([diagnoseReportId])
+  @@index([serviceType])
+  @@index([caseStatus])
+  @@index([targetRole])
+  @@index([roleFamily])
+  @@index([candidateStage])
+  @@map("service_cases")
+}
+
+// ─── CaseSnapshot（案例快照） ─────────────────────────────────────
+model CaseSnapshot {
+  id              String        @id @default(cuid())
+  serviceCaseId   String        @map("service_case_id")
+  snapshotType    SnapshotType  @map("snapshot_type")
+  content         String
+  isAnonymized    Boolean       @default(false) @map("is_anonymized")
+  createdAt       DateTime      @default(now()) @map("created_at")
+
+  serviceCase ServiceCase @relation(fields: [serviceCaseId], references: [id])
+
+  @@index([serviceCaseId])
+  @@index([snapshotType])
+  @@map("case_snapshots")
+}
+
+// ─── DiagnosisLabel（诊断标签） ──────────────────────────────────
+model DiagnosisLabel {
+  id                      String                  @id @default(cuid())
+  serviceCaseId           String                  @map("service_case_id")
+  mainJudgment            String                  @map("main_judgment")
+  secondaryIssues         Json?                   @map("secondary_issues")
+  issueDimensions         Json?                   @map("issue_dimensions")
+  atsRiskLevel            AtsRiskLevel            @default(unknown) @map("ats_risk_level")
+  hrRiskLevel             HrRiskLevel             @default(unknown) @map("hr_risk_level")
+  directionMismatchLevel  DirectionMismatchLevel  @default(unknown) @map("direction_mismatch_level")
+  confidence              ConfidenceLevel         @default(medium) @map("confidence")
+  requiresUserInput       Boolean                 @default(false) @map("requires_user_input")
+  humanReviewed           Boolean                 @default(true) @map("human_reviewed")
+  reviewNote              String?                 @map("review_note")
+  createdAt               DateTime                @default(now()) @map("created_at")
+  updatedAt               DateTime                @updatedAt @map("updated_at")
+
+  serviceCase ServiceCase @relation(fields: [serviceCaseId], references: [id])
+  patternEvidences PatternEvidence[]
+
+  @@index([serviceCaseId])
+  @@index([atsRiskLevel])
+  @@index([hrRiskLevel])
+  @@index([directionMismatchLevel])
+  @@map("diagnosis_labels")
+}
+
+// ─── RewritePair（改写对） ───────────────────────────────────────
+model RewritePair {
+  id              String        @id @default(cuid())
+  serviceCaseId   String        @map("service_case_id")
+  issueType       String?       @map("issue_type")
+  rewriteType     String?       @map("rewrite_type")
+  sourceLocation  Json?         @map("source_location")
+  originalText    String
+  rewrittenText   String
+  changeSummary   String?       @map("change_summary")
+  needsUserInput  Boolean       @default(false) @map("needs_user_input")
+  adoptedByUser   Boolean?      @map("adopted_by_user")
+  createdAt       DateTime      @default(now()) @map("created_at")
+
+  serviceCase ServiceCase @relation(fields: [serviceCaseId], references: [id])
+  patternEvidences PatternEvidence[]
+
+  @@index([serviceCaseId])
+  @@index([issueType])
+  @@index([rewriteType])
+  @@map("rewrite_pairs")
+}
+
+// ─── FeedbackEvent（反馈事件） ───────────────────────────────────
+model FeedbackEvent {
+  id                   String         @id @default(cuid())
+  serviceCaseId        String         @map("service_case_id")
+  stage                FeedbackStage  @map("stage")
+  adoptedActions       Json?          @map("adopted_actions")
+  rejectedActions      Json?          @map("rejected_actions")
+  appliedAfterRevision Boolean?       @map("applied_after_revision")
+  interviewCount       Int?           @map("interview_count")
+  offerCount           Int?           @map("offer_count")
+  satisfactionScore    Int?           @map("satisfaction_score")
+  feedbackNote         String?        @map("feedback_note")
+  createdAt            DateTime       @default(now()) @map("created_at")
+
+  serviceCase ServiceCase @relation(fields: [serviceCaseId], references: [id])
+
+  @@index([serviceCaseId])
+  @@index([stage])
+  @@map("feedback_events")
+}
+
+// ─── KnowledgePattern（知识模式） ────────────────────────────────
+model KnowledgePattern {
+  id               String         @id @default(cuid())
+  roleFamily       String?        @map("role_family")
+  issueType        String?        @map("issue_type")
+  patternType      PatternType    @map("pattern_type")
+  title            String
+  patternText      String         @map("pattern_text")
+  strengthScore    Float          @default(0.0) @map("strength_score")
+  evidenceCount    Int            @default(0) @map("evidence_count")
+  status           PatternStatus  @default(draft) @map("status")
+  lastValidatedAt  DateTime?      @map("last_validated_at")
+  createdAt        DateTime       @default(now()) @map("created_at")
+  updatedAt        DateTime       @updatedAt @map("updated_at")
+
+  patternEvidences PatternEvidence[]
+
+  @@index([roleFamily])
+  @@index([issueType])
+  @@index([patternType])
+  @@index([status])
+  @@index([strengthScore])
+  @@map("knowledge_patterns")
+}
+
+// ─── PatternEvidence（模式证据） ──────────────────────────────────
+model PatternEvidence {
+  id                  String           @id @default(cuid())
+  knowledgePatternId  String           @map("knowledge_pattern_id")
+  serviceCaseId       String?          @map("service_case_id")
+  rewritePairId       String?          @map("rewrite_pair_id")
+  diagnosisLabelId    String?          @map("diagnosis_label_id")
+  evidenceSnippet     String           @map("evidence_snippet")
+  outcomeTag          String?          @map("outcome_tag")
+  createdAt           DateTime         @default(now()) @map("created_at")
+
+  knowledgePattern KnowledgePattern @relation(fields: [knowledgePatternId], references: [id])
+  serviceCase      ServiceCase?     @relation(fields: [serviceCaseId], references: [id])
+  rewritePair      RewritePair?     @relation(fields: [rewritePairId], references: [id])
+  diagnosisLabel   DiagnosisLabel?  @relation(fields: [diagnosisLabelId], references: [id])
+
+  @@index([knowledgePatternId])
+  @@index([serviceCaseId])
+  @@index([rewritePairId])
+  @@index([diagnosisLabelId])
+  @@map("pattern_evidences")
+}

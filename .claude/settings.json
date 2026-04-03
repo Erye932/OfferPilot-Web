@@ -1,0 +1,42 @@
+{
+  "env": {
+    "ENABLE_TOOL_SEARCH": "false"
+  },
+  "permissions": {
+    "allow": [
+      "Bash(npx prisma:*)",
+      "Bash(python3 -c \"import json,sys; d=json.load\\(sys.stdin\\); print\\(json.dumps\\(d, indent=2, ensure_ascii=False\\)\\)\")",
+      "Bash(git --version)",
+      "Bash(node \".claude/skills/web-access/scripts/check-deps.mjs\")",
+      "Bash(node*)",
+      "Bash(curl*)",
+      "WebSearch",
+      "WebFetch",
+      "Bash(curl -s -X POST \"http://localhost:3456/eval?target=73997A3C95488DDDD3FE67701F21DE0F\" -d 'document.querySelectorAll\\(\"\".b_algo\"\"\\).length')",
+      "Bash(curl -s -X POST \"http://localhost:3456/eval?target=E86FBD89362D4FFC61CC907A17998030\" -d 'document.body.innerText.includes\\(\"\"tool_reference\"\"\\)')",
+      "Bash(claude --version)",
+      "Bash(set)",
+      "Bash(ls -la *.log)",
+      "Bash(pg_isready -h localhost -p 5432)",
+      "Bash(netstat -ano)",
+      "Bash(findstr :3000)",
+      "Bash(taskkill /PID 18088 /F)",
+      "Bash(kill -9 18088)",
+      "Bash(taskkill.exe /PID 18088 /F)",
+      "Bash(npx kill-port:*)",
+      "Bash(python -c \"import sys,json; data=json.load\\(sys.stdin\\); print\\(json.dumps\\(data, ensure_ascii=False, indent=2\\)[:500]\\) if isinstance\\(data, dict\\) else print\\(str\\(data\\)[:500]\\)\")",
+      "Bash(echo \"Response saved. Status code: $?\")",
+      "Bash(npx vitest:*)",
+      "Bash(npm run:*)",
+      "Bash(dir \"c:\\\\Users\\\\Administrator\\\\Desktop\\\\offerpilot-web\\\\prisma\")",
+      "Bash(dir \"c:\\\\Users\\\\Administrator\\\\Desktop\\\\offerpilot-web\\\\prisma\\\\migrations\")",
+      "Bash(taskkill /F /IM node.exe)",
+      "Bash(cmd /c \"taskkill /F /IM node.exe\")",
+      "Bash(nslookup api.metaso.cn)",
+      "mcp__mobb-mcp__fetch_available_fixes"
+    ],
+    "additionalDirectories": [
+      "C:\\Users\\Administrator\\Desktop\\offerpilot-web"
+    ]
+  }
+}

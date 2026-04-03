@@ -1,0 +1,697 @@
+
+> offerpilot-web@0.1.0 dev
+> next dev --webpack
+
+▲ Next.js 16.2.1 (webpack)
+- Local:         http://localhost:3000
+- Network:       http://100.72.147.9:3000
+- Environments: .env.local, .env
+✓ Ready in 239ms
+
+[DiagnoseWorkflow] 开始免费版诊断工作流 V3 {}
+[DiagnoseSummary] normalized_input: {
+  summary: '[Object keys=resume_sentences_count,resume_paragraphs_count,jd_quality,has_jd,target_role,tier,text_quality]'
+}
+[DiagnoseSummary] rule_match_result: {
+  summary: '[Object keys=total_matched,matches_count,matched_issue_types]'
+}
+[DiagnoseSummary] issue_enrichment_result: { summary: '[Object keys=enrichments_count,enriched_issue_types]' }
+[DiagnoseSummary] ai_response_raw: {
+  summary: '[Object keys=scenario,candidate_issues_count,excellent_score,has_rewrite_examples,minor_suggestions_count]'
+}
+[DiagnoseWorkflow] 工作流场景裁决: normal { qualityTier: 'medium', excellentScore: 50 }
+[DiagnoseWorkflow] 后处理完成，最终问题数: 2 {}
+[DeepWorkflow] 开始深度诊断工作流 {}
+[DeepWorkflow] Step 2: HR Simulator (基于基础诊断，深度专用) {}
+[AIRouter] Routing task hr_review to deepseek {}
+[DeepWorkflow] Step 3: Resume Master (基于基础诊断，深度专用) {}
+[AIRouter] Routing task rewrite_review to deepseek {}
+ POST /api/diagnose 200 in 90s (next.js: 700ms, application-code: 89s)
+[DeepWorkflow] Step 4: Cross Critique (深度专用) {}
+[AIRouter] Routing task verify to deepseek {}
+[DeepWorkflow] Step 5: Scenario Simulation (基于基础诊断) {}
+[DeepWorkflow] Step 6: Deep Delta Dedup {}
+[DeepWorkflow] Step 7: Final Synthesis (深度诊断专用) {}
+[AIRouter] Routing task synthesize to deepseek {}
+[AIRouter] Routing task synthesize to deepseek {}
+[SafeParseJson] Schema validation failed: undefined {}
+[DeepWorkflow] 深度诊断工作流完成 {}
+[DiagnoseWorkflow] 开始免费版诊断工作流 V3 {}
+[DiagnoseSummary] normalized_input: {
+  summary: '[Object keys=resume_sentences_count,resume_paragraphs_count,jd_quality,has_jd,target_role,tier,text_quality]'
+}
+[DiagnoseSummary] rule_match_result: {
+  summary: '[Object keys=total_matched,matches_count,matched_issue_types]'
+}
+[DiagnoseSummary] issue_enrichment_result: { summary: '[Object keys=enrichments_count,enriched_issue_types]' }
+[DiagnoseSummary] ai_response_raw: {
+  summary: '[Object keys=scenario,candidate_issues_count,excellent_score,has_rewrite_examples,minor_suggestions_count]'
+}
+[DiagnoseWorkflow] 工作流场景裁决: normal { qualityTier: 'weak', excellentScore: 0 }
+[DiagnoseWorkflow] 后处理完成，最终问题数: 3 {}
+[DeepWorkflow] 开始深度诊断工作流 {}
+[DeepWorkflow] Step 2: HR Simulator (基于基础诊断，深度专用) {}
+[AIRouter] Routing task hr_review to deepseek {}
+[DeepWorkflow] Step 3: Resume Master (基于基础诊断，深度专用) {}
+[AIRouter] Routing task rewrite_review to deepseek {}
+[DeepWorkflow] Step 4: Cross Critique (深度专用) {}
+[AIRouter] Routing task verify to deepseek {}
+[DeepWorkflow] Step 5: Scenario Simulation (基于基础诊断) {}
+[DeepWorkflow] Step 6: Deep Delta Dedup {}
+[DeepWorkflow] Step 7: Final Synthesis (深度诊断专用) {}
+[AIRouter] Routing task synthesize to deepseek {}
+[AIRouter] Routing task synthesize to deepseek {}
+ POST /api/diagnose 200 in 3.4min (next.js: 2ms, application-code: 3.4min)
+[SafeParseJson] Schema validation failed: undefined {}
+[DeepWorkflow] 深度诊断工作流完成 {}
+ GET / 200 in 2.2s (next.js: 1746ms, application-code: 458ms)
+ GET /diagnose 200 in 645ms (next.js: 587ms, application-code: 58ms)
+ POST /api/pdf/parse 200 in 892ms (next.js: 360ms, application-code: 532ms)
+ GET /diagnose/loading 200 in 562ms (next.js: 512ms, application-code: 50ms)
+[DiagnoseWorkflow] 开始免费版诊断工作流 V3 {}
+[DiagnoseSummary] normalized_input: {
+  summary: '[Object keys=resume_sentences_count,resume_paragraphs_count,jd_quality,has_jd,target_role,tier,text_quality]'
+}
+[DiagnoseSummary] rule_match_result: {
+  summary: '[Object keys=total_matched,matches_count,matched_issue_types]'
+}
+[DiagnoseSummary] issue_enrichment_result: { summary: '[Object keys=enrichments_count,enriched_issue_types]' }
+ GET /diagnose/loading 200 in 102ms (next.js: 41ms, application-code: 61ms)
+[DiagnoseWorkflow] 开始免费版诊断工作流 V3 {}
+[DiagnoseSummary] normalized_input: {
+  summary: '[Object keys=resume_sentences_count,resume_paragraphs_count,jd_quality,has_jd,target_role,tier,text_quality]'
+}
+[DiagnoseSummary] rule_match_result: {
+  summary: '[Object keys=total_matched,matches_count,matched_issue_types]'
+}
+[DiagnoseSummary] issue_enrichment_result: { summary: '[Object keys=enrichments_count,enriched_issue_types]' }
+[DiagnoseSummary] ai_response_raw: {
+  summary: '[Object keys=scenario,candidate_issues_count,excellent_score,has_rewrite_examples,minor_suggestions_count]'
+}
+[DiagnoseWorkflow] 工作流场景裁决: normal { qualityTier: 'weak', excellentScore: 0 }
+[DiagnoseWorkflow] 后处理完成，最终问题数: 3 {}
+[DeepWorkflow] 开始深度诊断工作流 {}
+[DeepWorkflow] Step 2&3: 并行执行 HR Simulator 和 Resume Master {}
+[DeepWorkflow] Step 2: HR Simulator (基于基础诊断，深度专用) {}
+[AIRouter] Routing task hr_review to deepseek {}
+[DeepWorkflow] Step 3: Resume Master (基于基础诊断，深度专用) {}
+[AIRouter] Routing task rewrite_review to deepseek {}
+[DiagnoseSummary] ai_response_raw: {
+  summary: '[Object keys=scenario,candidate_issues_count,excellent_score,has_rewrite_examples,minor_suggestions_count]'
+}
+[DiagnoseWorkflow] 工作流场景裁决: normal { qualityTier: 'weak', excellentScore: 0 }
+[DiagnoseWorkflow] 后处理完成，最终问题数: 3 {}
+[DeepWorkflow] 开始深度诊断工作流 {}
+[DeepWorkflow] Step 2&3: 并行执行 HR Simulator 和 Resume Master {}
+[DeepWorkflow] Step 2: HR Simulator (基于基础诊断，深度专用) {}
+[AIRouter] Routing task hr_review to deepseek {}
+[DeepWorkflow] Step 3: Resume Master (基于基础诊断，深度专用) {}
+[AIRouter] Routing task rewrite_review to deepseek {}
+[DeepWorkflow] Step 4: Cross Critique (深度专用) {}
+[AIRouter] Routing task verify to deepseek {}
+[DeepWorkflow] Step 4: Cross Critique (深度专用) {}
+[AIRouter] Routing task verify to deepseek {}
+[DeepWorkflow] Step 5: Scenario Simulation (基于基础诊断) {}
+[DeepWorkflow] Step 6: Deep Delta Dedup {}
+[DeepWorkflow] Step 7: Final Synthesis (深度诊断专用) {}
+[AIRouter] Routing task synthesize to deepseek {}
+[DeepWorkflow] Step 5: Scenario Simulation (基于基础诊断) {}
+[DeepWorkflow] Step 6: Deep Delta Dedup {}
+[DeepWorkflow] Step 7: Final Synthesis (深度诊断专用) {}
+[AIRouter] Routing task synthesize to deepseek {}
+[AIRouter] Routing task synthesize to deepseek {}
+[AIRouter] Routing task synthesize to deepseek {}
+[SafeParseJson] Schema validation failed: undefined {}
+[DeepWorkflow] 深度诊断工作流完成 {}
+ POST /api/diagnose 200 in 3.7min (next.js: 617ms, application-code: 3.7min)
+[SafeParseJson] Schema validation failed: undefined {}
+[DeepWorkflow] 深度诊断工作流完成 {}
+ POST /api/diagnose 200 in 3.8min (next.js: 609ms, application-code: 3.8min)
+ GET /diagnose/result/cmnh7iksb000a60qs465ht5e1 200 in 1351ms (next.js: 1299ms, application-code: 52ms)
+ GET /diagnose/result/cmnh7imz2000d60qsngaa26jg 200 in 96ms (next.js: 53ms, application-code: 43ms)
+ GET /api/diagnose/report/cmnh7iksb000a60qs465ht5e1 200 in 859ms (next.js: 814ms, application-code: 45ms)
+ GET /api/diagnose/report/cmnh7imz2000d60qsngaa26jg 200 in 323ms (next.js: 278ms, application-code: 45ms)
+ GET /api/diagnose/report/cmnh7imz2000d60qsngaa26jg 200 in 69ms (next.js: 7ms, application-code: 62ms)
+ GET /api/diagnose/report/cmnh7iksb000a60qs465ht5e1 200 in 58ms (next.js: 1711µs, application-code: 56ms)
+[browser] Uncaught TypeError: Cannot read properties of undefined (reading 'length')
+    at DeepDiagnoseResult (components\offerpilot\DeepDiagnoseResult.tsx:216:34)
+    at DiagnoseResult (components\offerpilot\DiagnoseResult.next.tsx:343:12)
+    at DiagnoseResultPage (app\diagnose\result\[id]\page.tsx:9:10)
+  214 |
+  215 |         {/* 改写包 */}
+> 216 |         {deepReport.rewrite_pack.length > 0 && (
+      |                                  ^
+  217 |           <div className="mb-6 rounded-lg border border-neutral-100 bg-white p-6">
+  218 |             <h3 className="text-lg font-normal tracking-tight text-neutral-800">可直接替...
+  219 |             <div className="mt-4 space-y-3">
+ GET /diagnose/result/cmnh7imz2000d60qsngaa26jg 200 in 300ms (next.js: 132ms, application-code: 168ms)
+ GET /diagnose/result/cmnh7imz2000d60qsngaa26jg 200 in 109ms (next.js: 48ms, application-code: 61ms)
+ GET /api/diagnose/report/cmnh7imz2000d60qsngaa26jg 200 in 938ms (next.js: 705ms, application-code: 233ms)
+ GET /diagnose/result/cmnh7imz2000d60qsngaa26jg 200 in 33ms (next.js: 2ms, application-code: 31ms)
+ GET /diagnose/result/cmnh7imz2000d60qsngaa26jg 200 in 147ms (next.js: 9ms, application-code: 138ms)
+ GET /api/diagnose/report/cmnh7imz2000d60qsngaa26jg 200 in 54ms (next.js: 5ms, application-code: 49ms)
+ GET / 200 in 779ms (next.js: 723ms, application-code: 55ms)
+ GET / 200 in 19ms (next.js: 1171µs, application-code: 18ms)
+ GET /diagnose 200 in 17ms (next.js: 6ms, application-code: 12ms)
+ GET / 200 in 12ms (next.js: 1099µs, application-code: 11ms)
+ GET /demo/result 200 in 704ms (next.js: 657ms, application-code: 48ms)
+ GET /demo/result 200 in 23ms (next.js: 1181µs, application-code: 22ms)
+ GET / 200 in 20ms (next.js: 5ms, application-code: 15ms)
+ GET /diagnose 200 in 15ms (next.js: 5ms, application-code: 11ms)
+ GET /diagnose 200 in 55ms (next.js: 25ms, application-code: 30ms)
+ POST /api/pdf/parse 429 in 540ms (next.js: 454ms, application-code: 86ms)
+[browser] PDF解析失败: Error: 免费用户每日额度已用完，请明天再试
+    at parsePdfFile (components\offerpilot\DiagnoseInput.tsx:169:15)
+  167 |       if (!response.ok) {
+  168 |         const errorData = await response.json().catch(() => ({}));
+> 169 |         throw new Error(errorData.error || `PDF解析失败: ${response.status}`);
+      |               ^
+  170 |       }
+  171 |
+  172 |       setUploadStage("structuring"); (components\offerpilot\DiagnoseInput.tsx:191:15)
+ GET /diagnose/loading 200 in 24ms (next.js: 7ms, application-code: 17ms)
+ GET /diagnose/loading 200 in 62ms (next.js: 27ms, application-code: 35ms)
+ POST /api/diagnose 429 in 747ms (next.js: 663ms, application-code: 84ms)
+ POST /api/diagnose 429 in 743ms (next.js: 658ms, application-code: 85ms)
+[browser] 诊断失败: Error: 免费用户每日额度已用完，请明天再试
+    at DiagnoseLoading.useEffect.callAPI (components\offerpilot\DiagnoseLoading.tsx:168:17)
+  166 |             );
+  167 |           }
+> 168 |           throw new Error(errorData.error || `诊断失败: ${response.status}`);
+      |                 ^
+  169 |         }
+  170 |
+  171 |         const result = await response.json(); (components\offerpilot\DiagnoseLoading.tsx:198:17)
+[browser] 诊断失败: Error: 免费用户每日额度已用完，请明天再试
+    at DiagnoseLoading.useEffect.callAPI (components\offerpilot\DiagnoseLoading.tsx:168:17)
+  166 |             );
+  167 |           }
+> 168 |           throw new Error(errorData.error || `诊断失败: ${response.status}`);
+      |                 ^
+  169 |         }
+  170 |
+  171 |         const result = await response.json(); (components\offerpilot\DiagnoseLoading.tsx:198:17)
+ GET /diagnose 200 in 13ms (next.js: 3ms, application-code: 10ms)
+  Reload env: .env
+ GET /diagnose 200 in 262ms (next.js: 116ms, application-code: 146ms)
+ GET /diagnose 200 in 102ms (next.js: 3ms, application-code: 99ms)
+ GET /diagnose 200 in 32ms (next.js: 3ms, application-code: 29ms)
+ GET /diagnose 200 in 57ms (next.js: 2ms, application-code: 55ms)
+ GET /diagnose 200 in 78ms (next.js: 3ms, application-code: 76ms)
+ GET /diagnose 200 in 126ms (next.js: 2ms, application-code: 124ms)
+ GET /diagnose 200 in 107ms (next.js: 4ms, application-code: 103ms)
+ GET /diagnose 200 in 87ms (next.js: 3ms, application-code: 84ms)
+ GET /diagnose 200 in 62ms (next.js: 2ms, application-code: 59ms)
+ GET /diagnose 200 in 35ms (next.js: 3ms, application-code: 33ms)
+ GET /diagnose 200 in 62ms (next.js: 1918µs, application-code: 60ms)
+ GET /diagnose 200 in 85ms (next.js: 1856µs, application-code: 83ms)
+ GET /diagnose 200 in 33ms (next.js: 2ms, application-code: 31ms)
+ GET /diagnose 200 in 41ms (next.js: 3ms, application-code: 38ms)
+ GET /diagnose 200 in 25ms (next.js: 1493µs, application-code: 23ms)
+ GET /diagnose 200 in 24ms (next.js: 2ms, application-code: 21ms)
+ GET /diagnose 200 in 25ms (next.js: 2ms, application-code: 23ms)
+ GET /diagnose 200 in 39ms (next.js: 3ms, application-code: 36ms)
+ GET /diagnose 200 in 32ms (next.js: 1139µs, application-code: 31ms)
+ GET /diagnose 200 in 14ms (next.js: 1155µs, application-code: 13ms)
+ GET /diagnose 200 in 32ms (next.js: 3ms, application-code: 30ms)
+ GET /diagnose 200 in 28ms (next.js: 2ms, application-code: 26ms)
+ GET /diagnose 200 in 21ms (next.js: 1773µs, application-code: 19ms)
+ GET /diagnose 200 in 43ms (next.js: 3ms, application-code: 40ms)
+ GET /diagnose 200 in 86ms (next.js: 2ms, application-code: 84ms)
+ GET /diagnose 200 in 95ms (next.js: 2ms, application-code: 93ms)
+ GET /diagnose 200 in 76ms (next.js: 1890µs, application-code: 74ms)
+ GET /diagnose 200 in 56ms (next.js: 1778µs, application-code: 54ms)
+ GET /diagnose 200 in 36ms (next.js: 2ms, application-code: 34ms)
+ GET /diagnose 200 in 131ms (next.js: 2ms, application-code: 129ms)
+ GET /diagnose 200 in 109ms (next.js: 2ms, application-code: 106ms)
+ GET /diagnose 200 in 84ms (next.js: 2ms, application-code: 82ms)
+ GET /diagnose 200 in 60ms (next.js: 2ms, application-code: 58ms)
+ GET /diagnose 200 in 37ms (next.js: 4ms, application-code: 33ms)
+ GET /diagnose 200 in 110ms (next.js: 2ms, application-code: 107ms)
+ GET /diagnose 200 in 87ms (next.js: 2ms, application-code: 85ms)
+ GET /diagnose 200 in 60ms (next.js: 3ms, application-code: 57ms)
+ GET /diagnose 200 in 55ms (next.js: 2ms, application-code: 53ms)
+ GET /diagnose 200 in 97ms (next.js: 1350µs, application-code: 95ms)
+ GET /diagnose 200 in 76ms (next.js: 2ms, application-code: 74ms)
+ GET /diagnose 200 in 52ms (next.js: 4ms, application-code: 48ms)
+ GET /diagnose 200 in 27ms (next.js: 2ms, application-code: 25ms)
+ GET /diagnose 200 in 114ms (next.js: 2ms, application-code: 112ms)
+ GET /diagnose 200 in 90ms (next.js: 2ms, application-code: 87ms)
+ GET /diagnose 200 in 69ms (next.js: 1872µs, application-code: 67ms)
+ GET /diagnose 200 in 49ms (next.js: 1997µs, application-code: 47ms)
+ GET /diagnose 200 in 52ms (next.js: 2ms, application-code: 50ms)
+ GET /diagnose 200 in 27ms (next.js: 1894µs, application-code: 25ms)
+ GET /diagnose 200 in 53ms (next.js: 2ms, application-code: 50ms)
+ GET /diagnose 200 in 21ms (next.js: 2ms, application-code: 19ms)
+ GET /diagnose 200 in 39ms (next.js: 3ms, application-code: 36ms)
+ GET /diagnose 200 in 23ms (next.js: 2ms, application-code: 21ms)
+ GET /diagnose 200 in 39ms (next.js: 3ms, application-code: 36ms)
+ GET /diagnose 200 in 38ms (next.js: 3ms, application-code: 36ms)
+ GET /diagnose 200 in 21ms (next.js: 2ms, application-code: 19ms)
+ GET /diagnose 200 in 42ms (next.js: 3ms, application-code: 39ms)
+ GET /diagnose 200 in 104ms (next.js: 2ms, application-code: 102ms)
+ GET /diagnose 200 in 91ms (next.js: 1925µs, application-code: 89ms)
+ GET /diagnose 200 in 72ms (next.js: 1764µs, application-code: 71ms)
+ GET /diagnose 200 in 53ms (next.js: 1761µs, application-code: 51ms)
+ GET /diagnose 200 in 32ms (next.js: 1834µs, application-code: 30ms)
+ GET /diagnose 200 in 226ms (next.js: 82ms, application-code: 144ms)
+ GET /diagnose 200 in 101ms (next.js: 1859µs, application-code: 100ms)
+ GET /diagnose 200 in 78ms (next.js: 1708µs, application-code: 76ms)
+ GET /diagnose 200 in 56ms (next.js: 1712µs, application-code: 55ms)
+ GET /diagnose 200 in 37ms (next.js: 1801µs, application-code: 35ms)
+ GET /diagnose 200 in 124ms (next.js: 1735µs, application-code: 122ms)
+ GET /diagnose 200 in 102ms (next.js: 1798µs, application-code: 101ms)
+ GET /diagnose 200 in 79ms (next.js: 3ms, application-code: 76ms)
+ GET /diagnose 200 in 52ms (next.js: 2ms, application-code: 50ms)
+ GET /diagnose 200 in 31ms (next.js: 2ms, application-code: 29ms)
+ GET /diagnose 200 in 93ms (next.js: 1652µs, application-code: 92ms)
+ GET /diagnose 200 in 71ms (next.js: 1982µs, application-code: 69ms)
+ GET /diagnose 200 in 69ms (next.js: 2ms, application-code: 67ms)
+ GET /diagnose 200 in 53ms (next.js: 2ms, application-code: 51ms)
+ GET /diagnose 200 in 78ms (next.js: 1680µs, application-code: 77ms)
+ GET /diagnose 200 in 54ms (next.js: 3ms, application-code: 51ms)
+ GET /diagnose 200 in 34ms (next.js: 1934µs, application-code: 32ms)
+ GET /diagnose 200 in 64ms (next.js: 1304µs, application-code: 63ms)
+ GET /diagnose 200 in 94ms (next.js: 40ms, application-code: 54ms)
+ POST /api/pdf/parse 200 in 848ms (next.js: 671ms, application-code: 177ms)
+ GET /diagnose/loading 200 in 27ms (next.js: 6ms, application-code: 21ms)
+[DiagnoseWorkflow] 开始免费版诊断工作流 V3 {}
+[DiagnoseSummary] normalized_input: {
+  summary: '[Object keys=resume_sentences_count,resume_paragraphs_count,jd_quality,has_jd,target_role,tier,text_quality]'
+}
+[DiagnoseSummary] rule_match_result: {
+  summary: '[Object keys=total_matched,matches_count,matched_issue_types]'
+}
+[DiagnoseSummary] issue_enrichment_result: { summary: '[Object keys=enrichments_count,enriched_issue_types]' }
+[DiagnoseWorkflow] 开始免费版诊断工作流 V3 {}
+[DiagnoseSummary] normalized_input: {
+  summary: '[Object keys=resume_sentences_count,resume_paragraphs_count,jd_quality,has_jd,target_role,tier,text_quality]'
+}
+[DiagnoseSummary] rule_match_result: {
+  summary: '[Object keys=total_matched,matches_count,matched_issue_types]'
+}
+[DiagnoseSummary] issue_enrichment_result: { summary: '[Object keys=enrichments_count,enriched_issue_types]' }
+ GET /diagnose/loading 200 in 96ms (next.js: 49ms, application-code: 47ms)
+ GET /diagnose/loading 200 in 25ms (next.js: 2ms, application-code: 22ms)
+ GET /diagnose/loading 200 in 72ms (next.js: 40ms, application-code: 31ms)
+ GET /diagnose/loading 200 in 81ms (next.js: 38ms, application-code: 43ms)
+ GET /diagnose/loading 200 in 69ms (next.js: 41ms, application-code: 28ms)
+ GET /diagnose/loading 200 in 145ms (next.js: 97ms, application-code: 48ms)
+[DiagnoseSummary] ai_response_raw: {
+  summary: '[Object keys=scenario,candidate_issues_count,excellent_score,has_rewrite_examples,minor_suggestions_count]'
+}
+[DiagnoseWorkflow] 工作流场景裁决: normal { qualityTier: 'weak', excellentScore: 0 }
+[DiagnoseWorkflow] 后处理完成，最终问题数: 3 {}
+[DeepWorkflow] 开始深度诊断工作流（新主路径） {}
+[DeepWorkflow] Step 1: Deep Research Memo (Metaso) {}
+[AIRouter] Routing task research to metaso {}
+ GET /diagnose/loading 200 in 71ms (next.js: 44ms, application-code: 27ms)
+[AIRouter] {
+  name: 'Error',
+  message: 'Primary provider metaso failed',
+  stack: 'Error: Primary provider metaso failed\n' +
+    '    at logError (webpack-internal:///(rsc)/./lib/error-handler.ts:47:55)\n' +
+    '    at AIRouter.route (webpack-internal:///(rsc)/./lib/ai/router.ts:45:69)\n' +
+    '    at process.processTicksAndRejections (node:internal/process/task_queues:104:5)\n' +
+    '    at async runDeepResearchMemo (webpack-internal:///(rsc)/./lib/diagnose/v2/workflow.ts:172:22)\n' +
+    '    at async runDeepDiagnoseWorkflow (webpack-internal:///(rsc)/./lib/diagnose/v2/workflow.ts:365:28)\n' +
+    '    at async POST (webpack-internal:///(rsc)/./app/api/diagnose/route.ts:115:26)\n' +
+    '    at async AppRouteRouteModule.do (C:\\Users\\Administrator\\Desktop\\offerpilot-web\\node_modules\\next\\dist\\compiled\\next-server\\app-route.runtime.dev.js:5:40732)\n' +
+    '    at async AppRouteRouteModule.handle (C:\\Users\\Administrator\\Desktop\\offerpilot-web\\node_modules\\next\\dist\\compiled\\next-server\\app-route.runtime.dev.js:5:47861)\n' +
+    '    at async responseGenerator (webpack-internal:///(rsc)/./node_modules/next/dist/build/webpack/loaders/next-app-loader/index.js?name=app%2Fapi%2Fdiagnose%2Froute&page=%2Fapi%2Fdiagnose%2Froute&appPaths=&allNormalizedAppPaths=&pagePath=private-next-app-dir%2Fapi%2Fdiagnose%2Froute.ts&appDir=C%3A%5CUsers%5CAdministrator%5CDesktop%5Cofferpilot-web%5Capp&pageExtensions=tsx&pageExtensions=ts&pageExtensions=jsx&pageExtensions=js&rootDir=C%3A%5CUsers%5CAdministrator%5CDesktop%5Cofferpilot-web&isDev=true&tsconfigPath=&basePath=&assetPrefix=&nextConfigOutput=&preferredRegion=&middlewareConfig=e30%3D&isGlobalNotFoundEnabled=!:247:38)\n' +
+    '    at async AppRouteRouteModule.handleResponse (C:\\Users\\Administrator\\Desktop\\offerpilot-web\\node_modules\\next\\dist\\compiled\\next-server\\app-route.runtime.dev.js:1:227141)\n' +
+    '    at async handleResponse (webpack-internal:///(rsc)/./node_modules/next/dist/build/webpack/loaders/next-app-loader/index.js?name=app%2Fapi%2Fdiagnose%2Froute&page=%2Fapi%2Fdiagnose%2Froute&appPaths=&allNormalizedAppPaths=&pagePath=private-next-app-dir%2Fapi%2Fdiagnose%2Froute.ts&appDir=C%3A%5CUsers%5CAdministrator%5CDesktop%5Cofferpilot-web%5Capp&pageExtensions=tsx&pageExtensions=ts&pageExtensions=jsx&pageExtensions=js&rootDir=C%3A%5CUsers%5CAdministrator%5CDesktop%5Cofferpilot-web&isDev=true&tsconfigPath=&basePath=&assetPrefix=&nextConfigOutput=&preferredRegion=&middlewareConfig=e30%3D&isGlobalNotFoundEnabled=!:310:32)\n' +
+    '    at async Module.handler (webpack-internal:///(rsc)/./node_modules/next/dist/build/webpack/loaders/next-app-loader/index.js?name=app%2Fapi%2Fdiagnose%2Froute&page=%2Fapi%2Fdiagnose%2Froute&appPaths=&allNormalizedAppPaths=&pagePath=private-next-app-dir%2Fapi%2Fdiagnose%2Froute.ts&appDir=C%3A%5CUsers%5CAdministrator%5CDesktop%5Cofferpilot-web%5Capp&pageExtensions=tsx&pageExtensions=ts&pageExtensions=jsx&pageExtensions=js&rootDir=C%3A%5CUsers%5CAdministrator%5CDesktop%5Cofferpilot-web&isDev=true&tsconfigPath=&basePath=&assetPrefix=&nextConfigOutput=&preferredRegion=&middlewareConfig=e30%3D&isGlobalNotFoundEnabled=!:365:13)\n' +
+    '    at async DevServer.renderToResponseWithComponentsImpl (C:\\Users\\Administrator\\Desktop\\offerpilot-web\\node_modules\\next\\dist\\server\\base-server.js:1454:9)\n' +
+    '    at async DevServer.renderPageComponent (C:\\Users\\Administrator\\Desktop\\offerpilot-web\\node_modules\\next\\dist\\server\\base-server.js:1506:24)\n' +
+    '    at async DevServer.renderToResponseImpl (C:\\Users\\Administrator\\Desktop\\offerpilot-web\\node_modules\\next\\dist\\server\\base-server.js:1556:32)\n' +
+    '    at async DevServer.pipeImpl (C:\\Users\\Administrator\\Desktop\\offerpilot-web\\node_modules\\next\\dist\\server\\base-server.js:1043:25)\n' +
+    '    at async NextNodeServer.handleCatchallRenderRequest (C:\\Users\\Administrator\\Desktop\\offerpilot-web\\node_modules\\next\\dist\\server\\next-server.js:338:17)\n' +
+    '    at async DevServer.handleRequestImpl (C:\\Users\\Administrator\\Desktop\\offerpilot-web\\node_modules\\next\\dist\\server\\base-server.js:934:17)\n' +
+    '    at async C:\\Users\\Administrator\\Desktop\\offerpilot-web\\node_modules\\next\\dist\\server\\dev\\next-dev-server.js:394:20\n' +
+    '    at async Span.traceAsyncFn (C:\\Users\\Administrator\\Desktop\\offerpilot-web\\node_modules\\next\\dist\\trace\\trace.js:164:20)\n' +
+    '    at async DevServer.handleRequest (C:\\Users\\Administrator\\Desktop\\offerpilot-web\\node_modules\\next\\dist\\server\\dev\\next-dev-server.js:390:24)\n' +
+    '    at async invokeRender (C:\\Users\\Administrator\\Desktop\\offerpilot-web\\node_modules\\next\\dist\\server\\lib\\router-server.js:253:21)\n' +
+    '    at async handleRequest (C:\\Users\\Administrator\\Desktop\\offerpilot-web\\node_modules\\next\\dist\\server\\lib\\router-server.js:452:24)\n' +
+    '    at async requestHandlerImpl (C:\\Users\\Administrator\\Desktop\\offerpilot-web\\node_modules\\next\\dist\\server\\lib\\router-server.js:501:13)\n' +
+    '    at async Server.requestListener (C:\\Users\\Administrator\\Desktop\\offerpilot-web\\node_modules\\next\\dist\\server\\lib\\start-server.js:225:13)',
+  error: 'fetch failed'
+}
+[AIRouter] Falling back to deepseek {}
+ GET /diagnose/loading 200 in 50ms (next.js: 22ms, application-code: 28ms)
+[DiagnoseSummary] ai_response_raw: {
+  summary: '[Object keys=scenario,candidate_issues_count,excellent_score,has_rewrite_examples,minor_suggestions_count]'
+}
+[DiagnoseWorkflow] 工作流场景裁决: normal { qualityTier: 'weak', excellentScore: 0 }
+[DiagnoseWorkflow] 后处理完成，最终问题数: 3 {}
+[DeepWorkflow] 开始深度诊断工作流（新主路径） {}
+[DeepWorkflow] Step 1: Deep Research Memo (Metaso) {}
+[AIRouter] Routing task research to metaso {}
+[DeepWorkflow] Step 2: Deep Synthesis (DeepSeek) {}
+[AIRouter] Routing task deep_synthesize to deepseek {}
+[AIRouter] {
+  name: 'Error',
+  message: 'Primary provider metaso failed',
+  stack: 'Error: Primary provider metaso failed\n' +
+    '    at logError (webpack-internal:///(rsc)/./lib/error-handler.ts:47:55)\n' +
+    '    at AIRouter.route (webpack-internal:///(rsc)/./lib/ai/router.ts:45:69)\n' +
+    '    at process.processTicksAndRejections (node:internal/process/task_queues:104:5)\n' +
+    '    at async runDeepResearchMemo (webpack-internal:///(rsc)/./lib/diagnose/v2/workflow.ts:172:22)\n' +
+    '    at async runDeepDiagnoseWorkflow (webpack-internal:///(rsc)/./lib/diagnose/v2/workflow.ts:365:28)\n' +
+    '    at async POST (webpack-internal:///(rsc)/./app/api/diagnose/route.ts:115:26)\n' +
+    '    at async AppRouteRouteModule.do (C:\\Users\\Administrator\\Desktop\\offerpilot-web\\node_modules\\next\\dist\\compiled\\next-server\\app-route.runtime.dev.js:5:40732)\n' +
+    '    at async AppRouteRouteModule.handle (C:\\Users\\Administrator\\Desktop\\offerpilot-web\\node_modules\\next\\dist\\compiled\\next-server\\app-route.runtime.dev.js:5:47861)\n' +
+    '    at async responseGenerator (webpack-internal:///(rsc)/./node_modules/next/dist/build/webpack/loaders/next-app-loader/index.js?name=app%2Fapi%2Fdiagnose%2Froute&page=%2Fapi%2Fdiagnose%2Froute&appPaths=&allNormalizedAppPaths=&pagePath=private-next-app-dir%2Fapi%2Fdiagnose%2Froute.ts&appDir=C%3A%5CUsers%5CAdministrator%5CDesktop%5Cofferpilot-web%5Capp&pageExtensions=tsx&pageExtensions=ts&pageExtensions=jsx&pageExtensions=js&rootDir=C%3A%5CUsers%5CAdministrator%5CDesktop%5Cofferpilot-web&isDev=true&tsconfigPath=&basePath=&assetPrefix=&nextConfigOutput=&preferredRegion=&middlewareConfig=e30%3D&isGlobalNotFoundEnabled=!:247:38)\n' +
+    '    at async AppRouteRouteModule.handleResponse (C:\\Users\\Administrator\\Desktop\\offerpilot-web\\node_modules\\next\\dist\\compiled\\next-server\\app-route.runtime.dev.js:1:227141)\n' +
+    '    at async handleResponse (webpack-internal:///(rsc)/./node_modules/next/dist/build/webpack/loaders/next-app-loader/index.js?name=app%2Fapi%2Fdiagnose%2Froute&page=%2Fapi%2Fdiagnose%2Froute&appPaths=&allNormalizedAppPaths=&pagePath=private-next-app-dir%2Fapi%2Fdiagnose%2Froute.ts&appDir=C%3A%5CUsers%5CAdministrator%5CDesktop%5Cofferpilot-web%5Capp&pageExtensions=tsx&pageExtensions=ts&pageExtensions=jsx&pageExtensions=js&rootDir=C%3A%5CUsers%5CAdministrator%5CDesktop%5Cofferpilot-web&isDev=true&tsconfigPath=&basePath=&assetPrefix=&nextConfigOutput=&preferredRegion=&middlewareConfig=e30%3D&isGlobalNotFoundEnabled=!:310:32)\n' +
+    '    at async Module.handler (webpack-internal:///(rsc)/./node_modules/next/dist/build/webpack/loaders/next-app-loader/index.js?name=app%2Fapi%2Fdiagnose%2Froute&page=%2Fapi%2Fdiagnose%2Froute&appPaths=&allNormalizedAppPaths=&pagePath=private-next-app-dir%2Fapi%2Fdiagnose%2Froute.ts&appDir=C%3A%5CUsers%5CAdministrator%5CDesktop%5Cofferpilot-web%5Capp&pageExtensions=tsx&pageExtensions=ts&pageExtensions=jsx&pageExtensions=js&rootDir=C%3A%5CUsers%5CAdministrator%5CDesktop%5Cofferpilot-web&isDev=true&tsconfigPath=&basePath=&assetPrefix=&nextConfigOutput=&preferredRegion=&middlewareConfig=e30%3D&isGlobalNotFoundEnabled=!:365:13)\n' +
+    '    at async DevServer.renderToResponseWithComponentsImpl (C:\\Users\\Administrator\\Desktop\\offerpilot-web\\node_modules\\next\\dist\\server\\base-server.js:1454:9)\n' +
+    '    at async DevServer.renderPageComponent (C:\\Users\\Administrator\\Desktop\\offerpilot-web\\node_modules\\next\\dist\\server\\base-server.js:1506:24)\n' +
+    '    at async DevServer.renderToResponseImpl (C:\\Users\\Administrator\\Desktop\\offerpilot-web\\node_modules\\next\\dist\\server\\base-server.js:1556:32)\n' +
+    '    at async DevServer.pipeImpl (C:\\Users\\Administrator\\Desktop\\offerpilot-web\\node_modules\\next\\dist\\server\\base-server.js:1043:25)\n' +
+    '    at async NextNodeServer.handleCatchallRenderRequest (C:\\Users\\Administrator\\Desktop\\offerpilot-web\\node_modules\\next\\dist\\server\\next-server.js:338:17)\n' +
+    '    at async DevServer.handleRequestImpl (C:\\Users\\Administrator\\Desktop\\offerpilot-web\\node_modules\\next\\dist\\server\\base-server.js:934:17)\n' +
+    '    at async C:\\Users\\Administrator\\Desktop\\offerpilot-web\\node_modules\\next\\dist\\server\\dev\\next-dev-server.js:394:20\n' +
+    '    at async Span.traceAsyncFn (C:\\Users\\Administrator\\Desktop\\offerpilot-web\\node_modules\\next\\dist\\trace\\trace.js:164:20)\n' +
+    '    at async DevServer.handleRequest (C:\\Users\\Administrator\\Desktop\\offerpilot-web\\node_modules\\next\\dist\\server\\dev\\next-dev-server.js:390:24)\n' +
+    '    at async invokeRender (C:\\Users\\Administrator\\Desktop\\offerpilot-web\\node_modules\\next\\dist\\server\\lib\\router-server.js:253:21)\n' +
+    '    at async handleRequest (C:\\Users\\Administrator\\Desktop\\offerpilot-web\\node_modules\\next\\dist\\server\\lib\\router-server.js:452:24)\n' +
+    '    at async requestHandlerImpl (C:\\Users\\Administrator\\Desktop\\offerpilot-web\\node_modules\\next\\dist\\server\\lib\\router-server.js:501:13)\n' +
+    '    at async Server.requestListener (C:\\Users\\Administrator\\Desktop\\offerpilot-web\\node_modules\\next\\dist\\server\\lib\\start-server.js:225:13)',
+  error: 'fetch failed'
+}
+[AIRouter] Falling back to deepseek {}
+ GET /diagnose/loading 200 in 136ms (next.js: 86ms, application-code: 49ms)
+[DeepWorkflow] Step 2: Deep Synthesis (DeepSeek) {}
+[AIRouter] Routing task deep_synthesize to deepseek {}
+ GET /diagnose/loading 200 in 157ms (next.js: 110ms, application-code: 48ms)
+ GET /diagnose/loading 200 in 89ms (next.js: 46ms, application-code: 43ms)
+[SafeParseJson] {
+  name: 'Error',
+  message: "Failed to parse JSON: Expected ',' or ']' after array element in JSON at position 10913 (line 226 column 14)",
+  stack: "Error: Failed to parse JSON: Expected ',' or ']' after array element in JSON at position 10913 (line 226 column 14)\n" +
+    '    at logError (webpack-internal:///(rsc)/./lib/error-handler.ts:47:55)\n' +
+    '    at safeParseJson (webpack-internal:///(rsc)/./lib/diagnose/v2/workflow.ts:39:65)\n' +
+    '    at runDeepSynthesis (webpack-internal:///(rsc)/./lib/diagnose/v2/workflow.ts:195:20)\n' +
+    '    at process.processTicksAndRejections (node:internal/process/task_queues:104:5)\n' +
+    '    at async runDeepDiagnoseWorkflow (webpack-internal:///(rsc)/./lib/diagnose/v2/workflow.ts:373:28)\n' +
+    '    at async POST (webpack-internal:///(rsc)/./app/api/diagnose/route.ts:115:26)\n' +
+    '    at async AppRouteRouteModule.do (C:\\Users\\Administrator\\Desktop\\offerpilot-web\\node_modules\\next\\dist\\compiled\\next-server\\app-route.runtime.dev.js:5:40732)\n' +
+    '    at async AppRouteRouteModule.handle (C:\\Users\\Administrator\\Desktop\\offerpilot-web\\node_modules\\next\\dist\\compiled\\next-server\\app-route.runtime.dev.js:5:47861)\n' +
+    '    at async responseGenerator (webpack-internal:///(rsc)/./node_modules/next/dist/build/webpack/loaders/next-app-loader/index.js?name=app%2Fapi%2Fdiagnose%2Froute&page=%2Fapi%2Fdiagnose%2Froute&appPaths=&allNormalizedAppPaths=&pagePath=private-next-app-dir%2Fapi%2Fdiagnose%2Froute.ts&appDir=C%3A%5CUsers%5CAdministrator%5CDesktop%5Cofferpilot-web%5Capp&pageExtensions=tsx&pageExtensions=ts&pageExtensions=jsx&pageExtensions=js&rootDir=C%3A%5CUsers%5CAdministrator%5CDesktop%5Cofferpilot-web&isDev=true&tsconfigPath=&basePath=&assetPrefix=&nextConfigOutput=&preferredRegion=&middlewareConfig=e30%3D&isGlobalNotFoundEnabled=!:247:38)\n' +
+    '    at async AppRouteRouteModule.handleResponse (C:\\Users\\Administrator\\Desktop\\offerpilot-web\\node_modules\\next\\dist\\compiled\\next-server\\app-route.runtime.dev.js:1:227141)\n' +
+    '    at async handleResponse (webpack-internal:///(rsc)/./node_modules/next/dist/build/webpack/loaders/next-app-loader/index.js?name=app%2Fapi%2Fdiagnose%2Froute&page=%2Fapi%2Fdiagnose%2Froute&appPaths=&allNormalizedAppPaths=&pagePath=private-next-app-dir%2Fapi%2Fdiagnose%2Froute.ts&appDir=C%3A%5CUsers%5CAdministrator%5CDesktop%5Cofferpilot-web%5Capp&pageExtensions=tsx&pageExtensions=ts&pageExtensions=jsx&pageExtensions=js&rootDir=C%3A%5CUsers%5CAdministrator%5CDesktop%5Cofferpilot-web&isDev=true&tsconfigPath=&basePath=&assetPrefix=&nextConfigOutput=&preferredRegion=&middlewareConfig=e30%3D&isGlobalNotFoundEnabled=!:310:32)\n' +
+    '    at async Module.handler (webpack-internal:///(rsc)/./node_modules/next/dist/build/webpack/loaders/next-app-loader/index.js?name=app%2Fapi%2Fdiagnose%2Froute&page=%2Fapi%2Fdiagnose%2Froute&appPaths=&allNormalizedAppPaths=&pagePath=private-next-app-dir%2Fapi%2Fdiagnose%2Froute.ts&appDir=C%3A%5CUsers%5CAdministrator%5CDesktop%5Cofferpilot-web%5Capp&pageExtensions=tsx&pageExtensions=ts&pageExtensions=jsx&pageExtensions=js&rootDir=C%3A%5CUsers%5CAdministrator%5CDesktop%5Cofferpilot-web&isDev=true&tsconfigPath=&basePath=&assetPrefix=&nextConfigOutput=&preferredRegion=&middlewareConfig=e30%3D&isGlobalNotFoundEnabled=!:365:13)\n' +
+    '    at async DevServer.renderToResponseWithComponentsImpl (C:\\Users\\Administrator\\Desktop\\offerpilot-web\\node_modules\\next\\dist\\server\\base-server.js:1454:9)\n' +
+    '    at async DevServer.renderPageComponent (C:\\Users\\Administrator\\Desktop\\offerpilot-web\\node_modules\\next\\dist\\server\\base-server.js:1506:24)\n' +
+    '    at async DevServer.renderToResponseImpl (C:\\Users\\Administrator\\Desktop\\offerpilot-web\\node_modules\\next\\dist\\server\\base-server.js:1556:32)\n' +
+    '    at async DevServer.pipeImpl (C:\\Users\\Administrator\\Desktop\\offerpilot-web\\node_modules\\next\\dist\\server\\base-server.js:1043:25)\n' +
+    '    at async NextNodeServer.handleCatchallRenderRequest (C:\\Users\\Administrator\\Desktop\\offerpilot-web\\node_modules\\next\\dist\\server\\next-server.js:338:17)\n' +
+    '    at async DevServer.handleRequestImpl (C:\\Users\\Administrator\\Desktop\\offerpilot-web\\node_modules\\next\\dist\\server\\base-server.js:934:17)\n' +
+    '    at async C:\\Users\\Administrator\\Desktop\\offerpilot-web\\node_modules\\next\\dist\\server\\dev\\next-dev-server.js:394:20\n' +
+    '    at async Span.traceAsyncFn (C:\\Users\\Administrator\\Desktop\\offerpilot-web\\node_modules\\next\\dist\\trace\\trace.js:164:20)\n' +
+    '    at async DevServer.handleRequest (C:\\Users\\Administrator\\Desktop\\offerpilot-web\\node_modules\\next\\dist\\server\\dev\\next-dev-server.js:390:24)\n' +
+    '    at async invokeRender (C:\\Users\\Administrator\\Desktop\\offerpilot-web\\node_modules\\next\\dist\\server\\lib\\router-server.js:253:21)\n' +
+    '    at async handleRequest (C:\\Users\\Administrator\\Desktop\\offerpilot-web\\node_modules\\next\\dist\\server\\lib\\router-server.js:452:24)\n' +
+    '    at async requestHandlerImpl (C:\\Users\\Administrator\\Desktop\\offerpilot-web\\node_modules\\next\\dist\\server\\lib\\router-server.js:501:13)\n' +
+    '    at async Server.requestListener (C:\\Users\\Administrator\\Desktop\\offerpilot-web\\node_modules\\next\\dist\\server\\lib\\start-server.js:225:13)'
+}
+[DeepWorkflow] {
+  name: 'Error',
+  message: "JSON 解析失败: Expected ',' or ']' after array element in JSON at position 10913 (line 226 column 14)",
+  stack: "Error: JSON 解析失败: Expected ',' or ']' after array element in JSON at position 10913 (line 226 column 14)\n" +
+    '    at safeParseJson (webpack-internal:///(rsc)/./lib/diagnose/v2/workflow.ts:40:15)\n' +
+    '    at runDeepSynthesis (webpack-internal:///(rsc)/./lib/diagnose/v2/workflow.ts:195:20)\n' +
+    '    at process.processTicksAndRejections (node:internal/process/task_queues:104:5)\n' +
+    '    at async runDeepDiagnoseWorkflow (webpack-internal:///(rsc)/./lib/diagnose/v2/workflow.ts:373:28)\n' +
+    '    at async POST (webpack-internal:///(rsc)/./app/api/diagnose/route.ts:115:26)\n' +
+    '    at async AppRouteRouteModule.do (C:\\Users\\Administrator\\Desktop\\offerpilot-web\\node_modules\\next\\dist\\compiled\\next-server\\app-route.runtime.dev.js:5:40732)\n' +
+    '    at async AppRouteRouteModule.handle (C:\\Users\\Administrator\\Desktop\\offerpilot-web\\node_modules\\next\\dist\\compiled\\next-server\\app-route.runtime.dev.js:5:47861)\n' +
+    '    at async responseGenerator (webpack-internal:///(rsc)/./node_modules/next/dist/build/webpack/loaders/next-app-loader/index.js?name=app%2Fapi%2Fdiagnose%2Froute&page=%2Fapi%2Fdiagnose%2Froute&appPaths=&allNormalizedAppPaths=&pagePath=private-next-app-dir%2Fapi%2Fdiagnose%2Froute.ts&appDir=C%3A%5CUsers%5CAdministrator%5CDesktop%5Cofferpilot-web%5Capp&pageExtensions=tsx&pageExtensions=ts&pageExtensions=jsx&pageExtensions=js&rootDir=C%3A%5CUsers%5CAdministrator%5CDesktop%5Cofferpilot-web&isDev=true&tsconfigPath=&basePath=&assetPrefix=&nextConfigOutput=&preferredRegion=&middlewareConfig=e30%3D&isGlobalNotFoundEnabled=!:247:38)\n' +
+    '    at async AppRouteRouteModule.handleResponse (C:\\Users\\Administrator\\Desktop\\offerpilot-web\\node_modules\\next\\dist\\compiled\\next-server\\app-route.runtime.dev.js:1:227141)\n' +
+    '    at async handleResponse (webpack-internal:///(rsc)/./node_modules/next/dist/build/webpack/loaders/next-app-loader/index.js?name=app%2Fapi%2Fdiagnose%2Froute&page=%2Fapi%2Fdiagnose%2Froute&appPaths=&allNormalizedAppPaths=&pagePath=private-next-app-dir%2Fapi%2Fdiagnose%2Froute.ts&appDir=C%3A%5CUsers%5CAdministrator%5CDesktop%5Cofferpilot-web%5Capp&pageExtensions=tsx&pageExtensions=ts&pageExtensions=jsx&pageExtensions=js&rootDir=C%3A%5CUsers%5CAdministrator%5CDesktop%5Cofferpilot-web&isDev=true&tsconfigPath=&basePath=&assetPrefix=&nextConfigOutput=&preferredRegion=&middlewareConfig=e30%3D&isGlobalNotFoundEnabled=!:310:32)\n' +
+    '    at async Module.handler (webpack-internal:///(rsc)/./node_modules/next/dist/build/webpack/loaders/next-app-loader/index.js?name=app%2Fapi%2Fdiagnose%2Froute&page=%2Fapi%2Fdiagnose%2Froute&appPaths=&allNormalizedAppPaths=&pagePath=private-next-app-dir%2Fapi%2Fdiagnose%2Froute.ts&appDir=C%3A%5CUsers%5CAdministrator%5CDesktop%5Cofferpilot-web%5Capp&pageExtensions=tsx&pageExtensions=ts&pageExtensions=jsx&pageExtensions=js&rootDir=C%3A%5CUsers%5CAdministrator%5CDesktop%5Cofferpilot-web&isDev=true&tsconfigPath=&basePath=&assetPrefix=&nextConfigOutput=&preferredRegion=&middlewareConfig=e30%3D&isGlobalNotFoundEnabled=!:365:13)\n' +
+    '    at async DevServer.renderToResponseWithComponentsImpl (C:\\Users\\Administrator\\Desktop\\offerpilot-web\\node_modules\\next\\dist\\server\\base-server.js:1454:9)\n' +
+    '    at async DevServer.renderPageComponent (C:\\Users\\Administrator\\Desktop\\offerpilot-web\\node_modules\\next\\dist\\server\\base-server.js:1506:24)\n' +
+    '    at async DevServer.renderToResponseImpl (C:\\Users\\Administrator\\Desktop\\offerpilot-web\\node_modules\\next\\dist\\server\\base-server.js:1556:32)\n' +
+    '    at async DevServer.pipeImpl (C:\\Users\\Administrator\\Desktop\\offerpilot-web\\node_modules\\next\\dist\\server\\base-server.js:1043:25)\n' +
+    '    at async NextNodeServer.handleCatchallRenderRequest (C:\\Users\\Administrator\\Desktop\\offerpilot-web\\node_modules\\next\\dist\\server\\next-server.js:338:17)\n' +
+    '    at async DevServer.handleRequestImpl (C:\\Users\\Administrator\\Desktop\\offerpilot-web\\node_modules\\next\\dist\\server\\base-server.js:934:17)\n' +
+    '    at async C:\\Users\\Administrator\\Desktop\\offerpilot-web\\node_modules\\next\\dist\\server\\dev\\next-dev-server.js:394:20\n' +
+    '    at async Span.traceAsyncFn (C:\\Users\\Administrator\\Desktop\\offerpilot-web\\node_modules\\next\\dist\\trace\\trace.js:164:20)\n' +
+    '    at async DevServer.handleRequest (C:\\Users\\Administrator\\Desktop\\offerpilot-web\\node_modules\\next\\dist\\server\\dev\\next-dev-server.js:390:24)\n' +
+    '    at async invokeRender (C:\\Users\\Administrator\\Desktop\\offerpilot-web\\node_modules\\next\\dist\\server\\lib\\router-server.js:253:21)\n' +
+    '    at async handleRequest (C:\\Users\\Administrator\\Desktop\\offerpilot-web\\node_modules\\next\\dist\\server\\lib\\router-server.js:452:24)\n' +
+    '    at async requestHandlerImpl (C:\\Users\\Administrator\\Desktop\\offerpilot-web\\node_modules\\next\\dist\\server\\lib\\router-server.js:501:13)\n' +
+    '    at async Server.requestListener (C:\\Users\\Administrator\\Desktop\\offerpilot-web\\node_modules\\next\\dist\\server\\lib\\start-server.js:225:13)'
+}
+[DiagnoseAPI] 深度诊断失败，返回基础诊断 + fallback 标记 {
+  error: "JSON 解析失败: Expected ',' or ']' after array element in JSON at position 10913 (line 226 column 14)"
+}
+ POST /api/diagnose 200 in 4.6min (next.js: 826ms, application-code: 4.6min)
+ GET /diagnose/result/cmnhl3upr000i60qsomiaypil 200 in 39ms (next.js: 13ms, application-code: 26ms)
+ GET /api/diagnose/report/cmnhl3upr000i60qsomiaypil 200 in 435ms (next.js: 403ms, application-code: 32ms)
+ GET /api/diagnose/report/cmnhl3upr000i60qsomiaypil 200 in 7ms (next.js: 1713µs, application-code: 5ms)
+ GET /diagnose/result/cmnhl3upr000i60qsomiaypil 200 in 128ms (next.js: 79ms, application-code: 48ms)
+[SafeParseJson] {
+  name: 'Error',
+  message: "Failed to parse JSON: Expected ',' or '}' after property value in JSON at position 10990 (line 218 column 10)",
+  stack: "Error: Failed to parse JSON: Expected ',' or '}' after property value in JSON at position 10990 (line 218 column 10)\n" +
+    '    at logError (webpack-internal:///(rsc)/./lib/error-handler.ts:47:55)\n' +
+    '    at safeParseJson (webpack-internal:///(rsc)/./lib/diagnose/v2/workflow.ts:39:65)\n' +
+    '    at runDeepSynthesis (webpack-internal:///(rsc)/./lib/diagnose/v2/workflow.ts:195:20)\n' +
+    '    at process.processTicksAndRejections (node:internal/process/task_queues:104:5)\n' +
+    '    at async runDeepDiagnoseWorkflow (webpack-internal:///(rsc)/./lib/diagnose/v2/workflow.ts:373:28)\n' +
+    '    at async POST (webpack-internal:///(rsc)/./app/api/diagnose/route.ts:115:26)\n' +
+    '    at async AppRouteRouteModule.do (C:\\Users\\Administrator\\Desktop\\offerpilot-web\\node_modules\\next\\dist\\compiled\\next-server\\app-route.runtime.dev.js:5:40732)\n' +
+    '    at async AppRouteRouteModule.handle (C:\\Users\\Administrator\\Desktop\\offerpilot-web\\node_modules\\next\\dist\\compiled\\next-server\\app-route.runtime.dev.js:5:47861)\n' +
+    '    at async responseGenerator (webpack-internal:///(rsc)/./node_modules/next/dist/build/webpack/loaders/next-app-loader/index.js?name=app%2Fapi%2Fdiagnose%2Froute&page=%2Fapi%2Fdiagnose%2Froute&appPaths=&allNormalizedAppPaths=&pagePath=private-next-app-dir%2Fapi%2Fdiagnose%2Froute.ts&appDir=C%3A%5CUsers%5CAdministrator%5CDesktop%5Cofferpilot-web%5Capp&pageExtensions=tsx&pageExtensions=ts&pageExtensions=jsx&pageExtensions=js&rootDir=C%3A%5CUsers%5CAdministrator%5CDesktop%5Cofferpilot-web&isDev=true&tsconfigPath=&basePath=&assetPrefix=&nextConfigOutput=&preferredRegion=&middlewareConfig=e30%3D&isGlobalNotFoundEnabled=!:247:38)\n' +
+    '    at async AppRouteRouteModule.handleResponse (C:\\Users\\Administrator\\Desktop\\offerpilot-web\\node_modules\\next\\dist\\compiled\\next-server\\app-route.runtime.dev.js:1:227141)\n' +
+    '    at async handleResponse (webpack-internal:///(rsc)/./node_modules/next/dist/build/webpack/loaders/next-app-loader/index.js?name=app%2Fapi%2Fdiagnose%2Froute&page=%2Fapi%2Fdiagnose%2Froute&appPaths=&allNormalizedAppPaths=&pagePath=private-next-app-dir%2Fapi%2Fdiagnose%2Froute.ts&appDir=C%3A%5CUsers%5CAdministrator%5CDesktop%5Cofferpilot-web%5Capp&pageExtensions=tsx&pageExtensions=ts&pageExtensions=jsx&pageExtensions=js&rootDir=C%3A%5CUsers%5CAdministrator%5CDesktop%5Cofferpilot-web&isDev=true&tsconfigPath=&basePath=&assetPrefix=&nextConfigOutput=&preferredRegion=&middlewareConfig=e30%3D&isGlobalNotFoundEnabled=!:310:32)\n' +
+    '    at async Module.handler (webpack-internal:///(rsc)/./node_modules/next/dist/build/webpack/loaders/next-app-loader/index.js?name=app%2Fapi%2Fdiagnose%2Froute&page=%2Fapi%2Fdiagnose%2Froute&appPaths=&allNormalizedAppPaths=&pagePath=private-next-app-dir%2Fapi%2Fdiagnose%2Froute.ts&appDir=C%3A%5CUsers%5CAdministrator%5CDesktop%5Cofferpilot-web%5Capp&pageExtensions=tsx&pageExtensions=ts&pageExtensions=jsx&pageExtensions=js&rootDir=C%3A%5CUsers%5CAdministrator%5CDesktop%5Cofferpilot-web&isDev=true&tsconfigPath=&basePath=&assetPrefix=&nextConfigOutput=&preferredRegion=&middlewareConfig=e30%3D&isGlobalNotFoundEnabled=!:365:13)\n' +
+    '    at async DevServer.renderToResponseWithComponentsImpl (C:\\Users\\Administrator\\Desktop\\offerpilot-web\\node_modules\\next\\dist\\server\\base-server.js:1454:9)\n' +
+    '    at async DevServer.renderPageComponent (C:\\Users\\Administrator\\Desktop\\offerpilot-web\\node_modules\\next\\dist\\server\\base-server.js:1506:24)\n' +
+    '    at async DevServer.renderToResponseImpl (C:\\Users\\Administrator\\Desktop\\offerpilot-web\\node_modules\\next\\dist\\server\\base-server.js:1556:32)\n' +
+    '    at async DevServer.pipeImpl (C:\\Users\\Administrator\\Desktop\\offerpilot-web\\node_modules\\next\\dist\\server\\base-server.js:1043:25)\n' +
+    '    at async NextNodeServer.handleCatchallRenderRequest (C:\\Users\\Administrator\\Desktop\\offerpilot-web\\node_modules\\next\\dist\\server\\next-server.js:338:17)\n' +
+    '    at async DevServer.handleRequestImpl (C:\\Users\\Administrator\\Desktop\\offerpilot-web\\node_modules\\next\\dist\\server\\base-server.js:934:17)\n' +
+    '    at async C:\\Users\\Administrator\\Desktop\\offerpilot-web\\node_modules\\next\\dist\\server\\dev\\next-dev-server.js:394:20\n' +
+    '    at async Span.traceAsyncFn (C:\\Users\\Administrator\\Desktop\\offerpilot-web\\node_modules\\next\\dist\\trace\\trace.js:164:20)\n' +
+    '    at async DevServer.handleRequest (C:\\Users\\Administrator\\Desktop\\offerpilot-web\\node_modules\\next\\dist\\server\\dev\\next-dev-server.js:390:24)\n' +
+    '    at async invokeRender (C:\\Users\\Administrator\\Desktop\\offerpilot-web\\node_modules\\next\\dist\\server\\lib\\router-server.js:253:21)\n' +
+    '    at async handleRequest (C:\\Users\\Administrator\\Desktop\\offerpilot-web\\node_modules\\next\\dist\\server\\lib\\router-server.js:452:24)\n' +
+    '    at async requestHandlerImpl (C:\\Users\\Administrator\\Desktop\\offerpilot-web\\node_modules\\next\\dist\\server\\lib\\router-server.js:501:13)\n' +
+    '    at async Server.requestListener (C:\\Users\\Administrator\\Desktop\\offerpilot-web\\node_modules\\next\\dist\\server\\lib\\start-server.js:225:13)'
+}
+[DeepWorkflow] {
+  name: 'Error',
+  message: "JSON 解析失败: Expected ',' or '}' after property value in JSON at position 10990 (line 218 column 10)",
+  stack: "Error: JSON 解析失败: Expected ',' or '}' after property value in JSON at position 10990 (line 218 column 10)\n" +
+    '    at safeParseJson (webpack-internal:///(rsc)/./lib/diagnose/v2/workflow.ts:40:15)\n' +
+    '    at runDeepSynthesis (webpack-internal:///(rsc)/./lib/diagnose/v2/workflow.ts:195:20)\n' +
+    '    at process.processTicksAndRejections (node:internal/process/task_queues:104:5)\n' +
+    '    at async runDeepDiagnoseWorkflow (webpack-internal:///(rsc)/./lib/diagnose/v2/workflow.ts:373:28)\n' +
+    '    at async POST (webpack-internal:///(rsc)/./app/api/diagnose/route.ts:115:26)\n' +
+    '    at async AppRouteRouteModule.do (C:\\Users\\Administrator\\Desktop\\offerpilot-web\\node_modules\\next\\dist\\compiled\\next-server\\app-route.runtime.dev.js:5:40732)\n' +
+    '    at async AppRouteRouteModule.handle (C:\\Users\\Administrator\\Desktop\\offerpilot-web\\node_modules\\next\\dist\\compiled\\next-server\\app-route.runtime.dev.js:5:47861)\n' +
+    '    at async responseGenerator (webpack-internal:///(rsc)/./node_modules/next/dist/build/webpack/loaders/next-app-loader/index.js?name=app%2Fapi%2Fdiagnose%2Froute&page=%2Fapi%2Fdiagnose%2Froute&appPaths=&allNormalizedAppPaths=&pagePath=private-next-app-dir%2Fapi%2Fdiagnose%2Froute.ts&appDir=C%3A%5CUsers%5CAdministrator%5CDesktop%5Cofferpilot-web%5Capp&pageExtensions=tsx&pageExtensions=ts&pageExtensions=jsx&pageExtensions=js&rootDir=C%3A%5CUsers%5CAdministrator%5CDesktop%5Cofferpilot-web&isDev=true&tsconfigPath=&basePath=&assetPrefix=&nextConfigOutput=&preferredRegion=&middlewareConfig=e30%3D&isGlobalNotFoundEnabled=!:247:38)\n' +
+    '    at async AppRouteRouteModule.handleResponse (C:\\Users\\Administrator\\Desktop\\offerpilot-web\\node_modules\\next\\dist\\compiled\\next-server\\app-route.runtime.dev.js:1:227141)\n' +
+    '    at async handleResponse (webpack-internal:///(rsc)/./node_modules/next/dist/build/webpack/loaders/next-app-loader/index.js?name=app%2Fapi%2Fdiagnose%2Froute&page=%2Fapi%2Fdiagnose%2Froute&appPaths=&allNormalizedAppPaths=&pagePath=private-next-app-dir%2Fapi%2Fdiagnose%2Froute.ts&appDir=C%3A%5CUsers%5CAdministrator%5CDesktop%5Cofferpilot-web%5Capp&pageExtensions=tsx&pageExtensions=ts&pageExtensions=jsx&pageExtensions=js&rootDir=C%3A%5CUsers%5CAdministrator%5CDesktop%5Cofferpilot-web&isDev=true&tsconfigPath=&basePath=&assetPrefix=&nextConfigOutput=&preferredRegion=&middlewareConfig=e30%3D&isGlobalNotFoundEnabled=!:310:32)\n' +
+    '    at async Module.handler (webpack-internal:///(rsc)/./node_modules/next/dist/build/webpack/loaders/next-app-loader/index.js?name=app%2Fapi%2Fdiagnose%2Froute&page=%2Fapi%2Fdiagnose%2Froute&appPaths=&allNormalizedAppPaths=&pagePath=private-next-app-dir%2Fapi%2Fdiagnose%2Froute.ts&appDir=C%3A%5CUsers%5CAdministrator%5CDesktop%5Cofferpilot-web%5Capp&pageExtensions=tsx&pageExtensions=ts&pageExtensions=jsx&pageExtensions=js&rootDir=C%3A%5CUsers%5CAdministrator%5CDesktop%5Cofferpilot-web&isDev=true&tsconfigPath=&basePath=&assetPrefix=&nextConfigOutput=&preferredRegion=&middlewareConfig=e30%3D&isGlobalNotFoundEnabled=!:365:13)\n' +
+    '    at async DevServer.renderToResponseWithComponentsImpl (C:\\Users\\Administrator\\Desktop\\offerpilot-web\\node_modules\\next\\dist\\server\\base-server.js:1454:9)\n' +
+    '    at async DevServer.renderPageComponent (C:\\Users\\Administrator\\Desktop\\offerpilot-web\\node_modules\\next\\dist\\server\\base-server.js:1506:24)\n' +
+    '    at async DevServer.renderToResponseImpl (C:\\Users\\Administrator\\Desktop\\offerpilot-web\\node_modules\\next\\dist\\server\\base-server.js:1556:32)\n' +
+    '    at async DevServer.pipeImpl (C:\\Users\\Administrator\\Desktop\\offerpilot-web\\node_modules\\next\\dist\\server\\base-server.js:1043:25)\n' +
+    '    at async NextNodeServer.handleCatchallRenderRequest (C:\\Users\\Administrator\\Desktop\\offerpilot-web\\node_modules\\next\\dist\\server\\next-server.js:338:17)\n' +
+    '    at async DevServer.handleRequestImpl (C:\\Users\\Administrator\\Desktop\\offerpilot-web\\node_modules\\next\\dist\\server\\base-server.js:934:17)\n' +
+    '    at async C:\\Users\\Administrator\\Desktop\\offerpilot-web\\node_modules\\next\\dist\\server\\dev\\next-dev-server.js:394:20\n' +
+    '    at async Span.traceAsyncFn (C:\\Users\\Administrator\\Desktop\\offerpilot-web\\node_modules\\next\\dist\\trace\\trace.js:164:20)\n' +
+    '    at async DevServer.handleRequest (C:\\Users\\Administrator\\Desktop\\offerpilot-web\\node_modules\\next\\dist\\server\\dev\\next-dev-server.js:390:24)\n' +
+    '    at async invokeRender (C:\\Users\\Administrator\\Desktop\\offerpilot-web\\node_modules\\next\\dist\\server\\lib\\router-server.js:253:21)\n' +
+    '    at async handleRequest (C:\\Users\\Administrator\\Desktop\\offerpilot-web\\node_modules\\next\\dist\\server\\lib\\router-server.js:452:24)\n' +
+    '    at async requestHandlerImpl (C:\\Users\\Administrator\\Desktop\\offerpilot-web\\node_modules\\next\\dist\\server\\lib\\router-server.js:501:13)\n' +
+    '    at async Server.requestListener (C:\\Users\\Administrator\\Desktop\\offerpilot-web\\node_modules\\next\\dist\\server\\lib\\start-server.js:225:13)'
+}
+[DiagnoseAPI] 深度诊断失败，返回基础诊断 + fallback 标记 {
+  error: "JSON 解析失败: Expected ',' or '}' after property value in JSON at position 10990 (line 218 column 10)"
+}
+ POST /api/diagnose 200 in 5.5min (next.js: 822ms, application-code: 5.5min)
+ GET /diagnose/result/cmnhl50eq000l60qsa2nj1xhx 200 in 17ms (next.js: 6ms, application-code: 11ms)
+ GET /api/diagnose/report/cmnhl50eq000l60qsa2nj1xhx 200 in 635ms (next.js: 611ms, application-code: 23ms)
+ GET /api/diagnose/report/cmnhl50eq000l60qsa2nj1xhx 200 in 8ms (next.js: 1512µs, application-code: 6ms)
+ GET /diagnose/result/cmnhl50eq000l60qsa2nj1xhx 200 in 109ms (next.js: 57ms, application-code: 52ms)
+ GET /diagnose 200 in 25ms (next.js: 7ms, application-code: 18ms)
+ GET /diagnose/loading 200 in 18ms (next.js: 5ms, application-code: 12ms)
+[DiagnoseWorkflow] 开始免费版诊断工作流 V3 {}
+[DiagnoseSummary] normalized_input: {
+  summary: '[Object keys=resume_sentences_count,resume_paragraphs_count,jd_quality,has_jd,target_role,tier,text_quality]'
+}
+[DiagnoseSummary] rule_match_result: {
+  summary: '[Object keys=total_matched,matches_count,matched_issue_types]'
+}
+[DiagnoseSummary] issue_enrichment_result: { summary: '[Object keys=enrichments_count,enriched_issue_types]' }
+[DiagnoseWorkflow] 开始免费版诊断工作流 V3 {}
+[DiagnoseSummary] normalized_input: {
+  summary: '[Object keys=resume_sentences_count,resume_paragraphs_count,jd_quality,has_jd,target_role,tier,text_quality]'
+}
+[DiagnoseSummary] rule_match_result: {
+  summary: '[Object keys=total_matched,matches_count,matched_issue_types]'
+}
+[DiagnoseSummary] issue_enrichment_result: { summary: '[Object keys=enrichments_count,enriched_issue_types]' }
+ GET /diagnose/loading 200 in 102ms (next.js: 52ms, application-code: 50ms)
+[DiagnoseSummary] ai_response_raw: {
+  summary: '[Object keys=scenario,candidate_issues_count,excellent_score,has_rewrite_examples,minor_suggestions_count]'
+}
+[DiagnoseWorkflow] 工作流场景裁决: normal { qualityTier: 'weak', excellentScore: 0 }
+[DiagnoseWorkflow] 后处理完成，最终问题数: 2 {}
+[DeepWorkflow] 开始深度诊断工作流（新主路径） {}
+[DeepWorkflow] Step 1: Deep Research Memo (Metaso) {}
+[AIRouter] Routing task research to metaso {}
+[AIRouter] {
+  name: 'Error',
+  message: 'Primary provider metaso failed',
+  stack: 'Error: Primary provider metaso failed\n' +
+    '    at logError (webpack-internal:///(rsc)/./lib/error-handler.ts:47:55)\n' +
+    '    at AIRouter.route (webpack-internal:///(rsc)/./lib/ai/router.ts:45:69)\n' +
+    '    at process.processTicksAndRejections (node:internal/process/task_queues:104:5)\n' +
+    '    at async runDeepResearchMemo (webpack-internal:///(rsc)/./lib/diagnose/v2/workflow.ts:172:22)\n' +
+    '    at async runDeepDiagnoseWorkflow (webpack-internal:///(rsc)/./lib/diagnose/v2/workflow.ts:365:28)\n' +
+    '    at async POST (webpack-internal:///(rsc)/./app/api/diagnose/route.ts:115:26)\n' +
+    '    at async AppRouteRouteModule.do (C:\\Users\\Administrator\\Desktop\\offerpilot-web\\node_modules\\next\\dist\\compiled\\next-server\\app-route.runtime.dev.js:5:40732)\n' +
+    '    at async AppRouteRouteModule.handle (C:\\Users\\Administrator\\Desktop\\offerpilot-web\\node_modules\\next\\dist\\compiled\\next-server\\app-route.runtime.dev.js:5:47861)\n' +
+    '    at async responseGenerator (webpack-internal:///(rsc)/./node_modules/next/dist/build/webpack/loaders/next-app-loader/index.js?name=app%2Fapi%2Fdiagnose%2Froute&page=%2Fapi%2Fdiagnose%2Froute&appPaths=&allNormalizedAppPaths=&pagePath=private-next-app-dir%2Fapi%2Fdiagnose%2Froute.ts&appDir=C%3A%5CUsers%5CAdministrator%5CDesktop%5Cofferpilot-web%5Capp&pageExtensions=tsx&pageExtensions=ts&pageExtensions=jsx&pageExtensions=js&rootDir=C%3A%5CUsers%5CAdministrator%5CDesktop%5Cofferpilot-web&isDev=true&tsconfigPath=&basePath=&assetPrefix=&nextConfigOutput=&preferredRegion=&middlewareConfig=e30%3D&isGlobalNotFoundEnabled=!:247:38)\n' +
+    '    at async AppRouteRouteModule.handleResponse (C:\\Users\\Administrator\\Desktop\\offerpilot-web\\node_modules\\next\\dist\\compiled\\next-server\\app-route.runtime.dev.js:1:227141)\n' +
+    '    at async handleResponse (webpack-internal:///(rsc)/./node_modules/next/dist/build/webpack/loaders/next-app-loader/index.js?name=app%2Fapi%2Fdiagnose%2Froute&page=%2Fapi%2Fdiagnose%2Froute&appPaths=&allNormalizedAppPaths=&pagePath=private-next-app-dir%2Fapi%2Fdiagnose%2Froute.ts&appDir=C%3A%5CUsers%5CAdministrator%5CDesktop%5Cofferpilot-web%5Capp&pageExtensions=tsx&pageExtensions=ts&pageExtensions=jsx&pageExtensions=js&rootDir=C%3A%5CUsers%5CAdministrator%5CDesktop%5Cofferpilot-web&isDev=true&tsconfigPath=&basePath=&assetPrefix=&nextConfigOutput=&preferredRegion=&middlewareConfig=e30%3D&isGlobalNotFoundEnabled=!:310:32)\n' +
+    '    at async Module.handler (webpack-internal:///(rsc)/./node_modules/next/dist/build/webpack/loaders/next-app-loader/index.js?name=app%2Fapi%2Fdiagnose%2Froute&page=%2Fapi%2Fdiagnose%2Froute&appPaths=&allNormalizedAppPaths=&pagePath=private-next-app-dir%2Fapi%2Fdiagnose%2Froute.ts&appDir=C%3A%5CUsers%5CAdministrator%5CDesktop%5Cofferpilot-web%5Capp&pageExtensions=tsx&pageExtensions=ts&pageExtensions=jsx&pageExtensions=js&rootDir=C%3A%5CUsers%5CAdministrator%5CDesktop%5Cofferpilot-web&isDev=true&tsconfigPath=&basePath=&assetPrefix=&nextConfigOutput=&preferredRegion=&middlewareConfig=e30%3D&isGlobalNotFoundEnabled=!:365:13)\n' +
+    '    at async DevServer.renderToResponseWithComponentsImpl (C:\\Users\\Administrator\\Desktop\\offerpilot-web\\node_modules\\next\\dist\\server\\base-server.js:1454:9)\n' +
+    '    at async DevServer.renderPageComponent (C:\\Users\\Administrator\\Desktop\\offerpilot-web\\node_modules\\next\\dist\\server\\base-server.js:1506:24)\n' +
+    '    at async DevServer.renderToResponseImpl (C:\\Users\\Administrator\\Desktop\\offerpilot-web\\node_modules\\next\\dist\\server\\base-server.js:1556:32)\n' +
+    '    at async DevServer.pipeImpl (C:\\Users\\Administrator\\Desktop\\offerpilot-web\\node_modules\\next\\dist\\server\\base-server.js:1043:25)\n' +
+    '    at async NextNodeServer.handleCatchallRenderRequest (C:\\Users\\Administrator\\Desktop\\offerpilot-web\\node_modules\\next\\dist\\server\\next-server.js:338:17)\n' +
+    '    at async DevServer.handleRequestImpl (C:\\Users\\Administrator\\Desktop\\offerpilot-web\\node_modules\\next\\dist\\server\\base-server.js:934:17)\n' +
+    '    at async C:\\Users\\Administrator\\Desktop\\offerpilot-web\\node_modules\\next\\dist\\server\\dev\\next-dev-server.js:394:20\n' +
+    '    at async Span.traceAsyncFn (C:\\Users\\Administrator\\Desktop\\offerpilot-web\\node_modules\\next\\dist\\trace\\trace.js:164:20)\n' +
+    '    at async DevServer.handleRequest (C:\\Users\\Administrator\\Desktop\\offerpilot-web\\node_modules\\next\\dist\\server\\dev\\next-dev-server.js:390:24)\n' +
+    '    at async invokeRender (C:\\Users\\Administrator\\Desktop\\offerpilot-web\\node_modules\\next\\dist\\server\\lib\\router-server.js:253:21)\n' +
+    '    at async handleRequest (C:\\Users\\Administrator\\Desktop\\offerpilot-web\\node_modules\\next\\dist\\server\\lib\\router-server.js:452:24)\n' +
+    '    at async requestHandlerImpl (C:\\Users\\Administrator\\Desktop\\offerpilot-web\\node_modules\\next\\dist\\server\\lib\\router-server.js:501:13)\n' +
+    '    at async Server.requestListener (C:\\Users\\Administrator\\Desktop\\offerpilot-web\\node_modules\\next\\dist\\server\\lib\\start-server.js:225:13)',
+  error: 'fetch failed'
+}
+[AIRouter] Falling back to deepseek {}
+[DiagnoseSummary] ai_response_raw: {
+  summary: '[Object keys=scenario,candidate_issues_count,excellent_score,has_rewrite_examples,minor_suggestions_count]'
+}
+[DiagnoseWorkflow] 工作流场景裁决: normal { qualityTier: 'weak', excellentScore: 0 }
+[DiagnoseWorkflow] 后处理完成，最终问题数: 3 {}
+[DeepWorkflow] 开始深度诊断工作流（新主路径） {}
+[DeepWorkflow] Step 1: Deep Research Memo (Metaso) {}
+[AIRouter] Routing task research to metaso {}
+[AIRouter] {
+  name: 'Error',
+  message: 'Primary provider metaso failed',
+  stack: 'Error: Primary provider metaso failed\n' +
+    '    at logError (webpack-internal:///(rsc)/./lib/error-handler.ts:47:55)\n' +
+    '    at AIRouter.route (webpack-internal:///(rsc)/./lib/ai/router.ts:45:69)\n' +
+    '    at process.processTicksAndRejections (node:internal/process/task_queues:104:5)\n' +
+    '    at async runDeepResearchMemo (webpack-internal:///(rsc)/./lib/diagnose/v2/workflow.ts:172:22)\n' +
+    '    at async runDeepDiagnoseWorkflow (webpack-internal:///(rsc)/./lib/diagnose/v2/workflow.ts:365:28)\n' +
+    '    at async POST (webpack-internal:///(rsc)/./app/api/diagnose/route.ts:115:26)\n' +
+    '    at async AppRouteRouteModule.do (C:\\Users\\Administrator\\Desktop\\offerpilot-web\\node_modules\\next\\dist\\compiled\\next-server\\app-route.runtime.dev.js:5:40732)\n' +
+    '    at async AppRouteRouteModule.handle (C:\\Users\\Administrator\\Desktop\\offerpilot-web\\node_modules\\next\\dist\\compiled\\next-server\\app-route.runtime.dev.js:5:47861)\n' +
+    '    at async responseGenerator (webpack-internal:///(rsc)/./node_modules/next/dist/build/webpack/loaders/next-app-loader/index.js?name=app%2Fapi%2Fdiagnose%2Froute&page=%2Fapi%2Fdiagnose%2Froute&appPaths=&allNormalizedAppPaths=&pagePath=private-next-app-dir%2Fapi%2Fdiagnose%2Froute.ts&appDir=C%3A%5CUsers%5CAdministrator%5CDesktop%5Cofferpilot-web%5Capp&pageExtensions=tsx&pageExtensions=ts&pageExtensions=jsx&pageExtensions=js&rootDir=C%3A%5CUsers%5CAdministrator%5CDesktop%5Cofferpilot-web&isDev=true&tsconfigPath=&basePath=&assetPrefix=&nextConfigOutput=&preferredRegion=&middlewareConfig=e30%3D&isGlobalNotFoundEnabled=!:247:38)\n' +
+    '    at async AppRouteRouteModule.handleResponse (C:\\Users\\Administrator\\Desktop\\offerpilot-web\\node_modules\\next\\dist\\compiled\\next-server\\app-route.runtime.dev.js:1:227141)\n' +
+    '    at async handleResponse (webpack-internal:///(rsc)/./node_modules/next/dist/build/webpack/loaders/next-app-loader/index.js?name=app%2Fapi%2Fdiagnose%2Froute&page=%2Fapi%2Fdiagnose%2Froute&appPaths=&allNormalizedAppPaths=&pagePath=private-next-app-dir%2Fapi%2Fdiagnose%2Froute.ts&appDir=C%3A%5CUsers%5CAdministrator%5CDesktop%5Cofferpilot-web%5Capp&pageExtensions=tsx&pageExtensions=ts&pageExtensions=jsx&pageExtensions=js&rootDir=C%3A%5CUsers%5CAdministrator%5CDesktop%5Cofferpilot-web&isDev=true&tsconfigPath=&basePath=&assetPrefix=&nextConfigOutput=&preferredRegion=&middlewareConfig=e30%3D&isGlobalNotFoundEnabled=!:310:32)\n' +
+    '    at async Module.handler (webpack-internal:///(rsc)/./node_modules/next/dist/build/webpack/loaders/next-app-loader/index.js?name=app%2Fapi%2Fdiagnose%2Froute&page=%2Fapi%2Fdiagnose%2Froute&appPaths=&allNormalizedAppPaths=&pagePath=private-next-app-dir%2Fapi%2Fdiagnose%2Froute.ts&appDir=C%3A%5CUsers%5CAdministrator%5CDesktop%5Cofferpilot-web%5Capp&pageExtensions=tsx&pageExtensions=ts&pageExtensions=jsx&pageExtensions=js&rootDir=C%3A%5CUsers%5CAdministrator%5CDesktop%5Cofferpilot-web&isDev=true&tsconfigPath=&basePath=&assetPrefix=&nextConfigOutput=&preferredRegion=&middlewareConfig=e30%3D&isGlobalNotFoundEnabled=!:365:13)\n' +
+    '    at async DevServer.renderToResponseWithComponentsImpl (C:\\Users\\Administrator\\Desktop\\offerpilot-web\\node_modules\\next\\dist\\server\\base-server.js:1454:9)\n' +
+    '    at async DevServer.renderPageComponent (C:\\Users\\Administrator\\Desktop\\offerpilot-web\\node_modules\\next\\dist\\server\\base-server.js:1506:24)\n' +
+    '    at async DevServer.renderToResponseImpl (C:\\Users\\Administrator\\Desktop\\offerpilot-web\\node_modules\\next\\dist\\server\\base-server.js:1556:32)\n' +
+    '    at async DevServer.pipeImpl (C:\\Users\\Administrator\\Desktop\\offerpilot-web\\node_modules\\next\\dist\\server\\base-server.js:1043:25)\n' +
+    '    at async NextNodeServer.handleCatchallRenderRequest (C:\\Users\\Administrator\\Desktop\\offerpilot-web\\node_modules\\next\\dist\\server\\next-server.js:338:17)\n' +
+    '    at async DevServer.handleRequestImpl (C:\\Users\\Administrator\\Desktop\\offerpilot-web\\node_modules\\next\\dist\\server\\base-server.js:934:17)\n' +
+    '    at async C:\\Users\\Administrator\\Desktop\\offerpilot-web\\node_modules\\next\\dist\\server\\dev\\next-dev-server.js:394:20\n' +
+    '    at async Span.traceAsyncFn (C:\\Users\\Administrator\\Desktop\\offerpilot-web\\node_modules\\next\\dist\\trace\\trace.js:164:20)\n' +
+    '    at async DevServer.handleRequest (C:\\Users\\Administrator\\Desktop\\offerpilot-web\\node_modules\\next\\dist\\server\\dev\\next-dev-server.js:390:24)\n' +
+    '    at async invokeRender (C:\\Users\\Administrator\\Desktop\\offerpilot-web\\node_modules\\next\\dist\\server\\lib\\router-server.js:253:21)\n' +
+    '    at async handleRequest (C:\\Users\\Administrator\\Desktop\\offerpilot-web\\node_modules\\next\\dist\\server\\lib\\router-server.js:452:24)\n' +
+    '    at async requestHandlerImpl (C:\\Users\\Administrator\\Desktop\\offerpilot-web\\node_modules\\next\\dist\\server\\lib\\router-server.js:501:13)\n' +
+    '    at async Server.requestListener (C:\\Users\\Administrator\\Desktop\\offerpilot-web\\node_modules\\next\\dist\\server\\lib\\start-server.js:225:13)',
+  error: 'fetch failed'
+}
+[AIRouter] Falling back to deepseek {}
+[DeepWorkflow] Step 2: Deep Synthesis (DeepSeek) {}
+[AIRouter] Routing task deep_synthesize to deepseek {}
+[DeepWorkflow] Step 2: Deep Synthesis (DeepSeek) {}
+[AIRouter] Routing task deep_synthesize to deepseek {}
+[SafeParseJson] {
+  name: 'Error',
+  message: "Failed to parse JSON: Expected ',' or ']' after array element in JSON at position 10918 (line 222 column 14)",
+  stack: "Error: Failed to parse JSON: Expected ',' or ']' after array element in JSON at position 10918 (line 222 column 14)\n" +
+    '    at logError (webpack-internal:///(rsc)/./lib/error-handler.ts:47:55)\n' +
+    '    at safeParseJson (webpack-internal:///(rsc)/./lib/diagnose/v2/workflow.ts:39:65)\n' +
+    '    at runDeepSynthesis (webpack-internal:///(rsc)/./lib/diagnose/v2/workflow.ts:195:20)\n' +
+    '    at process.processTicksAndRejections (node:internal/process/task_queues:104:5)\n' +
+    '    at async runDeepDiagnoseWorkflow (webpack-internal:///(rsc)/./lib/diagnose/v2/workflow.ts:373:28)\n' +
+    '    at async POST (webpack-internal:///(rsc)/./app/api/diagnose/route.ts:115:26)\n' +
+    '    at async AppRouteRouteModule.do (C:\\Users\\Administrator\\Desktop\\offerpilot-web\\node_modules\\next\\dist\\compiled\\next-server\\app-route.runtime.dev.js:5:40732)\n' +
+    '    at async AppRouteRouteModule.handle (C:\\Users\\Administrator\\Desktop\\offerpilot-web\\node_modules\\next\\dist\\compiled\\next-server\\app-route.runtime.dev.js:5:47861)\n' +
+    '    at async responseGenerator (webpack-internal:///(rsc)/./node_modules/next/dist/build/webpack/loaders/next-app-loader/index.js?name=app%2Fapi%2Fdiagnose%2Froute&page=%2Fapi%2Fdiagnose%2Froute&appPaths=&allNormalizedAppPaths=&pagePath=private-next-app-dir%2Fapi%2Fdiagnose%2Froute.ts&appDir=C%3A%5CUsers%5CAdministrator%5CDesktop%5Cofferpilot-web%5Capp&pageExtensions=tsx&pageExtensions=ts&pageExtensions=jsx&pageExtensions=js&rootDir=C%3A%5CUsers%5CAdministrator%5CDesktop%5Cofferpilot-web&isDev=true&tsconfigPath=&basePath=&assetPrefix=&nextConfigOutput=&preferredRegion=&middlewareConfig=e30%3D&isGlobalNotFoundEnabled=!:247:38)\n' +
+    '    at async AppRouteRouteModule.handleResponse (C:\\Users\\Administrator\\Desktop\\offerpilot-web\\node_modules\\next\\dist\\compiled\\next-server\\app-route.runtime.dev.js:1:227141)\n' +
+    '    at async handleResponse (webpack-internal:///(rsc)/./node_modules/next/dist/build/webpack/loaders/next-app-loader/index.js?name=app%2Fapi%2Fdiagnose%2Froute&page=%2Fapi%2Fdiagnose%2Froute&appPaths=&allNormalizedAppPaths=&pagePath=private-next-app-dir%2Fapi%2Fdiagnose%2Froute.ts&appDir=C%3A%5CUsers%5CAdministrator%5CDesktop%5Cofferpilot-web%5Capp&pageExtensions=tsx&pageExtensions=ts&pageExtensions=jsx&pageExtensions=js&rootDir=C%3A%5CUsers%5CAdministrator%5CDesktop%5Cofferpilot-web&isDev=true&tsconfigPath=&basePath=&assetPrefix=&nextConfigOutput=&preferredRegion=&middlewareConfig=e30%3D&isGlobalNotFoundEnabled=!:310:32)\n' +
+    '    at async Module.handler (webpack-internal:///(rsc)/./node_modules/next/dist/build/webpack/loaders/next-app-loader/index.js?name=app%2Fapi%2Fdiagnose%2Froute&page=%2Fapi%2Fdiagnose%2Froute&appPaths=&allNormalizedAppPaths=&pagePath=private-next-app-dir%2Fapi%2Fdiagnose%2Froute.ts&appDir=C%3A%5CUsers%5CAdministrator%5CDesktop%5Cofferpilot-web%5Capp&pageExtensions=tsx&pageExtensions=ts&pageExtensions=jsx&pageExtensions=js&rootDir=C%3A%5CUsers%5CAdministrator%5CDesktop%5Cofferpilot-web&isDev=true&tsconfigPath=&basePath=&assetPrefix=&nextConfigOutput=&preferredRegion=&middlewareConfig=e30%3D&isGlobalNotFoundEnabled=!:365:13)\n' +
+    '    at async DevServer.renderToResponseWithComponentsImpl (C:\\Users\\Administrator\\Desktop\\offerpilot-web\\node_modules\\next\\dist\\server\\base-server.js:1454:9)\n' +
+    '    at async DevServer.renderPageComponent (C:\\Users\\Administrator\\Desktop\\offerpilot-web\\node_modules\\next\\dist\\server\\base-server.js:1506:24)\n' +
+    '    at async DevServer.renderToResponseImpl (C:\\Users\\Administrator\\Desktop\\offerpilot-web\\node_modules\\next\\dist\\server\\base-server.js:1556:32)\n' +
+    '    at async DevServer.pipeImpl (C:\\Users\\Administrator\\Desktop\\offerpilot-web\\node_modules\\next\\dist\\server\\base-server.js:1043:25)\n' +
+    '    at async NextNodeServer.handleCatchallRenderRequest (C:\\Users\\Administrator\\Desktop\\offerpilot-web\\node_modules\\next\\dist\\server\\next-server.js:338:17)\n' +
+    '    at async DevServer.handleRequestImpl (C:\\Users\\Administrator\\Desktop\\offerpilot-web\\node_modules\\next\\dist\\server\\base-server.js:934:17)\n' +
+    '    at async C:\\Users\\Administrator\\Desktop\\offerpilot-web\\node_modules\\next\\dist\\server\\dev\\next-dev-server.js:394:20\n' +
+    '    at async Span.traceAsyncFn (C:\\Users\\Administrator\\Desktop\\offerpilot-web\\node_modules\\next\\dist\\trace\\trace.js:164:20)\n' +
+    '    at async DevServer.handleRequest (C:\\Users\\Administrator\\Desktop\\offerpilot-web\\node_modules\\next\\dist\\server\\dev\\next-dev-server.js:390:24)\n' +
+    '    at async invokeRender (C:\\Users\\Administrator\\Desktop\\offerpilot-web\\node_modules\\next\\dist\\server\\lib\\router-server.js:253:21)\n' +
+    '    at async handleRequest (C:\\Users\\Administrator\\Desktop\\offerpilot-web\\node_modules\\next\\dist\\server\\lib\\router-server.js:452:24)\n' +
+    '    at async requestHandlerImpl (C:\\Users\\Administrator\\Desktop\\offerpilot-web\\node_modules\\next\\dist\\server\\lib\\router-server.js:501:13)\n' +
+    '    at async Server.requestListener (C:\\Users\\Administrator\\Desktop\\offerpilot-web\\node_modules\\next\\dist\\server\\lib\\start-server.js:225:13)'
+}
+[DeepWorkflow] {
+  name: 'Error',
+  message: "JSON 解析失败: Expected ',' or ']' after array element in JSON at position 10918 (line 222 column 14)",
+  stack: "Error: JSON 解析失败: Expected ',' or ']' after array element in JSON at position 10918 (line 222 column 14)\n" +
+    '    at safeParseJson (webpack-internal:///(rsc)/./lib/diagnose/v2/workflow.ts:40:15)\n' +
+    '    at runDeepSynthesis (webpack-internal:///(rsc)/./lib/diagnose/v2/workflow.ts:195:20)\n' +
+    '    at process.processTicksAndRejections (node:internal/process/task_queues:104:5)\n' +
+    '    at async runDeepDiagnoseWorkflow (webpack-internal:///(rsc)/./lib/diagnose/v2/workflow.ts:373:28)\n' +
+    '    at async POST (webpack-internal:///(rsc)/./app/api/diagnose/route.ts:115:26)\n' +
+    '    at async AppRouteRouteModule.do (C:\\Users\\Administrator\\Desktop\\offerpilot-web\\node_modules\\next\\dist\\compiled\\next-server\\app-route.runtime.dev.js:5:40732)\n' +
+    '    at async AppRouteRouteModule.handle (C:\\Users\\Administrator\\Desktop\\offerpilot-web\\node_modules\\next\\dist\\compiled\\next-server\\app-route.runtime.dev.js:5:47861)\n' +
+    '    at async responseGenerator (webpack-internal:///(rsc)/./node_modules/next/dist/build/webpack/loaders/next-app-loader/index.js?name=app%2Fapi%2Fdiagnose%2Froute&page=%2Fapi%2Fdiagnose%2Froute&appPaths=&allNormalizedAppPaths=&pagePath=private-next-app-dir%2Fapi%2Fdiagnose%2Froute.ts&appDir=C%3A%5CUsers%5CAdministrator%5CDesktop%5Cofferpilot-web%5Capp&pageExtensions=tsx&pageExtensions=ts&pageExtensions=jsx&pageExtensions=js&rootDir=C%3A%5CUsers%5CAdministrator%5CDesktop%5Cofferpilot-web&isDev=true&tsconfigPath=&basePath=&assetPrefix=&nextConfigOutput=&preferredRegion=&middlewareConfig=e30%3D&isGlobalNotFoundEnabled=!:247:38)\n' +
+    '    at async AppRouteRouteModule.handleResponse (C:\\Users\\Administrator\\Desktop\\offerpilot-web\\node_modules\\next\\dist\\compiled\\next-server\\app-route.runtime.dev.js:1:227141)\n' +
+    '    at async handleResponse (webpack-internal:///(rsc)/./node_modules/next/dist/build/webpack/loaders/next-app-loader/index.js?name=app%2Fapi%2Fdiagnose%2Froute&page=%2Fapi%2Fdiagnose%2Froute&appPaths=&allNormalizedAppPaths=&pagePath=private-next-app-dir%2Fapi%2Fdiagnose%2Froute.ts&appDir=C%3A%5CUsers%5CAdministrator%5CDesktop%5Cofferpilot-web%5Capp&pageExtensions=tsx&pageExtensions=ts&pageExtensions=jsx&pageExtensions=js&rootDir=C%3A%5CUsers%5CAdministrator%5CDesktop%5Cofferpilot-web&isDev=true&tsconfigPath=&basePath=&assetPrefix=&nextConfigOutput=&preferredRegion=&middlewareConfig=e30%3D&isGlobalNotFoundEnabled=!:310:32)\n' +
+    '    at async Module.handler (webpack-internal:///(rsc)/./node_modules/next/dist/build/webpack/loaders/next-app-loader/index.js?name=app%2Fapi%2Fdiagnose%2Froute&page=%2Fapi%2Fdiagnose%2Froute&appPaths=&allNormalizedAppPaths=&pagePath=private-next-app-dir%2Fapi%2Fdiagnose%2Froute.ts&appDir=C%3A%5CUsers%5CAdministrator%5CDesktop%5Cofferpilot-web%5Capp&pageExtensions=tsx&pageExtensions=ts&pageExtensions=jsx&pageExtensions=js&rootDir=C%3A%5CUsers%5CAdministrator%5CDesktop%5Cofferpilot-web&isDev=true&tsconfigPath=&basePath=&assetPrefix=&nextConfigOutput=&preferredRegion=&middlewareConfig=e30%3D&isGlobalNotFoundEnabled=!:365:13)\n' +
+    '    at async DevServer.renderToResponseWithComponentsImpl (C:\\Users\\Administrator\\Desktop\\offerpilot-web\\node_modules\\next\\dist\\server\\base-server.js:1454:9)\n' +
+    '    at async DevServer.renderPageComponent (C:\\Users\\Administrator\\Desktop\\offerpilot-web\\node_modules\\next\\dist\\server\\base-server.js:1506:24)\n' +
+    '    at async DevServer.renderToResponseImpl (C:\\Users\\Administrator\\Desktop\\offerpilot-web\\node_modules\\next\\dist\\server\\base-server.js:1556:32)\n' +
+    '    at async DevServer.pipeImpl (C:\\Users\\Administrator\\Desktop\\offerpilot-web\\node_modules\\next\\dist\\server\\base-server.js:1043:25)\n' +
+    '    at async NextNodeServer.handleCatchallRenderRequest (C:\\Users\\Administrator\\Desktop\\offerpilot-web\\node_modules\\next\\dist\\server\\next-server.js:338:17)\n' +
+    '    at async DevServer.handleRequestImpl (C:\\Users\\Administrator\\Desktop\\offerpilot-web\\node_modules\\next\\dist\\server\\base-server.js:934:17)\n' +
+    '    at async C:\\Users\\Administrator\\Desktop\\offerpilot-web\\node_modules\\next\\dist\\server\\dev\\next-dev-server.js:394:20\n' +
+    '    at async Span.traceAsyncFn (C:\\Users\\Administrator\\Desktop\\offerpilot-web\\node_modules\\next\\dist\\trace\\trace.js:164:20)\n' +
+    '    at async DevServer.handleRequest (C:\\Users\\Administrator\\Desktop\\offerpilot-web\\node_modules\\next\\dist\\server\\dev\\next-dev-server.js:390:24)\n' +
+    '    at async invokeRender (C:\\Users\\Administrator\\Desktop\\offerpilot-web\\node_modules\\next\\dist\\server\\lib\\router-server.js:253:21)\n' +
+    '    at async handleRequest (C:\\Users\\Administrator\\Desktop\\offerpilot-web\\node_modules\\next\\dist\\server\\lib\\router-server.js:452:24)\n' +
+    '    at async requestHandlerImpl (C:\\Users\\Administrator\\Desktop\\offerpilot-web\\node_modules\\next\\dist\\server\\lib\\router-server.js:501:13)\n' +
+    '    at async Server.requestListener (C:\\Users\\Administrator\\Desktop\\offerpilot-web\\node_modules\\next\\dist\\server\\lib\\start-server.js:225:13)'
+}
+[DiagnoseAPI] 深度诊断失败，返回基础诊断 + fallback 标记 {
+  error: "JSON 解析失败: Expected ',' or ']' after array element in JSON at position 10918 (line 222 column 14)"
+}
+ POST /api/diagnose 200 in 4.9min (next.js: 801ms, application-code: 4.9min)
+[SafeParseJson] Schema validation failed: [{"code":"invalid_value","values":["ats","hr_6s","hr_30s","interview","combined"],"path":["problem_pool","must_fix",0,"impact_surface"],"message":"Invalid option: expected one of \"ats\"|\"hr_6s\"|\"hr_30s\"|\"interview\"|\"combined\""},{"code":"invalid_value","values":["ats","hr_6s","hr_30s","interview","combined"],"path":["problem_pool","must_fix",1,"impact_surface"],"message":"Invalid option: expected one of \"ats\"|\"hr_6s\"|\"hr_30s\"|\"interview\"|\"combined\""},{"code":"invalid_value","values":["ats","hr_6s","hr_30s","interview","combined"],"path":["problem_pool","should_fix",0,"impact_surface"],"message":"Invalid option: expected one of \"ats\"|\"hr_6s\"|\"hr_30s\"|\"interview\"|\"combined\""}] {}
+[DeepWorkflow] 深度诊断工作流完成 {}
+ POST /api/diagnose 200 in 5.0min (next.js: 806ms, application-code: 4.9min)
+ GET /diagnose/result/cmnhlkrh1000o60qs9dj2e5wj 200 in 29ms (next.js: 14ms, application-code: 15ms)
+ GET /api/diagnose/report/cmnhlkrh1000o60qs9dj2e5wj 200 in 379ms (next.js: 356ms, application-code: 23ms)
+ GET /api/diagnose/report/cmnhlkrh1000o60qs9dj2e5wj 200 in 6ms (next.js: 1482µs, application-code: 5ms)
+ GET /diagnose/result/cmnhlksmt000r60qsdszzlbi5 200 in 46ms (next.js: 18ms, application-code: 28ms)
+ GET /api/diagnose/report/cmnhlksmt000r60qsdszzlbi5 200 in 8ms (next.js: 4ms, application-code: 4ms)
+ GET /api/diagnose/report/cmnhlksmt000r60qsdszzlbi5 200 in 4ms (next.js: 875µs, application-code: 3ms)

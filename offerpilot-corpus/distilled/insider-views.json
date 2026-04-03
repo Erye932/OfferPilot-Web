@@ -1,0 +1,162 @@
+[
+  {
+    "view_id": "view-001",
+    "issue_type": "lack_of_result_evidence",
+    "role_context": "business",
+    "view_text": "我能看出你参与了执行，但我看不到体量、结果和你的实际贡献。这会让我默认你更偏支持角色，而不是能独立承担结果的人。",
+    "tone": "calm",
+    "applicable_roles": [
+      "内容运营",
+      "用户运营",
+      "活动运营",
+      "产品运营",
+      "市场"
+    ],
+    "source_level": "A",
+    "notes": "适合免费版高频使用。是首批最核心的 insider view 之一。"
+  },
+  {
+    "view_id": "view-002",
+    "issue_type": "keyword_alignment_weak",
+    "role_context": "business",
+    "view_text": "这段经历不一定和岗位无关，但它没有把岗位最关心的能力点主动说出来。对我来说，这会增加理解成本，也会降低我第一眼判断你匹配度的速度。",
+    "tone": "calm",
+    "applicable_roles": [
+      "内容运营",
+      "用户运营",
+      "产品助理",
+      "产品运营",
+      "市场"
+    ],
+    "source_level": "A",
+    "notes": "很符合 OfferPilot 的核心价值：判断是表达问题还是匹配问题。"
+  },
+  {
+    "view_id": "view-003",
+    "issue_type": "weak_role_boundary",
+    "role_context": "business",
+    "view_text": "如果我看不清你具体主导了什么、参与了什么，我通常会把功劳默认归给团队，而不是归给你本人。这会直接削弱你的个人价值感。",
+    "tone": "calm",
+    "applicable_roles": [
+      "内容运营",
+      "用户运营",
+      "项目运营",
+      "产品助理",
+      "市场"
+    ],
+    "source_level": "A",
+    "notes": "这条和面试追问天然联动，适合做强信任点。"
+  },
+  {
+    "view_id": "view-004",
+    "issue_type": "weak_expression_pattern",
+    "role_context": "hr",
+    "view_text": "如果我连续看到几段都在写“参与、协助、支持”，我会默认你多数时候处在辅助位置，而不是核心推进位置。这不一定说明你能力不够，但会让我很难快速判断你的独立性。",
+    "tone": "calm",
+    "applicable_roles": [
+      "内容运营",
+      "用户运营",
+      "活动运营",
+      "项目运营",
+      "市场"
+    ],
+    "source_level": "A",
+    "notes": "非常适合免费版。用户看完通常能立刻理解。"
+  },
+  {
+    "view_id": "view-005",
+    "issue_type": "relevant_experience_not_emphasized",
+    "role_context": "hr",
+    "view_text": "初筛通常不是精读。如果最相关的一段经历没有更早出现，或者没有被展开，我很可能在形成第一印象之前，就已经把你归类成“相关性一般”。",
+    "tone": "calm",
+    "applicable_roles": [
+      "内容运营",
+      "用户运营",
+      "产品助理",
+      "市场",
+      "项目运营"
+    ],
+    "source_level": "A",
+    "notes": "非常适合承接“先改哪一段”。"
+  },
+  {
+    "view_id": "view-006",
+    "issue_type": "lack_of_quantification",
+    "role_context": "business",
+    "view_text": "看到“效果良好”这类表达，我不会默认它真的很好。我只会觉得这里缺少证据，因为每个人都可以这样写，但不是每个人都能给出结果。",
+    "tone": "direct",
+    "applicable_roles": [
+      "内容运营",
+      "用户运营",
+      "活动运营",
+      "市场",
+      "数据相关初级岗位"
+    ],
+    "source_level": "A",
+    "notes": "这条击中感很强，但语气仍然克制，适合免费版使用。"
+  },
+  {
+    "view_id": "view-007",
+    "issue_type": "advantage_not_front_loaded",
+    "role_context": "hr",
+    "view_text": "你可能确实有亮点，但如果亮点没有在前面被看见，对初筛来说它就很像不存在。因为我不会先假设你有优势，再耐心往后找。",
+    "tone": "calm",
+    "applicable_roles": [
+      "内容运营",
+      "用户运营",
+      "产品助理",
+      "市场",
+      "项目运营"
+    ],
+    "source_level": "A",
+    "notes": "这条适合结果页中段，不适合过度频繁触发。"
+  },
+  {
+    "view_id": "view-008",
+    "issue_type": "task_only_no_business_value",
+    "role_context": "business",
+    "view_text": "如果你只写自己做了哪些任务，但没有告诉我这些动作对团队、项目或结果带来了什么价值，我会更容易把你理解成在完成安排，而不是在创造价值。",
+    "tone": "calm",
+    "applicable_roles": [
+      "内容运营",
+      "用户运营",
+      "活动运营",
+      "产品运营",
+      "市场"
+    ],
+    "source_level": "A",
+    "notes": "这条和“缺少结果证据”相邻，但更强调业务价值感。"
+  },
+  {
+    "view_id": "view-009",
+    "issue_type": "jd_direction_mismatch",
+    "role_context": "hiring_manager",
+    "view_text": "如果岗位强调的是策略、分析或更强的问题判断，而你的简历主轴长期停留在执行支持层，我不会只觉得你表达得不够好，还会怀疑你当前的岗位方向是不是选得太靠前了。",
+    "tone": "calm",
+    "applicable_roles": [
+      "内容运营",
+      "用户运营",
+      "产品助理",
+      "数据分析初级岗",
+      "市场"
+    ],
+    "source_level": "A",
+    "notes": "这条是 OfferPilot 差异化价值的关键之一，但必须谨慎触发。"
+  },
+  {
+    "view_id": "view-010",
+    "issue_type": "overclaim_risk",
+    "role_context": "business",
+    "view_text": "当我看到“精通”“主导”“独立负责全流程”这类表述时，我会默认后面能展开讲清楚。如果后续支撑不够，这类词反而会放大追问风险。",
+    "tone": "direct",
+    "applicable_roles": [
+      "内容运营",
+      "用户运营",
+      "产品助理",
+      "技术类初级岗",
+      "市场"
+    ],
+    "source_level": "A",
+    "notes": "非常适合和“面试里可能会被问到”联动，产品体感强。"
+  }
+]

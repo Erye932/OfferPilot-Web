@@ -1,0 +1,152 @@
+[
+  {
+    "pattern_id": "rewrite-001",
+    "issue_type": "lack_of_result_evidence",
+    "role_type": "内容运营",
+    "before_text": "负责活动策划与执行，跟进现场落地，配合团队完成活动相关工作。",
+    "after_text": "负责活动策划与落地执行，协同团队推进现场流程，并在活动结束后整理复盘信息，帮助团队定位后续优化方向。",
+    "rewrite_logic": "把纯动作表述改成“动作 + 结果/复盘 + 影响”的结构，让经历不只停留在执行层。",
+    "key_transformation": [
+      "保留核心动作",
+      "补充结果或复盘动作",
+      "补充对团队或后续工作的价值"
+    ],
+    "source_level": "A",
+    "difficulty_level": "basic"
+  },
+  {
+    "pattern_id": "rewrite-002",
+    "issue_type": "keyword_alignment_weak",
+    "role_type": "用户运营",
+    "before_text": "参与项目推进、负责沟通协调、支持团队完成相关任务。",
+    "after_text": "围绕用户增长项目推进执行节奏，负责跨团队沟通与需求同步，支持活动上线与后续反馈整理。",
+    "rewrite_logic": "把泛化动作改成更贴岗位语境的表达，优先把 JD 里的核心能力词显性写出来。",
+    "key_transformation": [
+      "把泛动作换成岗位语境动作",
+      "补充与目标岗位相关的能力词",
+      "减少“支持相关任务”这类空表述"
+    ],
+    "source_level": "A",
+    "difficulty_level": "basic"
+  },
+  {
+    "pattern_id": "rewrite-003",
+    "issue_type": "weak_role_boundary",
+    "role_type": "项目运营",
+    "before_text": "负责推进项目相关工作，配合团队完成整体落地。",
+    "after_text": "负责项目执行节奏跟进与跨方协调，独立推进阶段节点落地，并配合团队完成整体上线支持。",
+    "rewrite_logic": "把“团队做了什么”和“你做了什么”拆开写，优先明确个人主导动作，再写配合部分。",
+    "key_transformation": [
+      "先写个人负责部分",
+      "再写团队协作部分",
+      "减少模糊归因"
+    ],
+    "source_level": "A",
+    "difficulty_level": "advanced"
+  },
+  {
+    "pattern_id": "rewrite-004",
+    "issue_type": "weak_expression_pattern",
+    "role_type": "活动运营",
+    "before_text": "参与活动执行，协助完成复盘整理，支持团队推进相关安排。",
+    "after_text": "跟进活动执行流程与现场协调，整理活动反馈与复盘信息，并支持后续优化安排推进。",
+    "rewrite_logic": "减少“参与、协助、支持”的密度，用更明确的动作表达替换弱表述，但不夸大个人角色。",
+    "key_transformation": [
+      "参与 -> 跟进/推进/负责",
+      "协助 -> 整理/输出/执行",
+      "支持 -> 具体说明支持了什么"
+    ],
+    "source_level": "A",
+    "difficulty_level": "basic"
+  },
+  {
+    "pattern_id": "rewrite-005",
+    "issue_type": "relevant_experience_not_emphasized",
+    "role_type": "产品助理",
+    "before_text": "参与某项目需求整理与测试支持。",
+    "after_text": "参与产品需求整理与测试支持，跟进需求流转和反馈收集，帮助团队推进版本上线前的问题确认。",
+    "rewrite_logic": "当相关经历本身不够展开时，优先补足最贴近目标岗位的动作细节，让这段经历有被放大的基础。",
+    "key_transformation": [
+      "扩充最相关经历细节",
+      "补充岗位相关动作",
+      "增强与目标岗位的直接连接"
+    ],
+    "source_level": "A",
+    "difficulty_level": "basic"
+  },
+  {
+    "pattern_id": "rewrite-006",
+    "issue_type": "lack_of_quantification",
+    "role_type": "市场",
+    "before_text": "活动效果良好，用户反馈不错。",
+    "after_text": "活动上线后完成反馈汇总与结果整理，参与复盘分析，并基于活动表现输出后续优化建议。",
+    "rewrite_logic": "当暂时没有可靠数字可写时，不要硬编数字，先把主观评价改成可验证的动作与结果处理流程。",
+    "key_transformation": [
+      "删掉空泛结果词",
+      "补充复盘与整理动作",
+      "避免无证据的主观判断"
+    ],
+    "source_level": "A",
+    "difficulty_level": "advanced"
+  },
+  {
+    "pattern_id": "rewrite-007",
+    "issue_type": "advantage_not_front_loaded",
+    "role_type": "内容运营",
+    "before_text": "负责日常内容整理与发布。",
+    "after_text": "负责内容选题整理与日常发布执行，跟进内容上线后的反馈收集，并支持后续内容优化方向整理。",
+    "rewrite_logic": "当前这条 pattern 不是解决排序，而是先把亮点内容写得更像亮点，为后续前置提供素材基础。",
+    "key_transformation": [
+      "补足完整动作链",
+      "增加反馈与优化动作",
+      "让经历更适合被前置"
+    ],
+    "source_level": "A",
+    "difficulty_level": "basic"
+  },
+  {
+    "pattern_id": "rewrite-008",
+    "issue_type": "task_only_no_business_value",
+    "role_type": "用户运营",
+    "before_text": "负责内容发布与日常维护。",
+    "after_text": "负责内容发布与日常运营维护，跟进用户反馈与基础数据整理，支持后续内容优化与运营节奏调整。",
+    "rewrite_logic": "把“任务完成”改成“任务 + 用户/数据/业务连接”，让动作和价值之间形成最基本的桥梁。",
+    "key_transformation": [
+      "补用户反馈",
+      "补数据整理",
+      "补后续优化价值"
+    ],
+    "source_level": "A",
+    "difficulty_level": "basic"
+  },
+  {
+    "pattern_id": "rewrite-009",
+    "issue_type": "jd_direction_mismatch",
+    "role_type": "产品运营",
+    "before_text": "负责校园活动执行与现场支持。",
+    "after_text": "负责校园活动执行与现场协调，并在活动结束后整理反馈与流程问题，为后续活动优化提供基础参考。",
+    "rewrite_logic": "当方向还不够完全匹配时，先把已有经历向目标岗位可迁移的能力上靠拢，但不能硬写成已经具备更高阶能力。",
+    "key_transformation": [
+      "保留真实经历边界",
+      "补充可迁移能力",
+      "避免虚假拔高"
+    ],
+    "source_level": "A",
+    "difficulty_level": "advanced"
+  },
+  {
+    "pattern_id": "rewrite-010",
+    "issue_type": "overclaim_risk",
+    "role_type": "产品助理",
+    "before_text": "主导项目全流程推进，独立负责整体策略制定。",
+    "after_text": "参与项目推进与需求协同，负责阶段性问题跟进和信息同步，支持项目按计划完成关键节点推进。",
+    "rewrite_logic": "当原句存在明显过度拔高风险时，优先把表述收回到真实角色边界，避免制造不必要的面试追问压力。",
+    "key_transformation": [
+      "去掉过强结论词",
+      "回归真实职责边界",
+      "降低追问风险"
+    ],
+    "source_level": "A",
+    "difficulty_level": "advanced"
+  }
+]

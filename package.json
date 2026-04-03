@@ -1,0 +1,47 @@
+{
+  "name": "offerpilot-web",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev --webpack",
+    "build": "next build",
+    "start": "next start",
+    "lint": "eslint .",
+    "cleanup": "npm run lint -- --fix",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:ui": "vitest --ui",
+    "db:migrate": "prisma migrate dev",
+    "db:studio": "prisma studio",
+    "db:generate": "prisma generate",
+    "sync:cases": "tsx scripts/sync-cases.ts",
+    "report:weekly": "tsx scripts/report-weekly.ts",
+    "promote:patterns": "tsx scripts/promote-patterns.ts"
+  },
+  "dependencies": {
+    "@prisma/adapter-pg": "^7.5.0",
+    "@prisma/client": "^7.5.0",
+    "dotenv": "^16.6.1",
+    "next": "^16.2.1",
+    "pdfjs-dist": "^5.5.207",
+    "pg": "^8.20.0",
+    "react": "^19.2.4",
+    "react-dom": "^19.2.4",
+    "zod": "^4.3.6"
+  },
+  "devDependencies": {
+    "@tailwindcss/postcss": "^4.2.2",
+    "@types/node": "^20.19.37",
+    "@types/pg": "^8.20.0",
+    "@types/react": "^19.2.14",
+    "@types/react-dom": "^19.2.3",
+    "eslint": "^9.39.4",
+    "eslint-config-next": "^16.2.1",
+    "postcss": "^8.5.8",
+    "prisma": "^7.5.0",
+    "tailwindcss": "^4.2.2",
+    "tsx": "^4.7.0",
+    "typescript": "^5.9.3",
+    "vitest": "^3.0.0"
+  }
+}
