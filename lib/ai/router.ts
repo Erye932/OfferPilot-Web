@@ -50,15 +50,7 @@ class AIRouter {
         model: response.model,
         contentLength: response.content.length,
       });
-      // Enhance response with metadata
-      const enhancedResponse = {
-        ...response,
-        providerRequested: primaryProvider.name,
-        providerActual: response.provider,
-        fallbackUsed: false,
-        taskType: task.type,
-      };
-      return enhancedResponse;
+      return response;
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : String(error);
       const isAIProviderError = error instanceof AIProviderError;
@@ -87,18 +79,7 @@ class AIRouter {
             finalProvider: fallbackProvider.name,
             fallbackResponseProvider: fallbackResponse.provider,
           });
-          // Enhance fallback response with metadata
-          const enhancedFallbackResponse = {
-            ...fallbackResponse,
-            providerRequested: primaryProvider.name,
-            providerActual: fallbackResponse.provider,
-            fallbackUsed: true,
-            fallbackFrom: primaryProvider.name,
-            fallbackTo: fallbackProvider.name,
-            fallbackReason: error.message,
-            taskType: task.type,
-          };
-          return enhancedFallbackResponse;
+          return fallbackResponse;
         } catch (fallbackError) {
           logError('AIRouter', `Fallback provider ${fallbackProvider.name} failed`, {
             error: fallbackError instanceof Error ? fallbackError.message : String(fallbackError),

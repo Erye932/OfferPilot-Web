@@ -24,14 +24,6 @@ export interface AIResponse {
   provider: string;
   model: string;
   tokensUsed?: number;
-  // Extended metadata for fallback tracking
-  providerRequested?: string;
-  providerActual?: string;
-  fallbackUsed?: boolean;
-  fallbackFrom?: string;
-  fallbackTo?: string;
-  fallbackReason?: string;
-  taskType?: string;
 }
 
 export interface AIProviderConfig {

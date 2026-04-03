@@ -122,15 +122,6 @@ export interface ReportMetadata {
   // 深度 fallback 状态（Phase 4 使用）
   deep_fallback_reason?: string;
   deep_fallback_message?: string;
-  // 深度研究阶段 provider 追踪（Phase 5 使用）
-  research_provider_requested?: string;
-  research_provider_actual?: string;
-  research_fallback_used?: boolean;
-  research_fallback_reason?: string;
-  research_fallback_from?: string;
-  research_fallback_to?: string;
-  research_memo_available?: boolean;
-  deep_diagnosis_executed?: boolean;
 }
 
 // ─── Request ─────────────────────────────────────────────────
