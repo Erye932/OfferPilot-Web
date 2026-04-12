@@ -431,6 +431,10 @@ export function buildDeepResearchMemoPrompt(
 
 ## 输入
 目标岗位: ${input.target_role}
+${input.role_resolution ? `标准化岗位: ${input.role_resolution.canonical_role}
+岗位族: ${input.role_resolution.role_family}
+相关岗位: ${input.role_resolution.alt_roles.join('、') || '无'}
+推断技能: ${input.role_resolution.skills_inferred.join('、') || '无'}` : ''}
 JD: ${truncatedJd}
 
 ## 简历关键事实
@@ -502,7 +506,25 @@ export function buildDeepSynthesisPrompt(
 2. 【明确增量价值】每个核心问题必须说明"为什么基础诊断没说到这个"以及"为什么这很重要"。
 3. 【严禁编造数据】只能基于简历中已有的信息做推断。不得编造项目、数据、公司。如需假设，标注"[需要你补充]"。
 4. 【允许提问】如发现关键信息缺失，在 follow_up_question 中明确提出需要用户补充什么。
-5. 【输出完整 JSON】必须返回合法的 FreeDiagnoseResponse 格式 JSON。
+5. 【输出纯 JSON】必须返回合法的 FreeDiagnoseResponse 格式 JSON，且只输出 JSON，不要有任何额外的 markdown 代码块、解释文字或前缀后缀。
+6. 【红队视角-证据绑定】（Phase 4 核心）ats_analysis / hr_analysis / interview_risk_analysis 中的每个高风险项必须附上 evidence_binding：
+   - 必须从简历原文中引用具体片段作为 evidence
+   - 必须指明 who_rejects（谁会因此拒绝：ats / hr_6s / hr_30s / interviewer）
+   - 必须说明 why_rejects（拒绝的具体原因）
+   - 不允许只输出文案式描述而没有证据绑定
+
+## 枚举字段允许值（必须严格使用这些值）
+- scenario: "normal", "excellent", "insufficient_input"
+- quality_tier: "excellent", "strong", "medium", "weak"
+- jd_relevance: "high", "medium", "low", "none"
+- dimension: "structure", "role_fit", "evidence", "credibility", "expression", "missing_info", "other"
+- severity: "must_fix", "should_fix", "optional", "nitpicky"
+- probability: "high", "medium", "low", "very_low"
+- impact_surface: "ats", "hr_6s", "hr_30s", "interview", "combined"
+- enrichment_safety: "safe_expand", "needs_user_input", "forbidden_to_invent"
+- source: "hr", "master", "both"
+- risk_level: "low", "medium", "high"
+- decision_estimate: "pass", "interview", "hold"
 
 ## 基础诊断结果（已知的，不要重复）
 场景: ${basicResult.scenario}
@@ -535,15 +557,15 @@ ${truncatedResume}
       "suggestion": "具体改写建议或解决方案",
       "follow_up_question": "需要用户补充的信息（如无则留空）",
       "priority": 1,
-      "jd_relevance": "high|medium|low|none",
-      "is_structural": true或false,
-      "dimension": "structure|role_fit|evidence|credibility|expression|missing_info|other",
+      "jd_relevance": "high",
+      "is_structural": false,
+      "dimension": "structure",
       "screening_impact": "对简历筛选的具体影响"
     }
   ],
   "core_issues_summary": {
-    "total_count": core_issues的实际数量,
-    "shown_count": 实际展示数量
+    "total_count": 1,
+    "shown_count": 1
   },
   "priority_actions": [
     { "title": "立即行动项", "description": "具体怎么做" }
@@ -562,27 +584,32 @@ ${truncatedResume}
       "interview_risk": { "before": "当前风险", "after": "改进后风险" }
     },
     "problem_pool": {
-      "must_fix": [ { "id": "p1", "title": "...", "severity": "must_fix", "probability": "high|medium|low|very_low", "impact_surface": "ats|hr_6s|hr_30s|interview|combined", "evidence": "...", "why_it_hurts": "...", "basic_already_mentioned": true|false, "incremental_value": "...", "enrichment_safety": "safe_expand|needs_user_input|forbidden_to_invent", "source": "hr|master|both", "dimension": "structure|role_fit|evidence|credibility|expression|missing_info|other", "jd_relevance": "high|medium|low|none", "is_structural": true|false } ],
+      "must_fix": [ { "id": "p1", "title": "...", "severity": "must_fix", "probability": "high", "impact_surface": "ats", "evidence": "...", "why_it_hurts": "...", "basic_already_mentioned": false, "incremental_value": "...", "enrichment_safety": "safe_expand", "source": "hr", "dimension": "structure", "jd_relevance": "high", "is_structural": false } ],
       "should_fix": [],
       "optional_optimize": [],
       "nitpicky": []
     },
     "ats_analysis": {
-      "risk_level": "low|medium|high",
+      "risk_level": "medium",
       "keyword_gaps": ["缺失关键词"],
       "format_risks": ["格式风险"],
-      "match_rate_estimate": "ATS匹配率估计"
+      "match_rate_estimate": "ATS匹配率估计",
+      "keyword_gap_evidence": [{ "risk": "缺失'Spring'关键词", "evidence": "原文片段：'熟悉Java生态'", "who_rejects": "ats", "why_rejects": "ATS系统因缺少关键技能词直接过滤" }],
+      "format_risk_evidence": [{ "risk": "联系方式格式不规范", "evidence": "原文片段：'邮箱：admin@', "who_rejects": "ats", "why_rejects": "ATS无法正确解析非标准邮箱格式" }]
     },
     "hr_analysis": {
-      "risk_level": "low|medium|high",
+      "risk_level": "medium",
       "six_second_risks": ["6秒扫描风险"],
       "thirty_second_risks": ["30秒审阅风险"],
-      "decision_estimate": "pass|interview|hold"
+      "decision_estimate": "pass",
+      "six_second_risk_evidence": [{ "risk": "工作经历顺序混乱", "evidence": "原文片段：'2019年-2021年：销售助理；2021年-2023年：产品运营'", "who_rejects": "hr_6s", "why_rejects": "HR在6秒扫描时无法快速定位最近的工作经历" }],
+      "thirty_second_risk_evidence": [{ "risk": "量化数据缺失", "evidence": "原文片段：'负责用户增长工作'", "who_rejects": "hr_30s", "why_rejects": "没有量化数据支撑，HR无法判断实际贡献大小" }]
     },
     "interview_risk_analysis": {
       "likely_questions": ["可能被追问的问题"],
       "weak_points": ["面试暴露的弱点"],
-      "preparation_suggestions": ["准备建议"]
+      "preparation_suggestions": ["准备建议"],
+      "weak_point_evidence": [{ "risk": "项目复杂度不足", "evidence": "原文片段：'主导了用户增长模块开发'", "who_rejects": "interviewer", "why_rejects": "面试官追问项目细节时，无法说清技术难点和解决方案" }]
     },
     "content_expansion_plan": {
       "safe_expand": [{ "location": "可安全展开的段落", "suggestion": "怎么展开" }],

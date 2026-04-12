@@ -1,0 +1,917 @@
+openapi: 3.1.0
+info:
+  title: OfferPilot API
+  description: |
+    OfferPilot 简历诊断 API
+
+    **Base URL**: https://offerpilot-web.vercel.app
+
+    所有 API 均通过 HTTPS 访问。
+  version: 1.0.0
+  contact:
+    name: OfferPilot
+servers:
+  - url: https://offerpilot-web.vercel.app
+    description: Production
+
+paths:
+  # ─── 简历诊断 ───────────────────────────────────────────────────────────
+  /api/diagnose:
+    post:
+      operationId: diagnoseResume
+      summary: 诊断简历
+      description: |
+        输入简历文本和目标岗位，返回结构化诊断报告。
+
+        **诊断模式**:
+        - `basic`（默认）：快速诊断，输出 core_issues + audit_rows
+        - `deep`：深度诊断，在 basic 基础上额外输出 deep_report（含 ATS/HR/面试风险分析）
+
+        **认证**：无需认证，通过匿名会话限流
+      tags:
+        - 诊断
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DiagnoseRequest'
+            example:
+              resume_text: |
+                张三
+                北京大学 计算机科学硕士
+                2021.09 - 2024.06
+
+                工作经历
+                字节跳动 | 后端开发工程师 | 2022.07 - 2024.06
+                - 负责用户增长系统后端开发
+                - 主导了用户增长模块开发
+                - 企业模拟项目：担任财务总监
+              target_role: 后端开发工程师
+              jd_text: |
+                岗位要求：
+                - 3年以上后端开发经验
+                - 熟悉 Java、Spring、MySQL
+                - 有高并发系统经验优先
+              tier: free
+              source_type: paste
+              diagnose_mode: basic
+      responses:
+        '200':
+          description: 诊断成功
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DiagnoseResponse'
+        '400':
+          description: 参数错误
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '429':
+          description: 请求过于频繁
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: 服务器内部错误
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  # ─── 诊断报告查询 ────────────────────────────────────────────────────────
+  /api/diagnose/report/{id}:
+    get:
+      operationId: getDiagnoseReport
+      summary: 查询诊断报告
+      description: 通过报告ID查询已保存的诊断结果
+      tags:
+        - 诊断
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: 诊断报告ID
+          schema:
+            type: string
+      responses:
+        '200':
+          description: 查询成功
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DiagnoseReportResponse'
+        '404':
+          description: 报告不存在
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  # ─── PDF 解析 ────────────────────────────────────────────────────────────
+  /api/pdf/parse:
+    post:
+      operationId: parsePdf
+      summary: 解析 PDF 文件
+      description: |
+        上传 PDF 文件，提取其中的文本内容。
+
+        **限制**：
+        - 支持 PDF 文件，不超过 10MB
+        - 仅支持文本型 PDF（不支持扫描版/图片 PDF）
+      tags:
+        - 工具
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                file:
+                  type: string
+                  format: binary
+                  description: PDF 文件（不超过 10MB）
+      responses:
+        '200':
+          description: 解析成功
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PdfParseResponse'
+        '400':
+          description: 文件格式错误或文件过大
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: PDF 解析失败
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  # ─── AI 解释 ────────────────────────────────────────────────────────────
+  /api/explain:
+    post:
+      operationId: explainIssue
+      summary: 解释诊断问题
+      description: |
+        针对诊断报告中的某个具体问题，AI 解释为什么系统会这样判断。
+
+        **约束**：
+        - 不重新判断，不新增问题
+        - 只引用原简历证据链进行解释
+        - 证据薄弱时会主动承认并提供替代建议
+      tags:
+        - AI 助手
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ExplainRequest'
+            example:
+              issue_title: "量化数据缺失让HR无法判断你的实际贡献"
+              issue_summary: "简历中'负责用户增长系统后端开发'一段缺乏具体数据支撑"
+              issue_suggestion: "建议补充具体的用户增长数字或项目成果"
+              resume_excerpt: "字节跳动 | 后端开发工程师 | 2022.07 - 2024.06\n- 负责用户增长系统后端开发\n- 主导了用户增长模块开发"
+              screening_impact: "HR在10秒浏览阶段可能直接跳过这份简历"
+              dimension: evidence
+              jd_relevance: high
+      responses:
+        '200':
+          description: 解释生成成功
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExplainResponse'
+        '400':
+          description: 参数错误
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '429':
+          description: 请求过于频繁
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+components:
+  schemas:
+    # ─── 诊断请求 ─────────────────────────────────────────────────────────
+    DiagnoseRequest:
+      type: object
+      required:
+        - resume_text
+        - target_role
+      properties:
+        resume_text:
+          type: string
+          description: 简历文本内容
+          example: "张三\n北京大学 计算机科学硕士\n工作经历\n字节跳动 | 后端开发工程师..."
+        resume_paragraphs:
+          type: array
+          items:
+            type: string
+          description: 可选，预分段简历（如果不传，系统自动分段）
+        target_role:
+          type: string
+          description: 目标岗位名称
+          example: 后端开发工程师
+        jd_text:
+          type: string
+          description: 职位描述（可选，但建议提供以获得更准确诊断）
+        tier:
+          type: string
+          enum: [free, paid]
+          default: free
+          description: 诊断层级
+        source_type:
+          type: string
+          enum: [paste, pdf]
+          default: paste
+          description: 简历来源类型
+        uploaded_file_id:
+          type: string
+          description: 上传文件ID（source_type 为 pdf 时使用）
+        diagnose_mode:
+          type: string
+          enum: [basic, deep]
+          default: basic
+          description: 诊断模式（basic=快速诊断，deep=深度诊断）
+
+    # ─── 诊断响应 ─────────────────────────────────────────────────────────
+    DiagnoseResponse:
+      type: object
+      description: 完整诊断响应（FreeDiagnoseResponse）
+      properties:
+        scenario:
+          type: string
+          enum: [normal, excellent, insufficient_input]
+          description: 诊断场景分类
+        main_judgment:
+          type: string
+          description: 一句话核心结论
+        core_issues:
+          type: array
+          items:
+            $ref: '#/components/schemas/CoreIssue'
+        core_issues_summary:
+          type: object
+          properties:
+            total_count:
+              type: integer
+            shown_count:
+              type: integer
+        priority_actions:
+          type: array
+          items:
+            $ref: '#/components/schemas/PriorityAction'
+        minor_suggestions:
+          type: array
+          items:
+            $ref: '#/components/schemas/MinorSuggestion'
+        rewrite_examples:
+          type: array
+          items:
+            $ref: '#/components/schemas/RewriteExample'
+        follow_up_prompts:
+          type: array
+          items:
+            $ref: '#/components/schemas/FollowUpPrompt'
+        excellent_score:
+          type: number
+          description: 简历质量评分（0-100）
+        quality_tier:
+          type: string
+          enum: [excellent, strong, medium, weak]
+        audit_rows:
+          type: array
+          description: 全量审计底稿（Phase 1 新增）
+          items:
+            $ref: '#/components/schemas/AuditRow'
+        grouped_issues_by_section:
+          type: object
+          description: 按段落分组的审计问题
+          additionalProperties:
+            type: array
+            items:
+              $ref: '#/components/schemas/CoreIssue'
+        grouped_issues_by_dimension:
+          type: object
+          description: 按维度分组的审计问题
+          additionalProperties:
+            type: array
+            items:
+              $ref: '#/components/schemas/CoreIssue'
+        missing_info_summary:
+          type: array
+          items:
+            type: string
+          description: 缺失信息摘要
+        deep_report:
+          $ref: '#/components/schemas/DeepReport'
+        metadata:
+          $ref: '#/components/schemas/ReportMetadata'
+
+    # ─── 核心问题 ─────────────────────────────────────────────────────────
+    CoreIssue:
+      type: object
+      properties:
+        title:
+          type: string
+          description: 问题标题
+        summary:
+          type: string
+          description: 问题说明
+        evidence:
+          type: string
+          description: 来自简历原文的证据
+        insider_view:
+          type: string
+          description: 招聘方视角
+        suggestion:
+          type: string
+          description: 改写建议
+        follow_up_question:
+          type: string
+          description: 需要用户补充的问题
+        priority:
+          type: integer
+          description: 优先级（1 最高）
+        screening_impact:
+          type: string
+          description: 对初筛的影响
+        is_structural:
+          type: boolean
+          description: 是否为结构性问题
+        jd_relevance:
+          type: string
+          enum: [high, medium, low, none]
+        dimension:
+          type: string
+          enum: [structure, role_fit, evidence, credibility, expression, missing_info, other]
+        source_location:
+          $ref: '#/components/schemas/SourceLocation'
+        rewrite_examples:
+          type: array
+          items:
+            $ref: '#/components/schemas/RewriteExample'
+
+    # ─── 审计行（Phase 1 新增）────────────────────────────────────────────
+    AuditRow:
+      type: object
+      description: 全量审计底稿中的一行
+      properties:
+        section:
+          type: string
+          description: 简历段落类型
+        dimension:
+          type: string
+          description: 问题维度
+        status:
+          type: string
+          enum: [ok, issue, missing_info]
+        title:
+          type: string
+        evidence:
+          type: array
+          items:
+            type: string
+        source_location:
+          $ref: '#/components/schemas/SourceLocation'
+        evidence_strength:
+          type: string
+          enum: [strong, medium, weak]
+        why_it_hurts:
+          type: string
+        fix_type:
+          type: string
+          enum: [safe_expand, needs_user_input, forbidden_to_invent]
+        required_user_inputs:
+          type: array
+          items:
+            type: string
+        severity:
+          type: string
+          enum: [must_fix, should_fix, optional, nitpicky]
+        probability:
+          type: string
+          enum: [high, medium, low, very_low]
+        impact_surface:
+          type: string
+          enum: [ats, hr_6s, hr_30s, interview, combined]
+
+    # ─── 深度报告 ─────────────────────────────────────────────────────────
+    DeepReport:
+      type: object
+      description: 深度诊断报告（仅 deep 模式）
+      properties:
+        deep_value_summary:
+          type: string
+        current_vs_after_metrics:
+          type: object
+          properties:
+            ats_match_rate:
+              type: object
+              properties:
+                before:
+                  type: string
+                after:
+                  type: string
+            hr_6s_pass_rate:
+              type: object
+              properties:
+                before:
+                  type: string
+                after:
+                  type: string
+            interview_risk:
+              type: object
+              properties:
+                before:
+                  type: string
+                after:
+                  type: string
+        problem_pool:
+          type: object
+          properties:
+            must_fix:
+              type: array
+              items:
+                $ref: '#/components/schemas/DeepProblem'
+            should_fix:
+              type: array
+              items:
+                $ref: '#/components/schemas/DeepProblem'
+            optional_optimize:
+              type: array
+              items:
+                $ref: '#/components/schemas/DeepProblem'
+            nitpicky:
+              type: array
+              items:
+                $ref: '#/components/schemas/DeepProblem'
+        ats_analysis:
+          $ref: '#/components/schemas/AtsAnalysis'
+        hr_analysis:
+          $ref: '#/components/schemas/HrAnalysis'
+        interview_risk_analysis:
+          $ref: '#/components/schemas/InterviewRiskAnalysis'
+        content_expansion_plan:
+          type: object
+          properties:
+            safe_expand:
+              type: array
+              items:
+                type: object
+                properties:
+                  location:
+                    type: string
+                  suggestion:
+                    type: string
+            needs_user_input:
+              type: array
+              items:
+                type: object
+                properties:
+                  location:
+                    type: string
+                  question:
+                    type: string
+            forbidden_to_invent:
+              type: array
+              items:
+                type: string
+        rewrite_pack:
+          type: array
+          items:
+            $ref: '#/components/schemas/RewriteExample'
+        impact_projection:
+          type: object
+          properties:
+            score_improvement_estimate:
+              type: string
+            ats_pass_probability:
+              type: string
+            hr_pass_probability:
+              type: string
+            interview_probability:
+              type: string
+        action_plan:
+          type: object
+          properties:
+            immediate_actions:
+              type: array
+              items:
+                type: string
+            requires_user_input:
+              type: array
+              items:
+                type: string
+            optional_improvements:
+              type: array
+              items:
+                type: string
+
+    # ─── ATS 分析（Phase 4 红队视角）────────────────────────────────────
+    AtsAnalysis:
+      type: object
+      properties:
+        risk_level:
+          type: string
+          enum: [low, medium, high]
+        keyword_gaps:
+          type: array
+          items:
+            type: string
+        format_risks:
+          type: array
+          items:
+            type: string
+        match_rate_estimate:
+          type: string
+        keyword_gap_evidence:
+          type: array
+          description: 每个关键词差距的证据绑定（Phase 4）
+          items:
+            $ref: '#/components/schemas/RiskEvidenceBinding'
+        format_risk_evidence:
+          type: array
+          description: 每个格式风险的证据绑定（Phase 4）
+          items:
+            $ref: '#/components/schemas/RiskEvidenceBinding'
+
+    # ─── HR 分析（Phase 4 红队视角）─────────────────────────────────────
+    HrAnalysis:
+      type: object
+      properties:
+        risk_level:
+          type: string
+          enum: [low, medium, high]
+        six_second_risks:
+          type: array
+          items:
+            type: string
+        thirty_second_risks:
+          type: array
+          items:
+            type: string
+        decision_estimate:
+          type: string
+          enum: [pass, interview, hold]
+        six_second_risk_evidence:
+          type: array
+          description: 每个6秒风险的证据绑定（Phase 4）
+          items:
+            $ref: '#/components/schemas/RiskEvidenceBinding'
+        thirty_second_risk_evidence:
+          type: array
+          description: 每个30秒风险的证据绑定（Phase 4）
+          items:
+            $ref: '#/components/schemas/RiskEvidenceBinding'
+
+    # ─── 面试风险分析（Phase 4 红队视角）────────────────────────────────
+    InterviewRiskAnalysis:
+      type: object
+      properties:
+        likely_questions:
+          type: array
+          items:
+            type: string
+        weak_points:
+          type: array
+          items:
+            type: string
+        preparation_suggestions:
+          type: array
+          items:
+            type: string
+        weak_point_evidence:
+          type: array
+          description: 每个弱点的证据绑定（Phase 4）
+          items:
+            $ref: '#/components/schemas/RiskEvidenceBinding'
+
+    # ─── 风险证据绑定（Phase 4）───────────────────────────────────────────
+    RiskEvidenceBinding:
+      type: object
+      description: 每个风险项必须附上的证据绑定
+      properties:
+        risk:
+          type: string
+          description: 风险描述
+        evidence:
+          type: string
+          description: 来源原文
+        source_location:
+          $ref: '#/components/schemas/SourceLocation'
+        who_rejects:
+          type: string
+          enum: [ats, hr_6s, hr_30s, interviewer]
+          description: 谁会因此拒绝这份简历
+        why_rejects:
+          type: string
+          description: 拒绝原因
+
+    # ─── 深度问题 ────────────────────────────────────────────────────────
+    DeepProblem:
+      type: object
+      properties:
+        id:
+          type: string
+        title:
+          type: string
+        severity:
+          type: string
+          enum: [must_fix, should_fix, optional, nitpicky]
+        probability:
+          type: string
+          enum: [high, medium, low, very_low]
+        impact_surface:
+          type: string
+          enum: [ats, hr_6s, hr_30s, interview, combined]
+        evidence:
+          type: string
+        why_it_hurts:
+          type: string
+        basic_already_mentioned:
+          type: boolean
+        incremental_value:
+          type: string
+        ats_risk:
+          type: string
+        hr_risk:
+          type: string
+        interview_risk:
+          type: string
+        direct_fix:
+          type: string
+        rewrite_template:
+          type: string
+        rewrite_example:
+          $ref: '#/components/schemas/RewriteExample'
+        required_user_inputs:
+          type: array
+          items:
+            type: string
+        enrichment_safety:
+          type: string
+          enum: [safe_expand, needs_user_input, forbidden_to_invent]
+        source:
+          type: string
+          enum: [hr, master, both]
+        dimension:
+          type: string
+          enum: [structure, role_fit, evidence, credibility, expression, missing_info, other]
+        jd_relevance:
+          type: string
+          enum: [high, medium, low, none]
+        is_structural:
+          type: boolean
+        follow_up_question:
+          type: string
+        source_location:
+          $ref: '#/components/schemas/SourceLocation'
+
+    # ─── 来源位置 ─────────────────────────────────────────────────────────
+    SourceLocation:
+      type: object
+      properties:
+        paragraph_index:
+          type: integer
+          description: 段落索引（从 0 开始）
+        sentence_index:
+          type: integer
+          description: 句子索引（从 0 开始）
+        text_snippet:
+          type: string
+          description: 用于定位的原文片段（前 80 字）
+
+    # ─── 优先行动 ─────────────────────────────────────────────────────────
+    PriorityAction:
+      type: object
+      properties:
+        title:
+          type: string
+        description:
+          type: string
+
+    # ─── 次要建议 ─────────────────────────────────────────────────────────
+    MinorSuggestion:
+      type: object
+      properties:
+        title:
+          type: string
+        description:
+          type: string
+        category:
+          type: string
+
+    # ─── 改写示例 ─────────────────────────────────────────────────────────
+    RewriteExample:
+      type: object
+      properties:
+        original:
+          type: string
+          description: 原文
+        rewritten:
+          type: string
+          description: 改写后版本
+        change_summary:
+          type: string
+          description: 变化说明
+
+    # ─── 追问提示 ─────────────────────────────────────────────────────────
+    FollowUpPrompt:
+      type: object
+      properties:
+        question:
+          type: string
+        why:
+          type: string
+
+    # ─── 报告元数据 ───────────────────────────────────────────────────────
+    ReportMetadata:
+      type: object
+      properties:
+        target_role:
+          type: string
+        has_jd:
+          type: boolean
+        generated_at:
+          type: string
+          format: date-time
+        tier:
+          type: string
+          enum: [free, paid]
+        jd_quality:
+          type: string
+          enum: [none, weak, strong]
+        schema_version:
+          type: string
+        diagnose_mode:
+          type: string
+          enum: [basic, deep]
+        deep_diagnosis:
+          type: boolean
+        based_on_basic_report:
+          type: boolean
+        deep_value_summary:
+          type: string
+        ats_risk_level:
+          type: string
+          enum: [low, medium, high]
+        hr_risk_level:
+          type: string
+          enum: [low, medium, high]
+        research_provider_requested:
+          type: string
+        research_provider_actual:
+          type: string
+        research_fallback_used:
+          type: boolean
+        research_fallback_reason:
+          type: string
+        research_memo_available:
+          type: boolean
+        deep_diagnosis_executed:
+          type: boolean
+
+    # ─── 诊断报告查询响应 ────────────────────────────────────────────────
+    DiagnoseReportResponse:
+      type: object
+      properties:
+        id:
+          type: string
+        sessionId:
+          type: string
+        mainJudgment:
+          type: string
+        reportJson:
+          type: object
+        modelName:
+          type: string
+        confidence:
+          type: number
+        createdAt:
+          type: string
+          format: date-time
+        auditJson:
+          type: object
+          description: 审计底稿（Phase 6 新增）
+        providerTraceJson:
+          type: object
+          description: AI provider 追踪（Phase 6 新增）
+        coverageVersion:
+          type: string
+          description: 覆盖矩阵版本（Phase 6 新增）
+
+    # ─── PDF 解析响应 ────────────────────────────────────────────────────
+    PdfParseResponse:
+      type: object
+      properties:
+        text:
+          type: string
+          description: 提取的文本内容
+        paragraphs:
+          type: array
+          items:
+            type: string
+          description: 分段文本
+        fileName:
+          type: string
+        pageCount:
+          type: integer
+        textLength:
+          type: integer
+        mimeType:
+          type: string
+        parseStatus:
+          type: string
+          enum: [success, no_text, failed]
+        extraction_quality:
+          type: string
+          enum: [high, medium, low]
+        error_code:
+          type: string
+          description: 错误代码（解析失败时）
+        pdf_error_code:
+          type: string
+          description: PDF 特定错误代码
+
+    # ─── AI 解释请求 ────────────────────────────────────────────────────
+    ExplainRequest:
+      type: object
+      required:
+        - issue_title
+        - issue_summary
+      properties:
+        issue_title:
+          type: string
+          description: 问题标题
+        issue_summary:
+          type: string
+          description: 问题摘要
+        issue_suggestion:
+          type: string
+          description: 改写建议
+        resume_excerpt:
+          type: string
+          description: 相关简历原文片段
+        user_question:
+          type: string
+          description: 用户的追问
+        screening_impact:
+          type: string
+        dimension:
+          type: string
+          enum: [structure, role_fit, evidence, credibility, expression, missing_info, other]
+        jd_relevance:
+          type: string
+          enum: [high, medium, low, none]
+        is_structural:
+          type: boolean
+
+    # ─── AI 解释响应 ────────────────────────────────────────────────────
+    ExplainResponse:
+      type: object
+      properties:
+        explanation:
+          type: string
+          description: 解释内容
+        corpus_evidence:
+          type: string
+          description: 语料库佐证
+        confidence:
+          type: string
+          enum: [high, medium, low]
+        might_be_wrong:
+          type: string
+          description: 主动承认可能的错误（仅在证据薄弱时）
+        follow_up_suggestion:
+          type: string
+        evidence_strength:
+          type: string
+          enum: [strong, moderate, weak]
+
+    # ─── 错误响应 ────────────────────────────────────────────────────────
+    ErrorResponse:
+      type: object
+      properties:
+        error:
+          type: object
+          properties:
+            code:
+              type: string
+            message:
+              type: string
+            details:
+              type: object

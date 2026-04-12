@@ -25,6 +25,21 @@ export const basicSummarySchema = z.object({
 
 export type BasicSummary = z.infer<typeof basicSummarySchema>;
 
+// ─── Risk Evidence Binding Schema (Phase 4) ─────────────────────
+export const riskEvidenceBindingSchema = z.object({
+  risk: z.string(),
+  evidence: z.string(),
+  source_location: z.object({
+    paragraph_index: z.number().optional(),
+    sentence_index: z.number().optional(),
+    text_snippet: z.string().optional(),
+  }).optional(),
+  who_rejects: z.enum(['ats', 'hr_6s', 'hr_30s', 'interviewer']).optional(),
+  why_rejects: z.string().optional(),
+});
+
+export type RiskEvidenceBinding = z.infer<typeof riskEvidenceBindingSchema>;
+
 // ─── Deep Diagnosis Schemas ──────────────────────────────────
 export const deepProblemSchema = z.object({
   id: z.string(),
@@ -60,6 +75,36 @@ export const deepProblemSchema = z.object({
   }).optional(),
 });
 
+const atsAnalysisSchema = z.object({
+  risk_level: z.enum(['low', 'medium', 'high']),
+  keyword_gaps: z.array(z.string()),
+  format_risks: z.array(z.string()),
+  match_rate_estimate: z.string(),
+  /** Phase 4 新增：每个关键词差距的证据绑定（必须回答"哪句原文导致了哪个淘汰风险"） */
+  keyword_gap_evidence: z.array(riskEvidenceBindingSchema).optional(),
+  /** Phase 4 新增：每个格式风险的证据绑定 */
+  format_risk_evidence: z.array(riskEvidenceBindingSchema).optional(),
+});
+
+const hrAnalysisSchema = z.object({
+  risk_level: z.enum(['low', 'medium', 'high']),
+  six_second_risks: z.array(z.string()),
+  thirty_second_risks: z.array(z.string()),
+  decision_estimate: z.enum(['pass', 'interview', 'hold']),
+  /** Phase 4 新增：每个6秒风险的证据绑定（必须回答"谁会拒你、为什么、基于哪句原文"） */
+  six_second_risk_evidence: z.array(riskEvidenceBindingSchema).optional(),
+  /** Phase 4 新增：每个30秒风险的证据绑定 */
+  thirty_second_risk_evidence: z.array(riskEvidenceBindingSchema).optional(),
+});
+
+const interviewRiskAnalysisSchema = z.object({
+  likely_questions: z.array(z.string()),
+  weak_points: z.array(z.string()),
+  preparation_suggestions: z.array(z.string()),
+  /** Phase 4 新增：每个弱点的证据绑定（必须回答"哪句原文暴露了哪个弱点"） */
+  weak_point_evidence: z.array(riskEvidenceBindingSchema).optional(),
+});
+
 export const deepReportSchema = z.object({
   deep_value_summary: z.string(),
   current_vs_after_metrics: z.object({
@@ -73,23 +118,9 @@ export const deepReportSchema = z.object({
     optional_optimize: z.array(deepProblemSchema),
     nitpicky: z.array(deepProblemSchema),
   }),
-  ats_analysis: z.object({
-    risk_level: z.enum(['low', 'medium', 'high']),
-    keyword_gaps: z.array(z.string()),
-    format_risks: z.array(z.string()),
-    match_rate_estimate: z.string(),
-  }),
-  hr_analysis: z.object({
-    risk_level: z.enum(['low', 'medium', 'high']),
-    six_second_risks: z.array(z.string()),
-    thirty_second_risks: z.array(z.string()),
-    decision_estimate: z.enum(['pass', 'interview', 'hold']),
-  }),
-  interview_risk_analysis: z.object({
-    likely_questions: z.array(z.string()),
-    weak_points: z.array(z.string()),
-    preparation_suggestions: z.array(z.string()),
-  }),
+  ats_analysis: atsAnalysisSchema,
+  hr_analysis: hrAnalysisSchema,
+  interview_risk_analysis: interviewRiskAnalysisSchema,
   content_expansion_plan: z.object({
     safe_expand: z.array(z.object({ location: z.string(), suggestion: z.string() })),
     needs_user_input: z.array(z.object({ location: z.string(), question: z.string() })),

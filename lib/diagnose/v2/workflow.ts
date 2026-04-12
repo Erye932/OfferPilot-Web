@@ -38,6 +38,13 @@ import {
 } from './prompts';
 import { mapToFreeDiagnoseResponse } from './mappers';
 
+// 清洗非法控制字符（U+0000 - U+001F 除了 \t \n \r）
+function cleanControlCharacters(text: string): string {
+  // 允许的空白字符：制表符 \t (U+0009)、换行 \n (U+000A)、回车 \r (U+000D)
+  // 替换其他控制字符为空格
+  return text.replace(/[\u0000-\u0008\u000B\u000C\u000E-\u001F\u007F\u0080-\u009F]/g, ' ');
+}
+
 // 尝试修复常见的 JSON 格式问题
 function attemptJsonRepair(text: string): string {
   let s = text.trim();
@@ -56,12 +63,15 @@ function attemptJsonRepair(text: string): string {
 
 // 安全 JSON 解析辅助函数
 function safeParseJson<T>(content: string, schema?: z.ZodSchema<T>): T {
-  // 提取候选 JSON 文本（代码块优先，其次最外层对象/数组）
+  // 1. 先清洗非法控制字符
+  content = cleanControlCharacters(content);
+
+  // 2. 提取候选 JSON 文本（代码块优先，其次最外层对象/数组）
   const codeBlockMatch = content.match(/```(?:json)?\n([\s\S]*?)\n```/);
   const objectMatch = content.match(/(\{[\s\S]*\}|\[[\s\S]*\])/);
   const candidates: string[] = [];
-  if (codeBlockMatch?.[1]) candidates.push(codeBlockMatch[1]);
-  if (objectMatch?.[1]) candidates.push(objectMatch[1]);
+  if (codeBlockMatch?.[1]) candidates.push(cleanControlCharacters(codeBlockMatch[1]));
+  if (objectMatch?.[1]) candidates.push(cleanControlCharacters(objectMatch[1]));
   candidates.push(content);
 
   let parsed: unknown;
@@ -251,7 +261,7 @@ export async function runDualDiagnoseWorkflow(
   try {
     logInfo('DualWorkflow', '开始双 AI 诊断工作流');
 
-    const normalizedInput = normalizeInput(request);
+    const normalizedInput = await normalizeInput(request);
 
     const baseResult = await runBaseAnalyzer(normalizedInput);
 
@@ -306,6 +316,25 @@ async function runDeepResearchMemo(
     temperature: 0.4,
     maxTokens: 2000,
     requireJson: false,
+  });
+
+  // 调试日志：打印 AIResponse 结构
+  logInfo('DeepWorkflow', 'AIResponse 结构调试', {
+    responseKeys: Object.keys(response),
+    hasProviderRequested: 'providerRequested' in response,
+    hasProviderActual: 'providerActual' in response,
+    hasFallbackUsed: 'fallbackUsed' in response,
+    hasFallbackReason: 'fallbackReason' in response,
+    providerRequestedValue: response.providerRequested,
+    providerActualValue: response.providerActual,
+    fallbackUsedValue: response.fallbackUsed,
+    fallbackReasonValue: response.fallbackReason,
+    fallbackFromValue: response.fallbackFrom,
+    fallbackToValue: response.fallbackTo,
+    taskTypeValue: response.taskType,
+    providerValue: response.provider,
+    modelValue: response.model,
+    contentLength: response.content.length,
   });
 
   // Strict mode validation: if fallback occurred and strict mode is enabled, throw error
@@ -370,6 +399,10 @@ async function runDeepSynthesis(
     follow_up_prompts: parsedFollowUpPrompts || basicResult.follow_up_prompts,
     excellent_score: parsedExcellentScore ?? basicResult.excellent_score,
     quality_tier: parsedQualityTier || basicResult.quality_tier,
+    audit_rows: basicResult.audit_rows,
+    grouped_issues_by_section: basicResult.grouped_issues_by_section,
+    grouped_issues_by_dimension: basicResult.grouped_issues_by_dimension,
+    missing_info_summary: basicResult.missing_info_summary,
     metadata: {
       ...basicResult.metadata,
       diagnose_mode: 'deep',
@@ -508,7 +541,7 @@ export async function runDeepDiagnoseWorkflow(
   try {
     logInfo('DeepWorkflow', '开始深度诊断工作流（新主路径）');
 
-    const normalizedInput = normalizeInput(request);
+    const normalizedInput = await normalizeInput(request);
     const basicSummary = extractBasicDiagnosisSummary(basicResult, normalizedInput);
 
     // Step 1: Research memo (Metaso)

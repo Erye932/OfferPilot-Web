@@ -13,6 +13,8 @@ import type {
   FollowUpPrompt,
   IssueDimension,
   SourceLocation,
+  AuditRow,
+  AuditBundle,
 } from './types';
 import { normalizeInput, InputQualityError } from './normalize';
 import { rulePreAnalysis } from './rules';
@@ -212,9 +214,89 @@ function matchSourceLocation(evidence: string, input: NormalizedInput): SourceLo
   return { text_snippet: snippet };
 }
 
+// ─── FMEA 风险评分 ────────────────────────────────────────────────
+// Phase 3: 基于 severity × probability × impact_surface 的统一风险分数
+// 用于：core_issues 排序可解释化，problem_pool 统一排序
+
+type SeverityLevel = 'must_fix' | 'should_fix' | 'optional' | 'nitpicky';
+type ProbabilityLevel = 'high' | 'medium' | 'low' | 'very_low';
+type ImpactLevel = 'ats' | 'hr_6s' | 'hr_30s' | 'interview' | 'combined';
+
+/** 从淘汰风险分推断严重程度 */
+function eliminationRiskToSeverity(eliminationRisk: number): SeverityLevel {
+  if (eliminationRisk >= 70) return 'must_fix';
+  if (eliminationRisk >= 50) return 'should_fix';
+  if (eliminationRisk >= 30) return 'optional';
+  return 'nitpicky';
+}
+
+/** 从证据强度推断发生概率 */
+function evidenceStrengthToProbability(strength: 'strong' | 'medium' | 'weak'): ProbabilityLevel {
+  if (strength === 'strong') return 'high';
+  if (strength === 'medium') return 'medium';
+  return 'low';
+}
+
+/** 从 dimension 推断影响面 */
+function dimensionToImpactSurface(dimension: IssueDimension): ImpactLevel {
+  switch (dimension) {
+    case 'role_fit': return 'hr_30s';
+    case 'evidence': return 'hr_30s';
+    case 'credibility': return 'ats';
+    case 'structure': return 'ats';
+    case 'missing_info': return 'hr_6s';
+    case 'expression': return 'interview';
+    default: return 'combined';
+  }
+}
+
+// FMEA 各因子分值表
+const SEVERITY_SCORES: Record<SeverityLevel, number> = {
+  must_fix: 4,
+  should_fix: 3,
+  optional: 2,
+  nitpicky: 1,
+};
+
+const PROBABILITY_SCORES: Record<ProbabilityLevel, number> = {
+  high: 4,
+  medium: 3,
+  low: 2,
+  very_low: 1,
+};
+
+const IMPACT_SCORES: Record<ImpactLevel, number> = {
+  combined: 4,
+  interview: 3,
+  hr_30s: 3,
+  hr_6s: 2,
+  ats: 2,
+};
+
+/**
+ * 计算 FMEA 风险优先级分数（RPN = Severity × Probability × Impact）
+ * 分数范围 1~64，用于问题排序的可解释参考
+ */
+function computeFmeaScore(
+  eliminationRisk: number,
+  dimension: IssueDimension,
+  evidenceStrength: 'strong' | 'medium' | 'weak'
+): number {
+  const severity = eliminationRiskToSeverity(eliminationRisk);
+  const probability = evidenceStrengthToProbability(evidenceStrength);
+  const impact = dimensionToImpactSurface(dimension);
+
+  return (
+    SEVERITY_SCORES[severity] *
+    PROBABILITY_SCORES[probability] *
+    IMPACT_SCORES[impact]
+  );
+}
+
 /**
  * 后端排序：从候选问题中选出最终核心问题并排序
  * V5: 动态问题数量 + 语义去雷同 + source_location
+ * V6 (Phase 3): FMEA 风险分数参与排序决策
  */
 function rankAndSelectIssues(
   candidates: AICandidateIssue[],
@@ -356,26 +438,47 @@ function rankAndSelectIssues(
 
     const glanceVisibility = Math.min(100, locationVisibility + summaryVisibility + rewriteVisibility);
 
+    // 4. FMEA 风险分数（Phase 3 新增）
+    // 证据强度由 evidence.length 推断
+    let evidenceStrength: 'strong' | 'medium' | 'weak' = 'medium';
+    if (c.evidence && c.evidence.length > 10 && !c.evidence.includes('未提供')) {
+      evidenceStrength = 'strong';
+    } else if (!c.evidence || c.evidence.includes('未提供') || c.evidence.length < 5) {
+      evidenceStrength = 'weak';
+    }
+    const fmeaScore = computeFmeaScore(eliminationRisk, dimension, evidenceStrength);
+    const severity = eliminationRiskToSeverity(eliminationRisk);
+    const probability = evidenceStrengthToProbability(evidenceStrength);
+    const impactSurface = dimensionToImpactSurface(dimension);
+
     return {
       issue: c,
       eliminationRisk,
       salience,
       glanceVisibility,
       dimension,
+      fmeaScore,
+      severity,
+      probability,
+      impactSurface,
     };
   });
 
-  // 三层裁决排序
+  // 四层裁决排序（Phase 3：FMEA 分数作为第一排序键）
   evaluated.sort((a, b) => {
-    // 第一级：淘汰风险（降序）
+    // 第一级：FMEA 风险分数（降序）— Phase 3 优先
+    if (Math.abs(a.fmeaScore - b.fmeaScore) >= 2) {
+      return b.fmeaScore - a.fmeaScore;
+    }
+    // 第二级：淘汰风险（降序）
     if (Math.abs(a.eliminationRisk - b.eliminationRisk) > 5) {
       return b.eliminationRisk - a.eliminationRisk;
     }
-    // 淘汰风险接近（差距≤5分），第二级：显眼度（降序）
+    // 淘汰风险接近（差距≤5分），第三级：显眼度（降序）
     if (Math.abs(a.salience - b.salience) > 5) {
       return b.salience - a.salience;
     }
-    // 显眼度也接近，第三级：一眼可见度（降序）
+    // 显眼度也接近，第四级：一眼可见度（降序）
     return b.glanceVisibility - a.glanceVisibility;
   });
 
@@ -661,6 +764,358 @@ function determineWorkflowScenario(
 }
 
 /**
+ * 从证据字符串中定位句子索引
+ */
+function findSentenceIndex(content: string, probe: string): number | undefined {
+  const sentences = content.split(/[。；\.\n]/).filter(s => s.trim().length > 0);
+  const shortProbe = probe.substring(0, Math.min(10, probe.length));
+  for (let si = 0; si < sentences.length; si++) {
+    if (sentences[si].includes(shortProbe)) return si;
+  }
+  return undefined;
+}
+
+/**
+ * 构建 AuditRow 的 source_location
+ */
+function buildSourceLocation(
+  section: { type: string; content: string; paragraph_index: number },
+  evidence: string[]
+): AuditRow['source_location'] {
+  const base: SourceLocation = { paragraph_index: section.paragraph_index };
+  if (evidence.length > 0) {
+    const si = findSentenceIndex(section.content, evidence[0]);
+    if (si !== undefined) base.sentence_index = si;
+    base.text_snippet = evidence[0].substring(0, 80);
+  }
+  return base;
+}
+
+// ─── Coverage Matrix（最小覆盖矩阵） ──────────────────────────────────────
+// 最小 Coverage Matrix：
+//   experience × result_evidence
+//   experience × role_boundary
+//   project × result_evidence
+//   skills × evidence
+//   self_summary × credibility
+//   education × keyword_match
+
+interface CoverageCell {
+  section: string;
+  dimension: string;
+}
+
+/** 最小覆盖矩阵的定义 */
+const COVERAGE_MATRIX: CoverageCell[] = [
+  { section: 'work_experience', dimension: 'evidence' },
+  { section: 'work_experience', dimension: 'role_fit' },
+  { section: 'project', dimension: 'evidence' },
+  { section: 'skill', dimension: 'evidence' },
+  { section: 'self_evaluation', dimension: 'credibility' },
+  { section: 'education', dimension: 'role_fit' },
+];
+
+/**
+ * 判断证据强度（基于文本特征）
+ */
+function assessEvidenceStrength(text: string): 'strong' | 'medium' | 'weak' {
+  if (!text || text.trim().length < 10) return 'weak';
+  // 强证据：包含量化数据
+  if (/[\d]+%|[一二三123]+[万千万百亿]|[0-9]+[年月日]/.test(text)) return 'strong';
+  // 中等证据：有具体描述但无数据
+  if (text.trim().length > 30) return 'medium';
+  return 'weak';
+}
+
+/**
+ * 判断是否有角色边界问题（强词 + 缺少具体支撑）
+ */
+function hasRoleBoundaryIssue(section: { type: string; content: string }): boolean {
+  const strongWords = ['主导', '负责', '带领', '管理', '创建', '发起', '独立完成'];
+  const hasStrongWord = strongWords.some(w => section.content.includes(w));
+  if (!hasStrongWord) return false;
+  // 检查是否有具体数据/结果支撑
+  const hasData = /[\d]+|完成了|实现了|获得了|提升了/.test(section.content);
+  return !hasData;
+}
+
+/**
+ * 判断是否有可信度问题（AI味/模板/夸大）
+ */
+function hasCredibilityIssue(text: string): boolean {
+  const aiPatterns = [
+    '具有较强的', '良好的', '优秀的', '出色的', '扎实的',
+    '能够独立', '熟练掌握', '深入了解', '良好的沟通',
+    '团队合作', '学习能力', '积极主动',
+  ];
+  const vaguePatterns = ['等等', '相关', '若干', '一定程度'];
+  const aiHit = aiPatterns.filter(p => text.includes(p)).length;
+  const vagueHit = vaguePatterns.filter(p => text.includes(p)).length;
+  return aiHit >= 2 || vagueHit >= 2;
+}
+
+/**
+ * 检查 section 内容是否"空洞"（缺少具体信息）
+ */
+function isSectionEmpty(section: { type: string; content: string }): boolean {
+  if (section.type === 'education') {
+    // 教育经历：学校+专业+时间 基本及格
+    const hasSchool = /大学|学院|学校|研究生|本科|硕士|博士/.test(section.content);
+    return !hasSchool;
+  }
+  if (section.type === 'skill') {
+    // 技能：列表形式，基本及格
+    return section.content.trim().length < 5;
+  }
+  return section.content.trim().length < 15;
+}
+
+/**
+ * 从段落中提取证据片段
+ */
+function extractEvidenceSnippets(content: string, dimension: string): string[] {
+  const snippets: string[] = [];
+
+  if (dimension === 'evidence') {
+    // 提取有量化数据的句子
+    const sentences = content.split(/[。；\n]/);
+    for (const s of sentences) {
+      if (/[\d]+%|[0-9]+[万千万百亿]/.test(s) && s.trim().length > 5) {
+        snippets.push(s.trim());
+      }
+    }
+    // 如果没有量化句子，取最短的非空白句子
+    if (snippets.length === 0) {
+      const nonEmpty = sentences.filter(s => s.trim().length > 5);
+      if (nonEmpty.length > 0) {
+        snippets.push(nonEmpty[0].trim());
+      }
+    }
+  }
+
+  if (dimension === 'credibility') {
+    // 提取可能的AI味句子
+    const aiPatterns = [
+      '具有较强的', '良好的', '优秀的', '出色的', '扎实的',
+      '能够独立', '熟练掌握', '深入了解',
+    ];
+    const sentences = content.split(/[。；\n]/);
+    for (const s of sentences) {
+      if (aiPatterns.some(p => s.includes(p))) {
+        snippets.push(s.trim());
+      }
+    }
+  }
+
+  return snippets.slice(0, 3);
+}
+
+/**
+ * 运行覆盖矩阵扫描，生成 AuditRow[]
+ * 这是在 AI 调用前对简历进行结构化"体检"
+ */
+function runCoverageScan(input: NormalizedInput): AuditBundle {
+  const rows: AuditRow[] = [];
+
+  for (const cell of COVERAGE_MATRIX) {
+    // 找到对应的简历段落
+    const sections = input.resume_sections.filter(s => s.type === cell.section);
+
+    if (sections.length === 0) {
+      // 该 section 不存在 → missing_info
+      const titleMap: Record<string, string> = {
+        'work_experience|evidence': '工作经历缺少结果证据',
+        'work_experience|role_fit': '工作经历缺少岗位方向说明',
+        'project|evidence': '项目经历缺少量化成果',
+        'skill|evidence': '技能描述缺少具体应用证据',
+        'self_evaluation|credibility': '自我评价缺少可信证据',
+        'education|role_fit': '教育背景缺少与目标岗位的关联说明',
+      };
+      const key = `${cell.section}|${cell.dimension}`;
+      rows.push({
+        section: cell.section,
+        dimension: cell.dimension,
+        status: 'missing_info',
+        title: titleMap[key] || `${cell.section} 的 ${cell.dimension} 问题`,
+        evidence: [],
+        evidence_strength: 'weak',
+        why_it_hurts: '该 section 不存在，无法评估',
+      });
+      continue;
+    }
+
+    // 对每个匹配到的 section 进行检查
+    for (const section of sections) {
+      if (isSectionEmpty(section)) {
+        rows.push({
+          section: section.type,
+          dimension: cell.dimension,
+          status: 'missing_info',
+          title: `${section.type} 内容过少，无法评估 ${cell.dimension}`,
+          evidence: [],
+          evidence_strength: 'weak',
+          source_location: { paragraph_index: section.paragraph_index },
+        });
+        continue;
+      }
+
+      let status: AuditRow['status'] = 'ok';
+      const evidences: string[] = [];
+
+      if (cell.dimension === 'evidence') {
+        const snippets = extractEvidenceSnippets(section.content, 'evidence');
+        const strength = assessEvidenceStrength(section.content);
+        if (strength === 'weak') {
+          status = 'issue';
+          evidences.push(...snippets);
+        } else {
+          evidences.push(...snippets);
+        }
+        rows.push({
+          section: section.type,
+          dimension: cell.dimension,
+          status,
+          title: status === 'ok'
+            ? `${section.type} 的 ${cell.dimension} 达标`
+            : `${section.type} 的 ${cell.dimension} 缺乏量化证据`,
+          evidence: evidences,
+          source_location: buildSourceLocation(section, evidences),
+          evidence_strength: strength,
+          why_it_hurts: status === 'issue' ? '缺少量化数据，HR 无法判断实际贡献' : undefined,
+        });
+      }
+
+      if (cell.dimension === 'role_fit') {
+        const hasBoundaryIssue = hasRoleBoundaryIssue(section);
+        if (hasBoundaryIssue) {
+          status = 'issue';
+        }
+        rows.push({
+          section: section.type,
+          dimension: cell.dimension,
+          status,
+          title: status === 'ok'
+            ? `${section.type} 的角色边界清晰`
+            : `${section.type} 存在角色边界模糊问题（强词+缺支撑）`,
+          evidence: [],
+          source_location: { paragraph_index: section.paragraph_index },
+          evidence_strength: 'medium',
+          why_it_hurts: status === 'issue' ? '使用强词但缺少具体支撑，可能引发可信度质疑' : undefined,
+        });
+      }
+
+      if (cell.dimension === 'credibility') {
+        const hasCredIssue = hasCredibilityIssue(section.content);
+        if (hasCredIssue) {
+          status = 'issue';
+          const snippets = extractEvidenceSnippets(section.content, 'credibility');
+          evidences.push(...snippets);
+        }
+        rows.push({
+          section: section.type,
+          dimension: cell.dimension,
+          status,
+          title: status === 'ok'
+            ? `${section.type} 语言可信度高`
+            : `${section.type} 存在模板化/AI味语言`,
+          evidence: evidences,
+          source_location: buildSourceLocation(section, evidences),
+          evidence_strength: status === 'ok' ? 'strong' : 'weak',
+          why_it_hurts: status === 'issue' ? '模板化语言降低可信度，AI味明显' : undefined,
+        });
+      }
+    }
+  }
+
+  // 按 section 分组
+  const grouped_by_section: Record<string, AuditRow[]> = {};
+  for (const row of rows) {
+    if (!grouped_by_section[row.section]) grouped_by_section[row.section] = [];
+    grouped_by_section[row.section].push(row);
+  }
+
+  // 按 dimension 分组
+  const grouped_by_dimension: Record<string, AuditRow[]> = {};
+  for (const row of rows) {
+    if (!grouped_by_dimension[row.dimension]) grouped_by_dimension[row.dimension] = [];
+    grouped_by_dimension[row.dimension].push(row);
+  }
+
+  // 缺失信息摘要
+  const missing_info_summary = rows
+    .filter(r => r.status === 'missing_info')
+    .map(r => r.title);
+
+  return { rows, grouped_by_section, grouped_by_dimension, missing_info_summary };
+}
+
+/**
+ * 格式化 AuditBundle 用于 AI prompt
+ */
+function formatAuditBundle(bundle: AuditBundle): string {
+  if (!bundle.rows || bundle.rows.length === 0) {
+    return '（覆盖矩阵扫描：无结果）';
+  }
+
+  const lines: string[] = ['## 覆盖矩阵扫描结果（体检底稿）'];
+
+  for (const [section, sectionRows] of Object.entries(bundle.grouped_by_section)) {
+    lines.push(`\n### ${section}（${sectionRows.length} 项检查）`);
+    for (const row of sectionRows) {
+      const statusIcon = row.status === 'ok' ? '✅' : row.status === 'issue' ? '❌' : '⚠️';
+      lines.push(`  ${statusIcon} [${row.dimension}] ${row.title}`);
+      if (row.evidence.length > 0) {
+        for (const ev of row.evidence.slice(0, 2)) {
+          lines.push(`     证据: "${ev.substring(0, 60)}${ev.length > 60 ? '…' : ''}"`);
+        }
+      }
+    }
+  }
+
+  if (bundle.missing_info_summary.length > 0) {
+    lines.push('\n### 缺失信息摘要');
+    for (const m of bundle.missing_info_summary) {
+      lines.push(`  - ${m}`);
+    }
+  }
+
+  return lines.join('\n');
+}
+
+/**
+ * 将 core_issues 按 section 分组
+ * section 由 source_location.paragraph_index 对应的段落类型决定
+ */
+function groupIssuesBySection(
+  issues: CoreIssue[],
+  input: NormalizedInput
+): Record<string, CoreIssue[]> {
+  const result: Record<string, CoreIssue[]> = {};
+  for (const issue of issues) {
+    const sectionIndex = issue.source_location?.paragraph_index ?? 0;
+    // 尝试从 resume_sections 获取段落类型
+    const section = input.resume_sections.find(s => s.paragraph_index === sectionIndex);
+    const sectionKey = section?.type || `段落${sectionIndex}`;
+    if (!result[sectionKey]) result[sectionKey] = [];
+    result[sectionKey].push(issue);
+  }
+  return result;
+}
+
+/**
+ * 将 core_issues 按 dimension 分组
+ */
+function groupIssuesByDimension(issues: CoreIssue[]): Record<string, CoreIssue[]> {
+  const result: Record<string, CoreIssue[]> = {};
+  for (const issue of issues) {
+    const dim = issue.dimension || 'other';
+    if (!result[dim]) result[dim] = [];
+    result[dim].push(issue);
+  }
+  return result;
+}
+
+/**
  * 运行免费版诊断工作流 V3
  */
 export async function runFreeDiagnoseWorkflow(
@@ -670,7 +1125,7 @@ export async function runFreeDiagnoseWorkflow(
     logInfo('DiagnoseWorkflow', '开始免费版诊断工作流 V3');
 
     // 1. 标准化输入
-    const normalizedInput = normalizeInput(request);
+    const normalizedInput = await normalizeInput(request);
     logDiagnoseSummary('normalized_input', normalizedInput);
 
     // 2. 轻量规则预分析
@@ -681,8 +1136,11 @@ export async function runFreeDiagnoseWorkflow(
     const enrichmentResult = enrichIssues(ruleMatchResult.matches);
     logDiagnoseSummary('issue_enrichment_result', enrichmentResult);
 
+    // 3.5. 覆盖矩阵扫描（生成 audit_rows 底稿）
+    const auditBundle = runCoverageScan(normalizedInput);
+
     // 4. 调用 DeepSeek API — 要求 AI 宽输出候选问题
-    const aiRaw = await callDeepSeekWithRetry(normalizedInput, ruleMatchResult, enrichmentResult);
+    const aiRaw = await callDeepSeekWithRetry(normalizedInput, ruleMatchResult, enrichmentResult, auditBundle);
     logDiagnoseSummary('ai_response_raw', aiRaw);
 
     // 5. 工作流正式裁决场景
@@ -841,6 +1299,10 @@ export async function runFreeDiagnoseWorkflow(
       follow_up_prompts: aiRaw.follow_up_prompts || [],
       excellent_score: excellentScore,
       quality_tier: qualityTier,
+      audit_rows: auditBundle.rows,
+      grouped_issues_by_section: groupIssuesBySection(rankedIssues, normalizedInput),
+      grouped_issues_by_dimension: groupIssuesByDimension(rankedIssues),
+      missing_info_summary: auditBundle.missing_info_summary,
       metadata: {
         target_role: normalizedInput.target_role,
         has_jd: normalizedInput.jd_quality !== 'none',
@@ -929,7 +1391,8 @@ function createInputQualityInsufficientResponse(request: DiagnoseRequest): FreeD
 async function callDeepSeekWithRetry(
   input: NormalizedInput,
   ruleMatch: RuleMatchResult,
-  enrichment: IssueEnrichmentResult
+  enrichment: IssueEnrichmentResult,
+  auditBundle: AuditBundle
 ): Promise<AIRawResponse> {
   const apiKey = process.env.DEEPSEEK_API_KEY;
   if (!apiKey) {
@@ -943,7 +1406,7 @@ async function callDeepSeekWithRetry(
     ? { ...input, resume_text: input.resume_text.slice(0, MAX_RESUME_CHARS) + '\n[简历内容已截断]' }
     : input;
 
-  const prompt = buildPrompt(truncatedInput, ruleMatch, enrichment);
+  const prompt = buildPrompt(truncatedInput, ruleMatch, enrichment, auditBundle);
 
   return retryJsonParse<AIRawResponse>(
     async () => {
@@ -1001,13 +1464,15 @@ async function callDeepSeekWithRetry(
 function buildPrompt(
   input: NormalizedInput,
   ruleMatch: RuleMatchResult,
-  enrichment: IssueEnrichmentResult
+  enrichment: IssueEnrichmentResult,
+  auditBundle: AuditBundle
 ): string {
   const { target_role, jd_quality } = input;
 
   const normalizedInputBlock = formatNormalizedInput(input);
   const ruleMatchBlock = formatRuleMatchResult(ruleMatch);
   const enrichmentBlock = formatEnrichmentResult(enrichment);
+  const auditBlock = formatAuditBundle(auditBundle);
 
   // H. 语境提示：处理“模拟/沙盘/课程项目”中的角色头衔（如“模拟财务总监”）
   // 这类头衔通常属于课程/竞赛的分工，不应被当成“造假/不真实头衔”。
@@ -1050,6 +1515,9 @@ ${ruleMatchBlock}
 
 ## 3. 三库映射增强信息
 ${enrichmentBlock}
+
+## 3.5. 覆盖矩阵扫描结果（审计底稿）
+${auditBlock}
 
 ## 4. 诊断思维顺序（必须严格执行）
 

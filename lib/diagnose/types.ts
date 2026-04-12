@@ -3,6 +3,51 @@
 
 import { z } from 'zod';
 
+// ─── Audit Layer Types ─────────────────────────────────────────
+
+/** 审计状态 */
+export type AuditStatus = 'ok' | 'issue' | 'missing_info';
+
+/** 证据强度 */
+export type EvidenceStrength = 'strong' | 'medium' | 'weak';
+
+/** 修复类型 */
+export type FixType = 'safe_expand' | 'needs_user_input' | 'forbidden_to_invent';
+
+/** 严重程度 */
+export type Severity = 'must_fix' | 'should_fix' | 'optional' | 'nitpicky';
+
+/**
+ * AuditRow — 全量审计底稿中的一行
+ * 每个检查点（section × dimension）生成一行结构化审计记录
+ */
+export interface AuditRow {
+  section: string;
+  dimension: string;
+  status: AuditStatus;
+  title: string;
+  evidence: string[];
+  source_location?: SourceLocation;
+  evidence_strength: EvidenceStrength;
+  why_it_hurts?: string;
+  fix_type?: FixType;
+  required_user_inputs?: string[];
+  severity?: Severity;
+  probability?: 'high' | 'medium' | 'low' | 'very_low';
+  impact_surface?: ImpactSurface;
+}
+
+/**
+ * AuditBundle — 全量审计底稿的集合
+ * 包含按 section 和 dimension 分组的结果，以及缺失信息摘要
+ */
+export interface AuditBundle {
+  rows: AuditRow[];
+  grouped_by_section: Record<string, AuditRow[]>;
+  grouped_by_dimension: Record<string, AuditRow[]>;
+  missing_info_summary: string[];
+}
+
 // ─── Issue Taxonomy ──────────────────────────────────────────
 export const ISSUE_TYPES = [
   'readability',
@@ -122,6 +167,15 @@ export interface ReportMetadata {
   // 深度 fallback 状态（Phase 4 使用）
   deep_fallback_reason?: string;
   deep_fallback_message?: string;
+  // 深度研究阶段 provider 追踪（Phase 5 使用）
+  research_provider_requested?: string;
+  research_provider_actual?: string;
+  research_fallback_used?: boolean;
+  research_fallback_reason?: string;
+  research_fallback_from?: string;
+  research_fallback_to?: string;
+  research_memo_available?: boolean;
+  deep_diagnosis_executed?: boolean;
 }
 
 // ─── Request ─────────────────────────────────────────────────
@@ -184,6 +238,28 @@ export interface FreeDiagnoseResponse {
   deep_report?: DeepReport;
   // 元数据
   metadata: ReportMetadata;
+  // 审计底稿（Phase 1 新增）
+  audit_rows?: AuditRow[];
+  // Phase 5 新增：审计底稿分组（输出双层化）
+  grouped_issues_by_section?: Record<string, CoreIssue[]>;
+  grouped_issues_by_dimension?: Record<string, CoreIssue[]>;
+  missing_info_summary?: string[];
+}
+export interface RoleResolution {
+  /** 原始岗位输入 */
+  raw_role: string;
+  /** 标准化岗位名称 */
+  canonical_role: string;
+  /** 岗位族系，如 "前端开发", "后端开发", "全栈开发" */
+  role_family: string;
+  /** 相关岗位别名/变体 */
+  alt_roles: string[];
+  /** 从简历/JD推断的技能关键词 */
+  skills_inferred: string[];
+  /** 解析置信度 0-1 */
+  confidence: number;
+  /** 模糊度说明，如 "输入包含多个可能岗位" */
+  ambiguity?: string;
 }
 
 // ─── Workflow Internal Types ─────────────────────────────────
@@ -201,6 +277,8 @@ export interface NormalizedInput {
   text_quality: 'sufficient' | 'insufficient';
   /** 经验级别：用于调整模拟/校园项目权重 */
   experience_level: 'senior' | 'junior' | 'neutral';
+  /** 岗位语义解析结果 */
+  role_resolution?: RoleResolution;
 }
 
 /** 简历段落类型 */
@@ -403,6 +481,23 @@ export interface DeepProblem {
   source_location?: SourceLocation;
 }
 
+/**
+ * 风险证据绑定（Phase 4 红队视角核心）
+ * 每个高风险项必须能回答：谁会拒你、为什么、基于哪句原文
+ */
+export interface RiskEvidenceBinding {
+  /** 风险描述 */
+  risk: string;
+  /** 来源原文 */
+  evidence: string;
+  /** 证据位置 */
+  source_location?: SourceLocation;
+  /** 谁会因此拒绝这份简历 */
+  who_rejects?: 'ats' | 'hr_6s' | 'hr_30s' | 'interviewer';
+  /** 拒绝原因（简短） */
+  why_rejects?: string;
+}
+
 export interface DeepReport {
   deep_value_summary: string;
   current_vs_after_metrics: {
@@ -421,17 +516,25 @@ export interface DeepReport {
     keyword_gaps: string[];
     format_risks: string[];
     match_rate_estimate: string;
+    /** Phase 4 新增：每个风险项的证据绑定 */
+    keyword_gap_evidence?: RiskEvidenceBinding[];
+    format_risk_evidence?: RiskEvidenceBinding[];
   };
   hr_analysis: {
     risk_level: 'low' | 'medium' | 'high';
     six_second_risks: string[];
     thirty_second_risks: string[];
     decision_estimate: 'pass' | 'interview' | 'hold';
+    /** Phase 4 新增：每个风险项的证据绑定 */
+    six_second_risk_evidence?: RiskEvidenceBinding[];
+    thirty_second_risk_evidence?: RiskEvidenceBinding[];
   };
   interview_risk_analysis: {
     likely_questions: string[];
     weak_points: string[];
     preparation_suggestions: string[];
+    /** Phase 4 新增：每个弱点的证据绑定 */
+    weak_point_evidence?: RiskEvidenceBinding[];
   };
   content_expansion_plan: {
     safe_expand: Array<{ location: string; suggestion: string }>;

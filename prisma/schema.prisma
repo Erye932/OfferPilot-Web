@@ -57,6 +57,10 @@ model DiagnoseReport {
   reportJson    Json     @map("report_json")
   modelName     String   @default("deepseek-chat") @map("model_name")
   confidence    Float?
+  // Phase 6 新增：审计层存档
+  auditJson          Json?   @map("audit_json")           // AuditBundle 全量底稿（audit_rows + 分组 + missing_info_summary）
+  providerTraceJson Json?   @map("provider_trace_json")   // AI provider 调用链路追踪（fallback 记录等）
+  coverageVersion    String? @map("coverage_version")     // 覆盖矩阵版本号（如 "1.0"）
   createdAt     DateTime @default(now()) @map("created_at")
 
   session DiagnoseSession @relation(fields: [sessionId], references: [id])

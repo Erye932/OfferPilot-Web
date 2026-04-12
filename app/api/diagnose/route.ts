@@ -55,6 +55,23 @@ async function persistDiagnoseResult(
         reportJson: JSON.parse(JSON.stringify(result)),
         modelName: 'deepseek-chat',
         confidence: null,
+        // Phase 6 新增：审计层存档字段
+        auditJson: result.audit_rows ? JSON.parse(JSON.stringify({
+          rows: result.audit_rows,
+          grouped_by_section: result.grouped_issues_by_section || {},
+          grouped_by_dimension: result.grouped_issues_by_dimension || {},
+          missing_info_summary: result.missing_info_summary || [],
+        })) : undefined,
+        providerTraceJson: JSON.parse(JSON.stringify({
+          research_provider_requested: result.metadata.research_provider_requested,
+          research_provider_actual: result.metadata.research_provider_actual,
+          research_fallback_used: result.metadata.research_fallback_used,
+          research_fallback_reason: result.metadata.research_fallback_reason,
+          research_fallback_from: result.metadata.research_fallback_from,
+          research_fallback_to: result.metadata.research_fallback_to,
+          deep_diagnosis_executed: result.metadata.deep_diagnosis_executed,
+        })) || undefined,
+        coverageVersion: '1.0',
       },
     });
 
