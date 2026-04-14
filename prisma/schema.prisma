@@ -70,6 +70,23 @@ model DiagnoseReport {
   @@map("diagnose_reports")
 }
 
+// ─── Diagnose Tasks（异步任务单）──────────────────────────────
+model DiagnoseTask {
+  id String @id @default(cuid())
+  status String @default("queued") @map("status") // queued | running | done | failed
+  inputJson Json @map("input_json") // 原始请求体
+  reportId String? @map("report_id") // 成功后关联的报告ID
+  errorMessage String? @map("error_message") // 失败时的错误信息
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+  startedAt DateTime? @map("started_at")
+  finishedAt DateTime? @map("finished_at")
+
+  @@index([status])
+  @@index([createdAt])
+  @@map("diagnose_tasks")
+}
+
 // ─── Uploaded Files ─────────────────────────────────────────
 model UploadedFile {
   id                  String   @id @default(cuid())

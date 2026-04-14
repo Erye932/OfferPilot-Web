@@ -181,6 +181,11 @@ export const Errors = {
       code: 'INSUFFICIENT_INPUT',
       status: 400,
     }),
+  notFoundError: (message: string) => createErrorResponse(message, {
+    code: "NOT_FOUND",
+    status: 404,
+  }),
+
 
   internalError: (details?: string) =>
     createErrorResponse('服务器内部错误', {
