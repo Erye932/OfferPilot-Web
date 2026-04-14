@@ -1,0 +1,8 @@
+{
+  "crons": [
+    {
+      "path": "/api/internal/diagnose-worker/cron",
+      "schedule": "* * * * *"
+    }
+  ]
+}
