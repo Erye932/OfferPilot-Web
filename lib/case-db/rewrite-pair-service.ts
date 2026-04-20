@@ -1,5 +1,5 @@
 import { prisma } from '../prisma';
-import type { RewritePair } from '../../generated/prisma/client';
+import type { RewritePair } from '@prisma/client';
 
 export interface CreateRewritePairInput {
   serviceCaseId: string;

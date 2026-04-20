@@ -1,5 +1,5 @@
 import { prisma } from '../prisma';
-import type { CaseSnapshot, SnapshotType } from '../../generated/prisma/client';
+import type { CaseSnapshot, SnapshotType } from '@prisma/client';
 
 export interface CreateSnapshotInput {
   serviceCaseId: string;

@@ -4,7 +4,7 @@ import type {
   PatternEvidence,
   PatternType,
   PatternStatus,
-} from '../../generated/prisma/client';
+} from '@prisma/client';
 
 export interface CreateKnowledgePatternInput {
   roleFamily?: string;

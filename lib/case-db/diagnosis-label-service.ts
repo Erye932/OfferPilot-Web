@@ -5,7 +5,7 @@ import type {
   HrRiskLevel,
   DirectionMismatchLevel,
   ConfidenceLevel,
-} from '../../generated/prisma/client';
+} from '@prisma/client';
 
 export interface CreateDiagnosisLabelInput {
   serviceCaseId: string;

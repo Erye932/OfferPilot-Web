@@ -1,5 +1,5 @@
 import { prisma } from '../prisma';
-import type { FeedbackEvent, FeedbackStage } from '../../generated/prisma/client';
+import type { FeedbackEvent, FeedbackStage } from '@prisma/client';
 
 export interface CreateFeedbackEventInput {
   serviceCaseId: string;

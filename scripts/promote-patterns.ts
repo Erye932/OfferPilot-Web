@@ -8,7 +8,7 @@
 import fs from 'fs';
 import path from 'path';
 import { prisma } from '../lib/prisma';
-import type { PatternType } from '../generated/prisma/client';
+import type { PatternType } from '@prisma/client';
 
 interface CandidatePattern {
   patternType: PatternType;

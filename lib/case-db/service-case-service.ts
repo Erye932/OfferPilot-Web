@@ -4,7 +4,7 @@ import type {
   ServiceType,
   CaseStatus,
   CandidateStage,
-} from '../../generated/prisma/client';
+} from '@prisma/client';
 
 export interface CreateServiceCaseInput {
   leadId?: string;

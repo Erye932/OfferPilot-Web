@@ -1,5 +1,5 @@
 import { prisma } from '../prisma';
-import type { Lead, LeadSourceChannel, LeadStatus } from '../../generated/prisma/client';
+import type { Lead, LeadSourceChannel, LeadStatus } from '@prisma/client';
 
 export interface CreateLeadInput {
   sourceChannel: LeadSourceChannel;

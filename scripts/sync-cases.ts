@@ -18,7 +18,7 @@ import type {
   ConfidenceLevel,
   SnapshotType,
   FeedbackStage,
-} from '../generated/prisma/client';
+} from '@prisma/client';
 
 // 解析结果接口
 interface ParsedCase {
