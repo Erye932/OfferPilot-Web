@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import { getOrCreateAnonymousSessionId, checkRateLimit, recordUsage, setAnonymousSessionCookie, isRateLimitEnabled } from '@/lib/rate-limit';
+import { getOrCreateAnonymousSessionId, checkRateLimit, recordUsage, setAnonymousSessionCookie } from '@/lib/rate-limit';
 import { prisma } from '@/lib/prisma';
 import type { NextRequest } from 'next/server';
 
@@ -13,7 +13,7 @@ vi.mock('@/lib/prisma', () => ({
   },
 }));
 
-const mockPrisma = vi.mocked(prisma);
+const mockPrisma = vi.mocked(prisma, true);
 
 describe('rate-limit', () => {
   beforeEach(() => {
@@ -126,7 +126,7 @@ describe('rate-limit', () => {
 
   describe('recordUsage', () => {
     it('should create usage record with anonymous session ID', async () => {
-      mockPrisma.usageRecord.create.mockResolvedValue({} as any);
+      mockPrisma.usageRecord.create.mockResolvedValue({} as never);
       await recordUsage('session-id', 'diagnose', 'free');
       expect(mockPrisma.usageRecord.create).toHaveBeenCalledWith({
         data: {
@@ -139,7 +139,7 @@ describe('rate-limit', () => {
     });
 
     it('should handle paid tier', async () => {
-      mockPrisma.usageRecord.create.mockResolvedValue({} as any);
+      mockPrisma.usageRecord.create.mockResolvedValue({} as never);
       await recordUsage('session-id', 'diagnose', 'paid');
       expect(mockPrisma.usageRecord.create).toHaveBeenCalledWith({
         data: {

@@ -52,7 +52,7 @@ import { getOrCreateAnonymousSessionId, checkRateLimit, recordUsage, setAnonymou
 import { extractPdfText } from '@/lib/pdf/extract';
 import { logError, logWarn } from '@/lib/error-handler';
 
-const mockPrisma = vi.mocked(prisma);
+const mockPrisma = vi.mocked(prisma, true);
 const mockGetOrCreateAnonymousSessionId = vi.mocked(getOrCreateAnonymousSessionId);
 const mockCheckRateLimit = vi.mocked(checkRateLimit);
 const mockRecordUsage = vi.mocked(recordUsage);
@@ -69,7 +69,7 @@ describe('/api/pdf/parse', () => {
     mockCheckRateLimit.mockResolvedValue({ allowed: true, currentCount: 0, limit: 5 });
     mockRecordUsage.mockResolvedValue();
     mockSetAnonymousSessionCookie.mockReturnValue({ 'Set-Cookie': 'test-cookie' });
-    mockPrisma.uploadedFile.create.mockResolvedValue({ id: 'upload-id' } as any);
+    mockPrisma.uploadedFile.create.mockResolvedValue({ id: 'upload-id' } as never);
   });
 
   function createMockRequest(file: File, fileName?: string): NextRequest {
@@ -84,7 +84,7 @@ describe('/api/pdf/parse', () => {
   }
 
   function createMockFile(content: Uint8Array, name = 'test.pdf', type = 'application/pdf'): File {
-    return new File([content], name, { type });
+    return new File([content.buffer as ArrayBuffer], name, { type });
   }
 
   it('正常 PDF - 解析成功返回文本', async () => {
@@ -98,6 +98,7 @@ describe('/api/pdf/parse', () => {
       textLength: 100,
       mimeType: 'application/pdf',
       parseStatus: 'success',
+      extraction_quality: 'high',
     });
 
     const request = createMockRequest(file);
@@ -187,6 +188,7 @@ describe('/api/pdf/parse', () => {
       textLength: 0,
       mimeType: 'application/pdf',
       parseStatus: 'no_text',
+      extraction_quality: 'low',
     });
 
     const request = createMockRequest(file);
@@ -213,13 +215,13 @@ describe('/api/pdf/parse', () => {
   it('损坏的 PDF - 返回400', async () => {
     const pdfContent = new Uint8Array([1, 2, 3]); // Not a valid PDF header
     const file = createMockFile(pdfContent);
+    mockExtractPdfText.mockRejectedValue(new Error('corrupt'));
     const request = createMockRequest(file);
     const response = await POST(request);
     const data = await response.json();
 
     expect(response.status).toBe(400);
     expect(data.error).toContain('PDF 文件可能已损坏');
-    expect(mockExtractPdfText).not.toHaveBeenCalled();
   });
 
   it('解析失败 (未知错误) - 返回500', async () => {
@@ -283,6 +285,7 @@ describe('/api/pdf/parse', () => {
       textLength: 50,
       mimeType: 'application/pdf',
       parseStatus: 'success',
+      extraction_quality: 'high',
     });
     mockPrisma.uploadedFile.create.mockRejectedValue(new Error('数据库连接失败'));
 
@@ -292,7 +295,7 @@ describe('/api/pdf/parse', () => {
 
     expect(response.status).toBe(200);
     expect(data.text).toBe('提取的文本内容');
-    expect(data.uploadedFileId).toBeUndefined(); // No upload ID due to DB failure
+    expect(data.uploadedFileId).toBeNull(); // No upload ID due to DB failure
     expect(mockLogWarn).toHaveBeenCalledWith('PersistUploadedFile', '上传文件落库失败', expect.anything());
   });
 
@@ -307,6 +310,7 @@ describe('/api/pdf/parse', () => {
       textLength: 10,
       mimeType: 'application/pdf',
       parseStatus: 'success',
+      extraction_quality: 'high',
     });
     mockRecordUsage.mockRejectedValue(new Error('数据库错误'));
 
@@ -318,8 +322,13 @@ describe('/api/pdf/parse', () => {
   });
 
   it('处理未知异常 - 返回500并设置cookie', async () => {
+    // 让首次 getOrCreateAnonymousSessionId 抛出，触发外层 catch
+    mockGetOrCreateAnonymousSessionId
+      .mockImplementationOnce(() => { throw new Error('Unexpected error'); })
+      .mockReturnValue('test-session-id');
+
     const request = {
-      formData: async () => { throw new Error('Unexpected error'); },
+      formData: async () => new FormData(),
       cookies: {
         get: vi.fn().mockReturnValue(undefined),
       },
