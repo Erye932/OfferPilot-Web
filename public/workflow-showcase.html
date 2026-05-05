@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>OfferPilot — 工作流</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Noto+Sans+SC:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{
+  background:#09090b;color:#a1a1aa;
+  font-family:'Inter','Noto Sans SC',system-ui,sans-serif;
+  -webkit-font-smoothing:antialiased;
+  padding:64px 32px 48px;
+  min-height:100vh;
+}
+
+.page{max-width:640px;margin:0 auto}
+
+/* ── header ── */
+.hd{margin-bottom:56px}
+.hd h1{
+  font-size:28px;font-weight:700;color:#fafafa;
+  letter-spacing:-.03em;line-height:1.3;margin-bottom:8px;
+}
+.hd p{font-size:14px;line-height:1.7}
+.hd .nums{
+  display:flex;gap:32px;margin-top:20px;
+}
+.hd .n{font-size:13px}
+.hd .n strong{color:#fafafa;font-weight:600;font-size:20px;display:block;letter-spacing:-.02em}
+
+/* ── phase ── */
+.ph{margin-bottom:40px;position:relative;padding-left:40px}
+.ph::before{
+  content:'';position:absolute;left:11px;top:28px;bottom:-40px;
+  width:1px;background:#27272a;
+}
+.ph:last-of-type::before{display:none}
+
+.ph-dot{
+  position:absolute;left:0;top:2px;
+  width:24px;height:24px;border-radius:50%;
+  border:1.5px solid #3f3f46;background:#09090b;
+  display:flex;align-items:center;justify-content:center;
+  font-size:10px;font-weight:700;color:#71717a;
+}
+
+.ph-title{
+  font-size:11px;font-weight:600;color:#71717a;
+  letter-spacing:.08em;text-transform:uppercase;
+  margin-bottom:12px;
+}
+.ph-title span{color:#fafafa}
+
+/* ── step rows ── */
+.steps{display:flex;flex-direction:column;gap:6px}
+
+.st{
+  display:flex;align-items:baseline;gap:10px;
+  font-size:13px;line-height:1.6;
+  padding:6px 0;
+  border-bottom:1px solid rgba(255,255,255,.04);
+}
+.st:last-child{border-bottom:none}
+
+.st-name{
+  color:#e4e4e7;font-weight:600;
+  white-space:nowrap;min-width:100px;flex-shrink:0;
+}
+.st-desc{color:#71717a;flex:1}
+
+.st-badge{
+  font-size:9px;font-weight:600;letter-spacing:.06em;
+  color:#52525b;white-space:nowrap;flex-shrink:0;
+}
+
+/* ── parallel indicator ── */
+.par{
+  font-size:10px;color:#52525b;
+  letter-spacing:.06em;margin-bottom:8px;
+  padding-left:2px;
+}
+
+/* ── output ── */
+.out{
+  margin-top:48px;padding-top:32px;
+  border-top:1px solid #27272a;
+}
+.out h2{
+  font-size:13px;font-weight:600;color:#71717a;
+  letter-spacing:.06em;text-transform:uppercase;
+  margin-bottom:16px;
+}
+.out-grid{
+  display:grid;grid-template-columns:1fr 1fr;gap:4px 24px;
+}
+.out-item{
+  font-size:13px;color:#a1a1aa;
+  padding:5px 0;
+  border-bottom:1px solid rgba(255,255,255,.03);
+}
+
+/* ── footer ── */
+.ft{
+  margin-top:48px;font-size:12px;color:#3f3f46;
+  text-align:center;
+}
+</style>
+</head>
+<body>
+<div class="page">
+
+<div class="hd">
+  <h1>你的简历，我们是这样看的</h1>
+  <p>不是随便丢给 AI 聊两句。每份简历都跑一遍完整流程，一步都不省。</p>
+  <div class="nums">
+    <div class="n"><strong>12</strong>次 AI 分析</div>
+    <div class="n"><strong>4</strong>个阶段</div>
+    <div class="n"><strong>7</strong>个角度</div>
+    <div class="n"><strong>6</strong>项评分</div>
+  </div>
+</div>
+
+<!-- Phase 0 -->
+<div class="ph">
+  <div class="ph-dot">0</div>
+  <div class="ph-title"><span>先读懂你的简历</span></div>
+  <div class="steps">
+    <div class="st">
+      <div class="st-name">拆结构</div>
+      <div class="st-desc">把简历拆成一段段，搞清楚你投的是什么岗</div>
+      <div class="st-badge">自动</div>
+    </div>
+    <div class="st">
+      <div class="st-name">查遗漏</div>
+      <div class="st-desc">检查有没有漏填的，比如手机号、学历、工作经历</div>
+      <div class="st-badge">自动</div>
+    </div>
+  </div>
+</div>
+
+<!-- Phase 1 -->
+<div class="ph">
+  <div class="ph-dot">1</div>
+  <div class="ph-title"><span>去网上查你投的岗位</span> — 同时进行</div>
+  <div class="steps">
+    <div class="st">
+      <div class="st-name">这岗要什么人</div>
+      <div class="st-desc">联网搜这个岗位看重什么能力、哪些是加分项、哪些是雷区</div>
+      <div class="st-badge">联网 + AI</div>
+    </div>
+    <div class="st">
+      <div class="st-name">HR 怎么筛的</div>
+      <div class="st-desc">研究 HR 拿到简历先看什么、什么情况直接扔掉</div>
+      <div class="st-badge">联网 + AI</div>
+    </div>
+  </div>
+</div>
+
+<!-- Phase 2 -->
+<div class="ph">
+  <div class="ph-dot">2</div>
+  <div class="ph-title"><span>对照岗位要求，读懂你这个人</span></div>
+  <div class="steps">
+    <div class="st">
+      <div class="st-name">深度研读</div>
+      <div class="st-desc">你实际什么水平、有没有过度包装、哪里是亮点哪里是短板</div>
+      <div class="st-badge">AI</div>
+    </div>
+  </div>
+</div>
+
+<!-- Phase 3 -->
+<div class="ph">
+  <div class="ph-dot">3</div>
+  <div class="ph-title"><span>全面挑毛病</span> — 7 个 AI 同时上</div>
+  <div class="steps">
+    <div class="st">
+      <div class="st-name">先打分</div>
+      <div class="st-desc">从 6 个角度给你简历打分，每一段单独评级</div>
+      <div class="st-badge">AI</div>
+    </div>
+  </div>
+  <div class="par" style="margin-top:12px">以下 4 个同时跑</div>
+  <div class="steps">
+    <div class="st">
+      <div class="st-name">模拟 HR</div>
+      <div class="st-desc">假装自己是 HR，扫一眼 6 秒、细看 30 秒，判断给不给你面试</div>
+      <div class="st-badge">AI</div>
+    </div>
+    <div class="st">
+      <div class="st-name">教你怎么改</div>
+      <div class="st-desc">每段都给改法，附上改前改后对比</div>
+      <div class="st-badge">AI</div>
+    </div>
+    <div class="st">
+      <div class="st-name">查水分</div>
+      <div class="st-desc">找出哪里写得太夸张、时间对不上、技能注水</div>
+      <div class="st-badge">AI</div>
+    </div>
+    <div class="st">
+      <div class="st-name">关键词匹配</div>
+      <div class="st-desc">看简历里有没有 JD 要的关键词，算一下机器筛选能不能过</div>
+      <div class="st-badge">AI</div>
+    </div>
+  </div>
+  <div class="steps" style="margin-top:12px">
+    <div class="st">
+      <div class="st-name">反过来再查一遍</div>
+      <div class="st-desc">假设你按建议全改了，重新打分，看还有没有问题</div>
+      <div class="st-badge">AI</div>
+    </div>
+    <div class="st">
+      <div class="st-name">出报告</div>
+      <div class="st-desc">把前面所有结果汇总，出一份完整的诊断报告</div>
+      <div class="st-badge">AI</div>
+    </div>
+  </div>
+</div>
+
+<!-- Output -->
+<div class="out">
+  <h2>你会拿到什么</h2>
+  <div class="out-grid">
+    <div class="out-item">6 项评分</div>
+    <div class="out-item">每段好坏一目了然</div>
+    <div class="out-item">HR 会不会给你面试</div>
+    <div class="out-item">哪里写得不靠谱</div>
+    <div class="out-item">每条怎么改</div>
+    <div class="out-item">机器筛选能不能过</div>
+    <div class="out-item">风险高中低</div>
+    <div class="out-item">改前改后对比</div>
+  </div>
+</div>
+
+<div class="ft">OfferPilot</div>
+
+</div>
+</body>
+</html>
