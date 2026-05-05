@@ -15,9 +15,6 @@ import type {
   AtsRiskLevel,
   HrRiskLevel,
   DirectionMismatchLevel,
-  ConfidenceLevel,
-  SnapshotType,
-  FeedbackStage,
 } from '@prisma/client';
 
 // 解析结果接口

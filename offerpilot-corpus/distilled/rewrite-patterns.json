@@ -5,7 +5,7 @@
     "role_type": "内容运营",
     "before_text": "负责活动策划与执行，跟进现场落地，配合团队完成活动相关工作。",
     "after_text": "负责活动策划与落地执行，协同团队推进现场流程，并在活动结束后整理复盘信息，帮助团队定位后续优化方向。",
-    "rewrite_logic": "把纯动作表述改成“动作 + 结果/复盘 + 影响”的结构，让经历不只停留在执行层。",
+    "rewrite_logic": "把纯动作表述改成'动作+结果/复盘+影响'的结构，让经历不只停留在执行层。",
     "key_transformation": [
       "保留核心动作",
       "补充结果或复盘动作",
@@ -20,11 +20,11 @@
     "role_type": "用户运营",
     "before_text": "参与项目推进、负责沟通协调、支持团队完成相关任务。",
     "after_text": "围绕用户增长项目推进执行节奏，负责跨团队沟通与需求同步，支持活动上线与后续反馈整理。",
-    "rewrite_logic": "把泛化动作改成更贴岗位语境的表达，优先把 JD 里的核心能力词显性写出来。",
+    "rewrite_logic": "把泛化动作改成更贴岗位语境的表达，优先把JD里的核心能力词显性写出来。",
     "key_transformation": [
       "把泛动作换成岗位语境动作",
       "补充与目标岗位相关的能力词",
-      "减少“支持相关任务”这类空表述"
+      "减少'支持相关任务'这类空表述"
     ],
     "source_level": "A",
     "difficulty_level": "basic"
@@ -35,7 +35,7 @@
     "role_type": "项目运营",
     "before_text": "负责推进项目相关工作，配合团队完成整体落地。",
     "after_text": "负责项目执行节奏跟进与跨方协调，独立推进阶段节点落地，并配合团队完成整体上线支持。",
-    "rewrite_logic": "把“团队做了什么”和“你做了什么”拆开写，优先明确个人主导动作，再写配合部分。",
+    "rewrite_logic": "把'团队做了什么'和'你做了什么'拆开写，优先明确个人主导动作，再写配合部分。",
     "key_transformation": [
       "先写个人负责部分",
       "再写团队协作部分",
@@ -50,11 +50,11 @@
     "role_type": "活动运营",
     "before_text": "参与活动执行，协助完成复盘整理，支持团队推进相关安排。",
     "after_text": "跟进活动执行流程与现场协调，整理活动反馈与复盘信息，并支持后续优化安排推进。",
-    "rewrite_logic": "减少“参与、协助、支持”的密度，用更明确的动作表达替换弱表述，但不夸大个人角色。",
+    "rewrite_logic": "减少'参与、协助、支持'的密度，用更明确的动作表达替换弱表述，但不夸大个人角色。",
     "key_transformation": [
-      "参与 -> 跟进/推进/负责",
-      "协助 -> 整理/输出/执行",
-      "支持 -> 具体说明支持了什么"
+      "参与->跟进/推进/负责",
+      "协助->整理/输出/执行",
+      "支持->具体说明支持了什么"
     ],
     "source_level": "A",
     "difficulty_level": "basic"
@@ -95,7 +95,7 @@
     "role_type": "内容运营",
     "before_text": "负责日常内容整理与发布。",
     "after_text": "负责内容选题整理与日常发布执行，跟进内容上线后的反馈收集，并支持后续内容优化方向整理。",
-    "rewrite_logic": "当前这条 pattern 不是解决排序，而是先把亮点内容写得更像亮点，为后续前置提供素材基础。",
+    "rewrite_logic": "当前这条pattern不是解决排序，而是先把亮点内容写得更像亮点，为后续前置提供素材基础。",
     "key_transformation": [
       "补足完整动作链",
       "增加反馈与优化动作",
@@ -110,7 +110,7 @@
     "role_type": "用户运营",
     "before_text": "负责内容发布与日常维护。",
     "after_text": "负责内容发布与日常运营维护，跟进用户反馈与基础数据整理，支持后续内容优化与运营节奏调整。",
-    "rewrite_logic": "把“任务完成”改成“任务 + 用户/数据/业务连接”，让动作和价值之间形成最基本的桥梁。",
+    "rewrite_logic": "把'任务完成'改成'任务+用户/数据/业务连接'，让动作和价值之间形成最基本的桥梁。",
     "key_transformation": [
       "补用户反馈",
       "补数据整理",
@@ -148,5 +148,300 @@
     ],
     "source_level": "A",
     "difficulty_level": "advanced"
+  },
+  {
+    "pattern_id": "rewrite-011",
+    "issue_type": "lack_of_result_evidence",
+    "role_type": "内容运营",
+    "before_text": "负责微信公众号内容策划与发布，根据热点撰写推文，跟进粉丝互动反馈。",
+    "after_text": "负责公众号内容策划与发布，制定月度选题计划，结合热点策划爆款内容，单篇平均阅读量从3000提升至1.2万，粉丝增长200%。",
+    "rewrite_logic": "把动作改成动作+数据结果的形式，让每一项工作都有可量化的价值支撑。",
+    "key_transformation": [
+      "补充具体成果数据",
+      "量化阅读量和粉丝增长",
+      "体现内容策划能力"
+    ],
+    "source_level": "AI",
+    "difficulty_level": "basic"
+  },
+  {
+    "pattern_id": "rewrite-012",
+    "issue_type": "lack_of_result_evidence",
+    "role_type": "用户运营",
+    "before_text": "负责社群用户运营，维护社群活跃度，策划社群活动，提升用户体验。",
+    "after_text": "负责500人用户社群运营，通过每日话题策划和每周活动运营，社群活跃度从15%提升至45%，月度留存率从60%提升至82%。",
+    "rewrite_logic": "把泛化的运营动作改成具体数据：规模、活跃度、留存率，全部量化。",
+    "key_transformation": [
+      "量化社群规模",
+      "量化活跃度提升",
+      "量化留存率提升"
+    ],
+    "source_level": "AI",
+    "difficulty_level": "basic"
+  },
+  {
+    "pattern_id": "rewrite-013",
+    "issue_type": "keyword_alignment_weak",
+    "role_type": "数据分析师",
+    "before_text": "负责业务数据分析，制作数据报表，支持业务决策。",
+    "after_text": "负责核心业务数据分析，建立用户路径漏斗分析模型，通过SQL+Python输出日/周/月数据看板，支撑运营策略决策，用户转化率提升分析准确率达95%。",
+    "rewrite_logic": "显性化JD关键词：SQL、Python、数据建模、决策支撑，全部对齐目标岗位要求。",
+    "key_transformation": [
+      "补充工具关键词",
+      "补充分析模型",
+      "量化决策支撑效果"
+    ],
+    "source_level": "AI",
+    "difficulty_level": "advanced"
+  },
+  {
+    "pattern_id": "rewrite-014",
+    "issue_type": "weak_expression_pattern",
+    "role_type": "活动运营",
+    "before_text": "协助完成活动策划工作，配合团队进行活动执行跟进。",
+    "after_text": "独立策划并执行23场用户活动，包括线上直播、线下沙龙、节日营销活动，累计参与用户超5000人，活动满意度评分达4.7分（满分5分）。",
+    "rewrite_logic": "把'协助'改成'独立'，把'配合'改成'主导'，并补充具体规模数据。",
+    "key_transformation": [
+      "弱动词升级为强动词",
+      "补充具体活动数量",
+      "补充参与规模和满意度"
+    ],
+    "source_level": "AI",
+    "difficulty_level": "basic"
+  },
+  {
+    "pattern_id": "rewrite-015",
+    "issue_type": "weak_role_boundary",
+    "role_type": "前端开发",
+    "before_text": "参与电商项目前端开发，配合团队完成页面实现。",
+    "after_text": "作为前端核心开发，独立负责电商项目商品详情页、购物车、订单结算三个核心模块，使用Vue+Vuex实现，月均处理订单10万+，，首屏加载优化至1.5秒。",
+    "rewrite_logic": "明确个人角色（核心开发而非辅助），明确负责的具体模块，补充技术指标。",
+    "key_transformation": [
+      "明确个人角色",
+      "列出具体负责模块",
+      "补充技术性能指标"
+    ],
+    "source_level": "AI",
+    "difficulty_level": "basic"
+  },
+  {
+    "pattern_id": "rewrite-016",
+    "issue_type": "lack_of_quantification",
+    "role_type": "市场推广",
+    "before_text": "负责渠道推广工作，效果良好。",
+    "after_text": "负责SEM和信息流渠道推广，管理月度预算15万，通过关键词优化和落地页A/B测试，ROI从1.5提升至2.8，获客成本从120元降至68元。",
+    "rewrite_logic": "把'效果良好'改成具体指标：ROI、获客成本，全部数字化。",
+    "key_transformation": [
+      "补充预算规模",
+      "量化ROI提升",
+      "量化获客成本下降"
+    ],
+    "source_level": "AI",
+    "difficulty_level": "basic"
+  },
+  {
+    "pattern_id": "rewrite-017",
+    "issue_type": "task_only_no_business_value",
+    "role_type": "产品运营",
+    "before_text": "负责产品需求整理，跟进开发进度，整理项目文档。",
+    "after_text": "负责产品需求管理，通过用户反馈和数据分析提炼需求优先级，推动5次版本迭代，功能完成率达92%，上线后用户满意度提升15%。",
+    "rewrite_logic": "把任务描述改成价值描述：需求管理带来了版本迭代，用户满意度带来了业务价值。",
+    "key_transformation": [
+      "任务连接版本迭代",
+      "量化功能完成率",
+      "量化用户满意度提升"
+    ],
+    "source_level": "AI",
+    "difficulty_level": "advanced"
+  },
+  {
+    "pattern_id": "rewrite-018",
+    "issue_type": "overclaim_risk",
+    "role_type": "后端开发",
+    "before_text": "精通Java后端开发，独立负责系统架构设计与优化。",
+    "after_text": "熟练使用Spring Boot进行业务系统开发，作为核心开发参与用户系统设计，承担数据层接口开发与性能优化工作，单接口响应时间降低40%。",
+    "rewrite_logic": "把'精通'改成'熟练'，把'独立负责架构设计'改成'参与架构设计'，回归真实边界。",
+    "key_transformation": [
+      "弱化能力定语",
+      "缩小职责范围",
+      "补充技术细节"
+    ],
+    "source_level": "AI",
+    "difficulty_level": "advanced"
+  },
+  {
+    "pattern_id": "rewrite-019",
+    "issue_type": "advantage_not_front_loaded",
+    "role_type": "UX设计师",
+    "before_text": "负责界面设计，配合产品完成交互方案。项目一：企业官网设计。项目二：APP图标设计。最重要的项目：主导APP体验优化。",
+    "after_text": "主导APP体验优化项目：通过用户研究访谈和可用性测试，发现登录流程痛点，优化后转化率提升35%。负责企业官网和APP图标设计。",
+    "rewrite_logic": "把最有价值的项目前置，详细展开；把次要项目简化。调整前后顺序。",
+    "key_transformation": [
+      "最有价值项目前置",
+      "补充研究方法论",
+      "量化改版效果"
+    ],
+    "source_level": "AI",
+    "difficulty_level": "basic"
+  },
+  {
+    "pattern_id": "rewrite-020",
+    "issue_type": "ats_format_issue",
+    "role_type": "所有岗位",
+    "before_text": "【技能】PS★★★★　　Excel★★★★　　PPT★★★\n【教育】北京大学　　　MBA　　　2018-2020",
+    "after_text": "技能：Photoshop（精通）、Excel（熟练）、PowerPoint（熟练）\n教育：北京大学　MBA　2018.09-2020.06",
+    "rewrite_logic": "把图标和特殊符号改成文字描述，把表格改成段落格式，确保ATS能正确解析。",
+    "key_transformation": [
+      "去掉图标和特殊字符",
+      "表格转段落",
+      "时间格式标准化"
+    ],
+    "source_level": "AI",
+    "difficulty_level": "basic"
+  },
+  {
+    "pattern_id": "rewrite-021",
+    "issue_type": "keyword_alignment_weak",
+    "role_type": "活动运营",
+    "before_text": "负责策划和执行线上活动，与产品、技术、设计团队配合，确保活动按期上线。活动期间监控数据表现，结束后进行总结汇报。",
+    "after_text": "独立统筹10+场拉新活动策划与执行，跨部门协调产品、技术、设计资源，平均活动参与率提升40%。建立数据监测体系，输出活动效果复盘报告并沉淀SOP。",
+    "rewrite_logic": "将泛化的活动描述拆解为具体的关键词动作（统筹、拉新、跨部门协调、监测、复盘、SOP），并加入数据结果，关键词直接嵌入经历主体。",
+    "key_transformation": [
+      "职责描述从模糊动词（负责）升级为岗位专属动作词（独立统筹）",
+      "活动类型补充精准关键词（拉新活动）",
+      "增加跨部门协作的岗位关键行为描述",
+      "量化数据结果强化关键词说服力",
+      "补充复盘、SOP等运营岗位高频关键词"
+    ],
+    "source_level": "API",
+    "difficulty_level": "basic"
+  },
+  {
+    "pattern_id": "rewrite-023",
+    "issue_type": "relevant_experience_not_emphasized",
+    "role_type": "活动运营",
+    "before_text": "负责公司各类线下活动的策划与执行，包括前期场地对接、物料准备、现场人员协调等工作，确保活动顺利进行。",
+    "after_text": "主导20+场品牌活动落地，涵盖新品发布、用户沙龙等类型，单场参与人数最高达5000人，年度覆盖用户超10万，活动满意度达95%以上。",
+    "rewrite_logic": "将泛化的职责描述转化为具体数据成果，用量化指标替代模糊表述，突出与活动运营岗位直接相关的核心价值。",
+    "key_transformation": [
+      "从「负责...等工作」到「主导...落地」，动词从被动执行升级为主动负责",
+      "加入具体数据「20+场、5000人、10万用户」，用数字增强说服力",
+      "补充活动类型说明「新 品发布、用户沙龙」，体现业务覆盖广度",
+      "新增结果指标「满意度95%」，呈现可量化的成果产出"
+    ],
+    "source_level": "API",
+    "difficulty_level": "basic"
+  },
+  {
+    "pattern_id": "rewrite-024",
+    "issue_type": "task_only_no_business_value",
+    "role_type": "活动运营",
+    "before_text": "负责策划和执行公司线上活动，包括活动方案设计、宣传推广、执行监控和效果复盘，每月完成4场活动上线。",
+    "after_text": "策划并落地转化导向型活动矩阵，通过用户分层触达和实时数据监控优化活动SOP，单场活动最高带来12,000+新增用户注册，活动期间GMV环比提升35%，平均活动ROI达1:4.2。",
+    "rewrite_logic": "将任务罗列升级为价值叙事——先抛出策略方法，再补充量化结果数据，最后落到可衡量的业务指标（用户量、GMV、ROI），形成'做事方式+规模影响+业务回报'的完整价值链。",
+    "key_transformation": [
+      "任务罗列→策略方法论描述",
+      "无数据→有具体量化指标（用户量、GMV、ROI）",
+      "纯执行描述→体现数据驱动优化能力",
+      "未提及价值→直接挂钩业务增长结果"
+    ],
+    "source_level": "API",
+    "difficulty_level": "basic"
+  },
+  {
+    "pattern_id": "rewrite-025",
+    "issue_type": "overclaim_risk",
+    "role_type": "活动运营",
+    "before_text": "主导策划10场大型线上活动，累计覆盖人数50万+，活动ROI平均达到300%，显著提升了品牌影响力。",
+    "after_text": "作为核心成员参与策划10场线上活动，负责活动框架设计与用户互动机制搭建，配合渠道投放实现累计50万+曝光，最终ROI维持在200%-300%区间，对比行业基准（150%-200%）处于中上水平。",
+    "rewrite_logic": "将模糊的全局主导改为具体职责边界，用数据范围+行业基准替代单一夸大数值，并说明信息来源，降低追问问责风险。",
+    "key_transformation": [
+      "角色从'主导'改为'核心成员参与'，明确职责边界",
+      "成果从抽象词'显著提升'改为具体数字+基准对比",
+      "数据从'ROI300%'单值改为'200%-300%区间'范围表述",
+      "增加数据来源说明'配合渠道投放'增强可信度"
+    ],
+    "source_level": "API",
+    "difficulty_level": "basic"
+  },
+  {
+    "pattern_id": "rewrite-026",
+    "issue_type": "ats_format_issue",
+    "role_type": "活动运营",
+    "before_text": "负责策划执行各类线上线下活动，包括但不限于●用户裂变●节日营销●快闪店●直播带货等，累计覆盖人数 50,000+，通过活动转化新用户 3,000+ 人。",
+    "after_text": "策划与执行线上线下营销活动，涵盖用户裂变增长、节日营销、快闪店、直播带货等方向，年度活动覆盖用户50,000+，，活动获客转化3,000+人。",
+    "rewrite_logic": "去除ATS无法识别的特殊符号（●），将英文标点替换为标准中文标点，将非结构化的描述性信息转换为标准化bullet格式，提升ATS系统对关键字段的提取准确率。",
+    "key_transformation": [
+      "去除特殊符号●，替换为标准中文顿号",
+      "消除「包括但不限于」等模糊限定词",
+      "将数字指标前置，便于ATS提取量化数据",
+      "统一使用标准中文标点和空格分隔符"
+    ],
+    "source_level": "API",
+    "difficulty_level": "basic"
+  },
+  {
+    "pattern_id": "rewrite-027",
+    "issue_type": "lack_of_result_evidence",
+    "role_type": "产品运营",
+    "before_text": "负责APP用户运营工作，定期策划线上活动提升用户活跃度，通过数据监控分析优化运营策略，与产品团队协作推进功能迭代，用户量和留存均有提升。",
+    "after_text": "主导APP用户运营，策划并落地12场拉活活动，ROI达1:4.3；搭建RFM分层模型精准触达，付费转化率提升26%；推动产品功能迭代优化，用户次月留存率达41%。",
+    "rewrite_logic": "将笼统表述替换为具体数据指标（ROI、转化率、留存率），量化运营动作的成效，补充时间范围和对比基准使结果可验证。",
+    "key_transformation": [
+      "模糊词→具体数据：将'提升用户活跃度'改为'付费转化率提升26%'",
+      "无基准→有对比：补充'次月留存率达41%'等可量化基准",
+      "单点罗列→结构化呈现：用数字串联运营成果，体现方法与结果关联",
+      "过程描述→价值导向：强调运营动作的商业回报（ROI 1:4.3）"
+    ],
+    "source_level": "API",
+    "difficulty_level": "basic"
+  },
+  {
+    "pattern_id": "rewrite-028",
+    "issue_type": "weak_role_boundary",
+    "role_type": "产品运营",
+    "before_text": "在电商平台项目中，我负责用户增长模块，和产品、技术团队一起协作，通过活动策划和用户分层运营，将平台日活提升了40%，同时还参与了数据埋点和文案撰写工作。",
+    "after_text": "作为用户增长模块负责人，独立统筹活动策划、用户分层策略制定及AB测试方案设计，主导的拉新活动实现日活提升40%；协同技术团队完成数据埋点方案，输出运营文案3套，支撑后续数据复盘。",
+    "rewrite_logic": "将「我们」主语替换为「我」明确个人贡献边界，补充「负责人」职级定位，将并列罗列拆分为职责层（主导）与配合层（协同），让读者一眼区分核心贡献与辅助参与。",
+    "key_transformation": [
+      "主语从「我负责…和…团队一起」模糊协同关系，改为「作为…负责人」明确个人角色定位",
+      "「我们」去团队化，强调「我」的具体贡献范围",
+      "职责分层：核心主导事项标注「主导」，配合事项标注「协同」，形成清晰边界",
+      "成果量化独立标注「实现」而非混入团队成果中"
+    ],
+    "source_level": "API",
+    "difficulty_level": "basic"
+  },
+  {
+    "pattern_id": "rewrite-029",
+    "issue_type": "weak_expression_pattern",
+    "role_type": "产品运营",
+    "before_text": "负责产品运营工作，通过数据分析优化运营策略，提升用户活跃度和留存率，配合团队完成运营目标。",
+    "after_text": "基于A/B测试驱动产品迭代，通过埋点分析识别转化漏斗瓶颈，制定新手引导优化方案，试点期内新用户转化率提升23%，带动整体DAU增长18%。",
+    "rewrite_logic": "将宽泛的「数据分析」「优化策略」替换为具体的分析方法、问题定位过程及可量化结果，突出专业深度。",
+    "key_transformation": [
+      "将「数据分析」具体化为「埋点分析」和「A/B测试」",
+      "将「优化策略」细化为「识别转化漏斗瓶颈」",
+      "补充可量化指标：「转化率提升23%」「DAU增长18%」",
+      "明确成果边界：「试点期内」"
+    ],
+    "source_level": "API",
+    "difficulty_level": "basic"
+  },
+  {
+    "pattern_id": "rewrite-032",
+    "issue_type": "jd_direction_mismatch",
+    "role_type": "产品运营",
+    "before_text": "本人认真细心，沟通能力强，曾在互联网公司做过运营助理，对用户运营、内容运营、活动运营都有接触，希望在贵司找到一份运营类或产品类的工作，岗位不限。",
+    "after_text": "本人认真细心，沟通能力强，聚焦B2C电商平台的产品运营方向，擅长用户增长策略制定与活动策划，拥有从0到1搭建用户激励体系并实现DAU提升20%的实战经验。",
+    "rewrite_logic": "将散乱的多个岗位目标收束为一个精准方向，同时将泛泛的互联网行业定位到具体赛道，并以结果数据量化过往经历，证明方向聚焦且有能力胜任。",
+    "key_transformation": [
+      "由多岗位并列收束为单一目标岗位方向",
+      "由宽泛互联网行业聚焦到B2C电商具体赛道",
+      "将模糊经历描述转化为量化结果数据",
+      "由被动经历陈述转为主动能力输出"
+    ],
+    "source_level": "API",
+    "difficulty_level": "basic"
   }
 ]

@@ -13,7 +13,7 @@
       "市场"
     ],
     "source_level": "A",
-    "notes": "适合免费版高频使用。是首批最核心的 insider view 之一。"
+    "notes": "适合免费版高频使用。是首批最核心的insider view之一。"
   },
   {
     "view_id": "view-002",
@@ -29,7 +29,7 @@
       "市场"
     ],
     "source_level": "A",
-    "notes": "很符合 OfferPilot 的核心价值：判断是表达问题还是匹配问题。"
+    "notes": "很符合OfferPilot的核心价值：判断是表达问题还是匹配问题。"
   },
   {
     "view_id": "view-003",
@@ -51,7 +51,7 @@
     "view_id": "view-004",
     "issue_type": "weak_expression_pattern",
     "role_context": "hr",
-    "view_text": "如果我连续看到几段都在写“参与、协助、支持”，我会默认你多数时候处在辅助位置，而不是核心推进位置。这不一定说明你能力不够，但会让我很难快速判断你的独立性。",
+    "view_text": "如果我连续看到几段都在写'参与、协助、支持'，我会默认你多数时候处在辅助位置，而不是核心推进位置。这不一定说明你能力不够，但会让我很难快速判断你的独立性。",
     "tone": "calm",
     "applicable_roles": [
       "内容运营",
@@ -67,7 +67,7 @@
     "view_id": "view-005",
     "issue_type": "relevant_experience_not_emphasized",
     "role_context": "hr",
-    "view_text": "初筛通常不是精读。如果最相关的一段经历没有更早出现，或者没有被展开，我很可能在形成第一印象之前，就已经把你归类成“相关性一般”。",
+    "view_text": "初筛通常不是精读。如果最相关的一段经历没有更早出现，或者没有被展开，我很可能在形成第一印象之前，就已经把你归类成'相关性一般'。",
     "tone": "calm",
     "applicable_roles": [
       "内容运营",
@@ -77,13 +77,13 @@
       "项目运营"
     ],
     "source_level": "A",
-    "notes": "非常适合承接“先改哪一段”。"
+    "notes": "非常适合承接'先改哪一段'。"
   },
   {
     "view_id": "view-006",
     "issue_type": "lack_of_quantification",
     "role_context": "business",
-    "view_text": "看到“效果良好”这类表达，我不会默认它真的很好。我只会觉得这里缺少证据，因为每个人都可以这样写，但不是每个人都能给出结果。",
+    "view_text": "看到'效果良好'这类表达，我不会默认它真的很好。我只会觉得这里缺少证据，因为每个人都可以这样写，但不是每个人都能给出结果。",
     "tone": "direct",
     "applicable_roles": [
       "内容运营",
@@ -125,7 +125,7 @@
       "市场"
     ],
     "source_level": "A",
-    "notes": "这条和“缺少结果证据”相邻，但更强调业务价值感。"
+    "notes": "这条和'缺少结果证据'相邻，但更强调业务价值感。"
   },
   {
     "view_id": "view-009",
@@ -141,13 +141,13 @@
       "市场"
     ],
     "source_level": "A",
-    "notes": "这条是 OfferPilot 差异化价值的关键之一，但必须谨慎触发。"
+    "notes": "这条是OfferPilot差异化价值的关键之一，但必须谨慎触发。"
   },
   {
     "view_id": "view-010",
     "issue_type": "overclaim_risk",
     "role_context": "business",
-    "view_text": "当我看到“精通”“主导”“独立负责全流程”这类表述时，我会默认后面能展开讲清楚。如果后续支撑不够，这类词反而会放大追问风险。",
+    "view_text": "当我看到'精通''主导''独立负责全流程'这类表述时，我会默认后面能展开讲清楚。如果后续支撑不够，这类词反而会放大追问风险。",
     "tone": "direct",
     "applicable_roles": [
       "内容运营",
@@ -157,6 +157,315 @@
       "市场"
     ],
     "source_level": "A",
-    "notes": "非常适合和“面试里可能会被问到”联动，产品体感强。"
+    "notes": "非常适合和'面试里可能会被问到'联动，产品体感强。"
+  },
+  {
+    "view_id": "view-011",
+    "issue_type": "lack_of_result_evidence",
+    "role_context": "hr",
+    "view_text": "我看到你写了负责某项工作，但我不知道这件事做完后带来了什么改变。如果连你都不知道或者没有记录，那我会默认这件事没什么价值。",
+    "tone": "calm",
+    "applicable_roles": [
+      "内容运营",
+      "用户运营",
+      "活动运营",
+      "产品运营",
+      "数据分析师"
+    ],
+    "source_level": "AI",
+    "notes": "结果导向是运营岗的核心。"
+  },
+  {
+    "view_id": "view-012",
+    "issue_type": "keyword_alignment_weak",
+    "role_context": "hr",
+    "view_text": "你写的内容和我招聘的岗位要求在同一个领域，但你没有把关键能力词显性说出来。我得自己去猜、去对应，这增加了我的认知成本，也增加了你被误判的风险。",
+    "tone": "calm",
+    "applicable_roles": [
+      "内容运营",
+      "用户运营",
+      "产品运营",
+      "数据分析师"
+    ],
+    "source_level": "AI",
+    "notes": "JD关键词显性化很重要。"
+  },
+  {
+    "view_id": "view-013",
+    "issue_type": "weak_expression_pattern",
+    "role_context": "business",
+    "view_text": "连续几段都是'协助、配合、跟进、支持'，我会默认你多数时候在执行别人安排的任务，而不是主动承担并交付结果。",
+    "tone": "direct",
+    "applicable_roles": [
+      "内容运营",
+      "用户运营",
+      "活动运营",
+      "产品运营"
+    ],
+    "source_level": "AI",
+    "notes": "弱动词会降低专业形象。"
+  },
+  {
+    "view_id": "view-014",
+    "issue_type": "weak_role_boundary",
+    "role_context": "hiring_manager",
+    "view_text": "你说'配合团队完成项目'，但我不知道你在里面具体做了什么、是负责人还是执行者。我通常会把功劳归给团队，而不是归给你。",
+    "tone": "calm",
+    "applicable_roles": [
+      "前端开发",
+      "后端开发",
+      "产品运营",
+      "项目经理"
+    ],
+    "source_level": "AI",
+    "notes": "技术岗更要明确个人贡献。"
+  },
+  {
+    "view_id": "view-015",
+    "issue_type": "lack_of_quantification",
+    "role_context": "hr",
+    "view_text": "你说活动效果'良好'、用户反馈'不错'，这不是证据。任何人都可以这样写，但不是每个人都能给出具体的数字。",
+    "tone": "direct",
+    "applicable_roles": [
+      "活动运营",
+      "用户运营",
+      "市场推广",
+      "数据分析师"
+    ],
+    "source_level": "AI",
+    "notes": "数字比形容词更可信。"
+  },
+  {
+    "view_id": "view-016",
+    "issue_type": "task_only_no_business_value",
+    "role_context": "business",
+    "view_text": "你写了'发布内容、维护社群、整理资料'，但这些都是任务描述，不是价值描述。我看不到这些动作对业务目标有什么贡献。",
+    "tone": "calm",
+    "applicable_roles": [
+      "内容运营",
+      "用户运营",
+      "活动运营"
+    ],
+    "source_level": "AI",
+    "notes": "任务要连接到业务价值。"
+  },
+  {
+    "view_id": "view-017",
+    "issue_type": "jd_direction_mismatch",
+    "role_context": "hiring_manager",
+    "view_text": "你投递的是产品运营，但我看到的经历主要是执行支持层的工作。产品运营需要的是策略思维、数据驱动、跨部门协调能力，你的经历里没有体现这些。",
+    "tone": "calm",
+    "applicable_roles": [
+      "产品运营",
+      "策略运营"
+    ],
+    "source_level": "AI",
+    "notes": "方向问题比表达问题更严重。"
+  },
+  {
+    "view_id": "view-018",
+    "issue_type": "overclaim_risk",
+    "role_context": "technical_interviewer",
+    "view_text": "你写了'精通Vue、React，能独立完成前端项目'，如果面试时我深入问一个知识点你答不上来，这个强词反而会成为你的减分项。",
+    "tone": "direct",
+    "applicable_roles": [
+      "前端开发",
+      "后端开发",
+      "全栈开发"
+    ],
+    "source_level": "AI",
+    "notes": "技术强词要谨慎使用。"
+  },
+  {
+    "view_id": "view-019",
+    "issue_type": "advantage_not_front_loaded",
+    "role_context": "hr",
+    "view_text": "初筛不是精读。如果你的亮点在第三段之后，我可能已经在形成第一印象时把你归类为'相关性一般'了。亮点要让我在第一时间就看见。",
+    "tone": "calm",
+    "applicable_roles": [
+      "产品经理",
+      "UX设计师",
+      "数据分析师"
+    ],
+    "source_level": "AI",
+    "notes": "亮点前置是基本原则。"
+  },
+  {
+    "view_id": "view-020",
+    "issue_type": "ats_format_issue",
+    "role_context": "ats",
+    "view_text": "这份简历使用了表格和复杂的排版格式，我的解析系统无法正确提取其中的文字信息。这意味着关键内容可能会被遗漏，即使你很优秀，也可能无法进入下一轮。",
+    "tone": "calm",
+    "applicable_roles": [
+      "所有岗位"
+    ],
+    "source_level": "AI",
+    "notes": "ATS兼容性是技术问题但影响严重。"
+  },
+  {
+    "view_id": "view-021",
+    "issue_type": "keyword_alignment_weak",
+    "role_context": "hr/business/hiring_manager",
+    "view_text": "我筛一份简历平均不超过30秒。活动运营的核心能力——拉新裂变、转化链路、现场把控、预算管控——必须从简历里一眼就能看到。如果你的经历里有这些能力，但没有用岗位关键词直接呈现，我会默认你不够match，直接划过。",
+    "tone": "calm/direct",
+    "applicable_roles": [
+      "活动运营",
+      "用户增长类岗位"
+    ],
+    "source_level": "API",
+    "notes": "点出关键词不对齐的筛选后果，帮助候选人理解ATS和人工筛选的双重逻辑"
+  },
+  {
+    "view_id": "view-022",
+    "issue_type": "weak_expression_pattern",
+    "role_context": "hiring_manager",
+    "view_text": "活动运营是结果导向最强的岗位之一，我筛简历时平均一屏停留不超过10秒。你写'负责''参与''协助'，等于什么都没说——我不知道你扛了多少人、盘了多少预算、拉了多少转化。数字和结果是唯一能让我停下来的理由，没有就别怪简历被划走。",
+    "tone": "calm/direct",
+    "applicable_roles": [
+      "活动运营",
+      "用户运营",
+      "项目运营"
+    ],
+    "source_level": "API",
+    "notes": "让候选人直观感受招聘方的阅读节奏，理解'结果可见性'在经历中的核心地位"
+  },
+  {
+    "view_id": "view-024",
+    "issue_type": "relevant_experience_not_emphasized",
+    "role_context": "hiring_manager",
+    "view_text": "我平均一封简历只看30秒。如果活动运营候选人把执行类琐事放在第一行，而把独立操盘过200人+规模活动、统筹过资源调配的经历藏在第三段——我不会找，我会直接过。简历排版的优先级，就是我对候选人判断的第一条线索。",
+    "tone": "direct",
+    "applicable_roles": [
+      "活动运营",
+      "用户运营",
+      "项目运营"
+    ],
+    "source_level": "API",
+    "notes": "帮助候选人理解：HR的快速筛选逻辑是「首因效应」，简历第一段的位置几乎等同于你在我心里的排序。"
+  },
+  {
+    "view_id": "view-025",
+    "issue_type": "task_only_no_business_value",
+    "role_context": "hr/business/hiring_manager",
+    "view_text": "我每天看几十份活动运营简历，90%都在写'策划活动''执行方案''维护社群'——这不是在告诉我你能做什么，而是在复述一份谁都能写的JD。我不知道你策划的活动带来多少GMV、拉新多少用户、转化率提升了几个点。你写的每一项工作，都必须接一个结果，否则和外包执行没有区别。",
+    "tone": "calm/direct",
+    "applicable_roles": [
+      "活动运营",
+      "用户运营",
+      "内容运营"
+    ],
+    "source_level": "API",
+    "notes": "帮助候选人理解招聘方真实心理：任务描述只是信息噪音，真正影响筛选的是业务结果和价值贡献。"
+  },
+  {
+    "view_id": "view-026",
+    "issue_type": "overclaim_risk",
+    "role_context": "hr/business/hiring_manager",
+    "view_text": "活动运营的简历我最怕看到'圆满成功''效果显著'这种结论。规模多大、覆盖多少人、转化多少、对比同期增长多少——什么都没有，就一句话盖棺定论，面试随便追问两个细节就能戳穿。这种表述在我这里是减分项，我反而更相信那些主动说出'当时其实遇到什么问题，我是这么处理的'的候选人。",
+    "tone": "calm/direct",
+    "applicable_roles": [
+      "活动运营",
+      "会展执行",
+      "品牌活动"
+    ],
+    "source_level": "API",
+    "notes": "指出结论先行但证据缺失的问题，帮助候选人理解HR为何对模糊表述保持警惕，以及真实细节的重要性"
+  },
+  {
+    "view_id": "view-027",
+    "issue_type": "ats_format_issue",
+    "role_context": "hiring_manager",
+    "view_text": "我筛简历的时候，系统根本读不出你用Word合并单元格排的那些活动经验，也看不到图片里的流程图。等我想去后台手动补字段，你的信息早就被标记为「格式异常」跳过了。你的能力再好，ATS那一关过不了，人根本没到我眼前。",
+    "tone": "calm/direct",
+    "applicable_roles": [
+      "活动运营",
+      "市场策划",
+      "项目管理"
+    ],
+    "source_level": "API",
+    "notes": "从系统解析失败的实际后果切入，让候选人理解ATS不是走个流程，而是真实决定简历是否被看到"
+  },
+  {
+    "view_id": "view-028",
+    "issue_type": "lack_of_result_evidence",
+    "role_context": "hr/business/hiring_manager",
+    "view_text": "产品运营是强结果导向的岗位，简历里写「负责用户运营」「策划活动」只说明你做过，不能说明你做得好。我真正想知道的是：结果是什么，数据是多少，影响了哪项指标，以及你从中学到了什么。没有结果证据，面试官只能靠猜——而我们通常选择不猜，直接跳过。",
+    "tone": "calm/direct",
+    "applicable_roles": [
+      "产品运营",
+      "用户运营",
+      "活动运营"
+    ],
+    "source_level": "API",
+    "notes": "帮助候选人理解结果导向在运营岗位简历中的核心地位，消除「做了=做好了」的认知误区"
+  },
+  {
+    "view_id": "view-029",
+    "issue_type": "weak_role_boundary",
+    "role_context": "hr/business/hiring_manager",
+    "view_text": "产品运营的日常工作本身就涉及大量跨部门协同，招聘方最想知道的是你在项目里是决策者、执行者还是辅助者。如果你的描述里'我'和'我们'混在一起，分不清哪段是你独立推动的，我很难判断你是否具备独立操盘项目的能力，也就没法给你合适的面试机会。",
+    "tone": "calm/direct",
+    "applicable_roles": [
+      "产品运营",
+      "项目管理",
+      "运营专员"
+    ],
+    "source_level": "API",
+    "notes": "帮助候选人意识到'职责边界模糊'会直接导致招聘方无法评估其独立贡献能力，从而失去面试机会。"
+  },
+  {
+    "view_id": "view-030",
+    "issue_type": "weak_expression_pattern",
+    "role_context": "hr/business/hiring_manager",
+    "view_text": "作为HR，我每天过几十份简历，注意力窗口极短。泛化表述让我无法判断候选人的真实贡献——「协助推进」「参与优化」这类词，到底帮了多少GMV？降低了多少流失率？是执行者还是核心决策者？看完脑子里全是问号，pass的冲动远大于追问的耐心。你的经历需要让我在3秒内看到「你做了什么、结果是什么、规模有多大」。",
+    "tone": "calm/direct",
+    "applicable_roles": [
+      "产品运营",
+      "数据运营",
+      "用户运营"
+    ],
+    "source_level": "API",
+    "notes": "让候选人理解：HR不是不理解经历，而是泛化表述直接侵占了他们的注意力预算，结果必然是被快速过滤"
+  },
+  {
+    "view_id": "view-031",
+    "issue_type": "lack_of_quantification",
+    "role_context": "hr/business/hiring_manager",
+    "view_text": "我每天看几十份简历，没有数据的描述我只能靠猜——\"用户增长\"是带5个人还是50个人？\"提升转化率\"是从1%提到2%还是20%？没有数字，我默认你的成果价值有限，简历在30秒内就会被划走。",
+    "tone": "calm/direct",
+    "applicable_roles": [
+      "产品运营",
+      "相关岗位"
+    ],
+    "source_level": "API",
+    "notes": "用\"靠猜\"和\"30秒划走\"建立真实的时间压力感，让候选人立刻理解数字缺失的后果不是\"写得不详细\"，而是\"直接失去被阅读的机会\"。"
+  },
+  {
+    "view_id": "view-033",
+    "issue_type": "task_only_no_business_value",
+    "role_context": "hr/business/hiring_manager",
+    "view_text": "我每天看上百份简历，候选人描述的都是\"做了什么\"，而不是\"做到了什么\"。运营工作本质上是结果导向的，如果你的经历里只有职责清单，没有数据、没有改善、没有解决掉什么问题，我根本没有理由相信你能胜任这个岗位。",
+    "tone": "calm/direct",
+    "applicable_roles": [
+      "产品运营",
+      "内容运营",
+      "用户运营"
+    ],
+    "source_level": "API",
+    "notes": "帮助候选人理解任务描述与价值描述的本质区别，以及为什么HR无法仅凭任务清单做筛选判断"
+  },
+  {
+    "view_id": "view-034",
+    "issue_type": "jd_direction_mismatch",
+    "role_context": "hiring_manager",
+    "view_text": "产品运营这个岗位要落地执行、要跨部门推动，项目经历散的人进来根本接不住。我要的是在用户增长、数据运营、活动策划里深耕过的人，简历里什么都沾一点，反而让我怀疑你到底想不想做这一行——还是广撒网碰运气。",
+    "tone": "direct",
+    "applicable_roles": [
+      "产品运营",
+      "用户运营",
+      "活动运营"
+    ],
+    "source_level": "API",
+    "notes": "让候选人理解：方向模糊不只是表达问题，招聘方会质疑你的职业稳定性与岗位匹配深度"
   }
 ]
