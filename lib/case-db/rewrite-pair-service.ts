@@ -1,11 +1,11 @@
 import { prisma } from '../prisma';
-import type { RewritePair } from '@prisma/client';
+import type { Prisma, RewritePair } from '@prisma/client';
 
 export interface CreateRewritePairInput {
   serviceCaseId: string;
   issueType?: string;
   rewriteType?: string;
-  sourceLocation?: any; // JSON
+  sourceLocation?: Prisma.InputJsonValue; // JSON
   originalText: string;
   rewrittenText: string;
   changeSummary?: string;
@@ -16,7 +16,7 @@ export interface CreateRewritePairInput {
 export interface UpdateRewritePairInput {
   issueType?: string | null;
   rewriteType?: string | null;
-  sourceLocation?: any | null;
+  sourceLocation?: Prisma.InputJsonValue | Prisma.NullableJsonNullValueInput;
   originalText?: string;
   rewrittenText?: string;
   changeSummary?: string | null;

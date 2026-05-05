@@ -1,6 +1,9 @@
 // Prisma client singleton for Next.js
 // Prevents multiple instances in development due to hot-reloading
 
+import { config } from 'dotenv';
+config({ path: '.env.local', override: true });
+
 import { PrismaClient } from '@prisma/client';
 import { PrismaPg } from '@prisma/adapter-pg';
 

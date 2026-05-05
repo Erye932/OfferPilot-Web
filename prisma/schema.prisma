@@ -125,6 +125,21 @@ model UsageRecord {
 // 3. UsageRecord: 保留90天用于分析
 // 实现方式：定期运行 pruneOldData() 清理函数
 
+// ─── Research Cache（研究阶段持久化缓存） ──────────────────────
+model ResearchCache {
+  id         String   @id @default(cuid())
+  cacheKey   String   @unique @map("cache_key")   // "role-study:<normalized_role>" 或 "hr-insider:<normalized_role>"
+  cacheType  String   @map("cache_type")           // role_study | hr_insider
+  targetRole String   @map("target_role")
+  valueJson  Json     @map("value_json")
+  createdAt  DateTime @default(now()) @map("created_at")
+  expiresAt  DateTime @map("expires_at")
+
+  @@index([cacheType])
+  @@index([expiresAt])
+  @@map("research_cache")
+}
+
 // ─── Corpus Sources ─────────────────────────────────────────
 model CorpusSource {
   id         String   @id @default(cuid())

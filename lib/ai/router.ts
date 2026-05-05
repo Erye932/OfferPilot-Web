@@ -25,9 +25,6 @@ const PROVIDER_MAP: Record<AITask['type'], typeof deepseekProvider | typeof meta
   rewrite_review: deepseekProvider,
 };
 
-// 允许 fallback 的任务类型（仅 research）
-const FALLBACK_TASKS: AITask['type'][] = ['research'];
-
 class AIRouter {
   async route(task: AITask, config?: AIProviderConfig): Promise<AIResponse> {
     const primaryProvider = this.selectPrimaryProvider(task.type);
@@ -50,7 +47,15 @@ class AIRouter {
         model: response.model,
         contentLength: response.content.length,
       });
-      return response;
+      // Enhance response with metadata
+      const enhancedResponse = {
+        ...response,
+        providerRequested: primaryProvider.name,
+        providerActual: response.provider,
+        fallbackUsed: false,
+        taskType: task.type,
+      };
+      return enhancedResponse;
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : String(error);
       const isAIProviderError = error instanceof AIProviderError;
@@ -79,7 +84,18 @@ class AIRouter {
             finalProvider: fallbackProvider.name,
             fallbackResponseProvider: fallbackResponse.provider,
           });
-          return fallbackResponse;
+          // Enhance fallback response with metadata
+          const enhancedFallbackResponse = {
+            ...fallbackResponse,
+            providerRequested: primaryProvider.name,
+            providerActual: fallbackResponse.provider,
+            fallbackUsed: true,
+            fallbackFrom: primaryProvider.name,
+            fallbackTo: fallbackProvider.name,
+            fallbackReason: error.message,
+            taskType: task.type,
+          };
+          return enhancedFallbackResponse;
         } catch (fallbackError) {
           logError('AIRouter', `Fallback provider ${fallbackProvider.name} failed`, {
             error: fallbackError instanceof Error ? fallbackError.message : String(fallbackError),

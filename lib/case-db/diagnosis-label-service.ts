@@ -1,5 +1,6 @@
 import { prisma } from '../prisma';
 import type {
+  Prisma,
   DiagnosisLabel,
   AtsRiskLevel,
   HrRiskLevel,
@@ -10,8 +11,8 @@ import type {
 export interface CreateDiagnosisLabelInput {
   serviceCaseId: string;
   mainJudgment: string;
-  secondaryIssues?: any; // JSON
-  issueDimensions?: any; // JSON
+  secondaryIssues?: Prisma.InputJsonValue; // JSON
+  issueDimensions?: Prisma.InputJsonValue; // JSON
   atsRiskLevel?: AtsRiskLevel;
   hrRiskLevel?: HrRiskLevel;
   directionMismatchLevel?: DirectionMismatchLevel;
@@ -23,8 +24,8 @@ export interface CreateDiagnosisLabelInput {
 
 export interface UpdateDiagnosisLabelInput {
   mainJudgment?: string;
-  secondaryIssues?: any | null;
-  issueDimensions?: any | null;
+  secondaryIssues?: Prisma.InputJsonValue | Prisma.NullableJsonNullValueInput;
+  issueDimensions?: Prisma.InputJsonValue | Prisma.NullableJsonNullValueInput;
   atsRiskLevel?: AtsRiskLevel;
   hrRiskLevel?: HrRiskLevel;
   directionMismatchLevel?: DirectionMismatchLevel;

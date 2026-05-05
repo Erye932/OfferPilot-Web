@@ -1,11 +1,11 @@
 import { prisma } from '../prisma';
-import type { FeedbackEvent, FeedbackStage } from '@prisma/client';
+import type { Prisma, FeedbackEvent, FeedbackStage } from '@prisma/client';
 
 export interface CreateFeedbackEventInput {
   serviceCaseId: string;
   stage: FeedbackStage;
-  adoptedActions?: any; // JSON
-  rejectedActions?: any; // JSON
+  adoptedActions?: Prisma.InputJsonValue; // JSON
+  rejectedActions?: Prisma.InputJsonValue; // JSON
   appliedAfterRevision?: boolean | null;
   interviewCount?: number | null;
   offerCount?: number | null;
@@ -14,8 +14,8 @@ export interface CreateFeedbackEventInput {
 }
 
 export interface UpdateFeedbackEventInput {
-  adoptedActions?: any | null;
-  rejectedActions?: any | null;
+  adoptedActions?: Prisma.InputJsonValue | Prisma.NullableJsonNullValueInput;
+  rejectedActions?: Prisma.InputJsonValue | Prisma.NullableJsonNullValueInput;
   appliedAfterRevision?: boolean | null;
   interviewCount?: number | null;
   offerCount?: number | null;

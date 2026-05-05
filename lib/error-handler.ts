@@ -69,6 +69,9 @@ export function createErrorResponse(
 
 /**
  * 安全日志记录 - 避免泄露敏感信息
+ *
+ * 在 dev 环境下，错误同时追加到 .logs/error.log 方便排查
+ * （生产环境只走 console，由托管平台收集）
  */
 export function logError(
   context: string,
@@ -78,12 +81,39 @@ export function logError(
   const errorObj = error instanceof Error ? error : new Error(String(error));
   const safeExtra = extra ? sanitizeExtraData(extra) : {};
 
-  console.error(`[${context}]`, {
+  const payload = {
     name: errorObj.name,
     message: errorObj.message,
     stack: process.env.NODE_ENV === 'development' ? errorObj.stack : undefined,
     ...safeExtra,
-  });
+  };
+
+  console.error(`[${context}]`, payload);
+
+  // dev 持久化（不阻塞、失败静默）
+  if (process.env.NODE_ENV === 'development' || process.env.NODE_ENV === 'test') {
+    appendToErrorLog(context, payload).catch(() => { /* ignore */ });
+  }
+}
+
+/**
+ * 追加错误日志到 .logs/error.log（dev only）
+ */
+async function appendToErrorLog(context: string, payload: unknown): Promise<void> {
+  try {
+    const fs = await import('fs/promises');
+    const path = await import('path');
+    const logDir = path.join(process.cwd(), '.logs');
+    await fs.mkdir(logDir, { recursive: true });
+    const line = JSON.stringify({
+      ts: new Date().toISOString(),
+      context,
+      ...(typeof payload === 'object' && payload !== null ? payload : { payload }),
+    }) + '\n';
+    await fs.appendFile(path.join(logDir, 'error.log'), line, 'utf8');
+  } catch {
+    // 任何文件 IO 失败都不应影响主流程
+  }
 }
 
 /**

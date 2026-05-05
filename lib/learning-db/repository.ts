@@ -2,6 +2,7 @@
 // 提供最小可用方法，用于服务沉淀层与知识学习层的数据写入
 
 import { prisma } from '@/lib/prisma';
+import type { Prisma, PatternType } from '@prisma/client';
 
 // ─── Lead（线索） ────────────────────────────────────────────────
 
@@ -94,8 +95,8 @@ export async function saveCaseSnapshot(input: CreateSnapshotInput) {
 export interface CreateDiagnosisLabelInput {
   serviceCaseId: string;
   mainJudgment: string;
-  secondaryIssues?: any;
-  issueDimensions?: any;
+  secondaryIssues?: Prisma.InputJsonValue;
+  issueDimensions?: Prisma.InputJsonValue;
   atsRiskLevel?: 'low' | 'medium' | 'high' | 'unknown';
   hrRiskLevel?: 'low' | 'medium' | 'high' | 'unknown';
   directionMismatchLevel?: 'none' | 'weak' | 'medium' | 'strong' | 'unknown';
@@ -129,7 +130,7 @@ export interface CreateRewritePairInput {
   serviceCaseId: string;
   issueType?: string;
   rewriteType?: string;
-  sourceLocation?: any;
+  sourceLocation?: Prisma.InputJsonValue;
   originalText: string;
   rewrittenText: string;
   changeSummary?: string;
@@ -174,8 +175,8 @@ export async function saveRewritePairs(pairs: CreateRewritePairInput[]) {
 export interface CreateFeedbackEventInput {
   serviceCaseId: string;
   stage: 'after_delivery' | 'day7' | 'day30';
-  adoptedActions?: any;
-  rejectedActions?: any;
+  adoptedActions?: Prisma.InputJsonValue;
+  rejectedActions?: Prisma.InputJsonValue;
   appliedAfterRevision?: boolean;
   interviewCount?: number;
   offerCount?: number;
@@ -281,7 +282,7 @@ export async function findPatternsByRoleFamily(roleFamily: string, patternType?:
   return await prisma.knowledgePattern.findMany({
     where: {
       roleFamily,
-      patternType: patternType as any,
+      patternType: patternType as PatternType,
       status: 'validated',
     },
     orderBy: { strengthScore: 'desc' },

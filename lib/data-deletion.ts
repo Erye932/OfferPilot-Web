@@ -1,16 +1,14 @@
 // 用户数据删除扩展模块（未来实现）
 // 提供 GDPR/个人信息保护法规要求的用户数据删除能力
 
-import { prisma } from './prisma';
-
 /**
  * 删除用户的所有数据（未来实现）
- * @param userId 用户ID
- * @param options 删除选项
+ * @param _userId 用户ID
+ * @param _options 删除选项
  */
 export async function deleteUserData(
-  userId: string,
-  options?: {
+  _userId: string,
+  _options?: {
     /** 是否保留匿名使用记录（用于数据分析） */
     keepAnonymousUsage?: boolean;
     /** 删除后是否创建审计记录 */
@@ -44,7 +42,7 @@ export async function deleteUserData(
  * @param anonymousSessionId 匿名会话ID
  */
 export async function deleteAnonymousSessionData(
-  anonymousSessionId: string
+  _anonymousSessionId: string
 ): Promise<{ success: boolean }> {
   // 实现逻辑：
   // 1. 查找该匿名会话的所有 DiagnoseSession 和 DiagnoseReport
