@@ -1,6 +1,8 @@
 // 标准化输入模块
 
 import type { DiagnoseRequest, NormalizedInput, JdQuality, ResumeSection, ResumeSectionType } from './types';
+import { resolveRole } from './role-resolver';
+import { logInfo } from '../error-handler';
 
 // ─── 段落类型识别策略 ────────────────────────────────────────
 interface ParagraphContext {
@@ -433,7 +435,7 @@ function detectExperienceLevel(resumeText: string, sentences: string[]): 'senior
 /**
  * 标准化输入
  */
-export function normalizeInput(request: DiagnoseRequest): NormalizedInput {
+export async function normalizeInput(request: DiagnoseRequest): Promise<NormalizedInput> {
   const { target_role, tier } = request;
   let { resume_text, jd_text = '' } = request;
 
@@ -557,7 +559,8 @@ export function normalizeInput(request: DiagnoseRequest): NormalizedInput {
   // 检测经验级别
   const experience_level = detectExperienceLevel(resume_text, sentences);
 
-  return {
+  // 构建基础NormalizedInput
+  const baseInput: NormalizedInput = {
     resume_text,
     target_role,
     jd_text,
@@ -569,6 +572,37 @@ export function normalizeInput(request: DiagnoseRequest): NormalizedInput {
     jd_quality,
     text_quality: 'sufficient',
     experience_level,
+  };
+
+  // 岗位语义解析
+  let role_resolution;
+  try {
+    role_resolution = await resolveRole(baseInput);
+    logInfo('Normalize', '岗位解析成功', {
+      raw_role: role_resolution.raw_role,
+      canonical_role: role_resolution.canonical_role,
+      role_family: role_resolution.role_family,
+      confidence: role_resolution.confidence,
+    });
+  } catch (error) {
+    logInfo('Normalize', '岗位解析失败，使用默认', {
+      error: error instanceof Error ? error.message : String(error),
+    });
+    // 提供默认解析结果
+    role_resolution = {
+      raw_role: target_role,
+      canonical_role: target_role,
+      role_family: '未知',
+      alt_roles: [],
+      skills_inferred: [],
+      confidence: 0.1,
+      ambiguity: '解析失败，使用原始输入',
+    };
+  }
+
+  return {
+    ...baseInput,
+    role_resolution,
   };
 }
 

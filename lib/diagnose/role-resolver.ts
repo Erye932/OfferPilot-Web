@@ -197,6 +197,8 @@ function dictionaryLookup(cleanedRole: string): {
   alt?: string[];
   confidence: number;
 } {
+  if (!cleanedRole) return { matched: false, confidence: 0 };
+
   // 精确匹配
   if (ROLE_DICTIONARY[cleanedRole]) {
     const entry = ROLE_DICTIONARY[cleanedRole];
@@ -384,9 +386,9 @@ export async function resolveRole(input: NormalizedInput): Promise<RoleResolutio
 
   if (dictResult.matched) {
     // 词典匹配成功
-    canonical = dictResult.canonical!;
-    family = dictResult.family!;
-    alt = dictResult.alt!;
+    canonical = dictResult.canonical ?? rawRole;
+    family = dictResult.family ?? '未知';
+    alt = dictResult.alt ?? [];
     confidence = dictResult.confidence;
 
     // 检查技能推断与词典匹配是否一致
@@ -425,8 +427,8 @@ export async function resolveRole(input: NormalizedInput): Promise<RoleResolutio
     if (dictResult.matched && dictResult.canonical) {
       candidates.push({
         canonical: dictResult.canonical,
-        family: dictResult.family!,
-        alt: dictResult.alt!,
+        family: dictResult.family ?? '未知',
+        alt: dictResult.alt ?? [],
       });
     }
 

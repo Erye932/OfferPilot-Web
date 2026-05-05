@@ -199,7 +199,8 @@ export const diagnoseRequestSchema = z.object({
   tier: z.enum(['free', 'paid']).default('free'),
   source_type: z.enum(['paste', 'pdf']).optional().default('paste'),
   uploaded_file_id: z.string().optional(),
-  diagnose_mode: z.enum(['basic', 'deep']).optional().default('basic'),
+  diagnose_mode: z.enum(['basic', 'deep']).optional().default('basic'), // V4 不再使用，但保留以向后兼容
+  force_refresh: z.boolean().optional().default(false), // V4：绕过 24h 缓存
 });
 
 // ─── Response (Unified Report Schema V3) ────────────────────
@@ -554,3 +555,323 @@ export interface DeepReport {
     optional_improvements: string[];
   };
 }
+
+// ════════════════════════════════════════════════════════════════
+// ─── V4 Schema: 段落 × 维度 矩阵报告（操盘工作台版） ────────────
+// ════════════════════════════════════════════════════════════════
+//
+// 设计原则：
+// 1. 报告给"操盘手 + AI 半人马"看，专业尖锐、信息密度高、可复制
+// 2. 段落 × 维度矩阵作为骨架（顶部热图）
+// 3. 复用现有：Severity / FixType / ImpactSurface / RewriteExample /
+//              SourceLocation / ResumeSectionType / DiagnoseScenario
+// 4. 删除 free/paid tier 概念 — 所有用户拿同一份详尽报告
+
+/**
+ * V4 诊断维度（6 个固定维度）
+ * 与旧 IssueDimension 不同：去掉 'other'，更聚焦
+ */
+export type V4Dimension =
+  | 'structure'        // 结构 / 排版 / 可读性 / 信息层级
+  | 'expression'       // 语言表达 / 动词使用 / 句式
+  | 'evidence'         // 量化证据 / 数字 / 具体性
+  | 'role_fit'         // 岗位贴合 / JD 关键词 / 技能匹配
+  | 'credibility'      // 可信度 / 一致性 / 不夸大
+  | 'missing_info';    // 关键信息缺失 / 应说未说
+
+export const V4_DIMENSIONS: V4Dimension[] = [
+  'structure',
+  'expression',
+  'evidence',
+  'role_fit',
+  'credibility',
+  'missing_info',
+];
+
+/** V4 维度的中文标签 */
+export const V4_DIMENSION_LABELS: Record<V4Dimension, string> = {
+  structure: '结构',
+  expression: '表达',
+  evidence: '证据',
+  role_fit: '岗位贴合',
+  credibility: '可信度',
+  missing_info: '信息缺失',
+};
+
+/** 单元格 / 评论状态 */
+export type CellStatus = 'ok' | 'warn' | 'problem' | 'missing';
+
+/** 状态对应的中文 + emoji（前端展示用） */
+export const CELL_STATUS_META: Record<CellStatus, { label: string; emoji: string; color: string }> = {
+  ok:      { label: '良好',     emoji: '🟢', color: 'green' },
+  warn:    { label: '提醒',     emoji: '🟡', color: 'yellow' },
+  problem: { label: '问题',     emoji: '🔴', color: 'red' },
+  missing: { label: '缺失信息', emoji: '⚫', color: 'gray' },
+};
+
+/**
+ * V4 改写示范（V4Comment.rewrite 字段）
+ *
+ * 与旧 RewriteExample (original/rewritten/change_summary) 不同，使用更直观的命名。
+ */
+export interface V4Rewrite {
+  before: string;          // 改前原句
+  after: string;           // 改后建议
+  what_changed: string;    // 简短说明改了什么（如"加入量化"、"动词换主动式"）
+}
+
+/**
+ * V4 评论来源（便于调试 / 追溯产生路径）
+ */
+export type V4CommentSource =
+  | 'rule'           // MissingInfoProbe 规则探针
+  | 'hr'             // HrSimulator
+  | 'master'         // ResumeMaster
+  | 'credibility'    // CredibilityCheck
+  | 'jd_coverage'    // JdKeywordCoverage
+  | 'self_critique'  // SelfCritiqueLoop
+  | 'cross';         // CrossCritique
+
+/**
+ * 可信度问题分类（CredibilityCheck 输出）
+ */
+export type CredibilityConcern =
+  | 'numeric_doubt'      // 数字主张不可信（如应届生过高指标）
+  | 'overclaim'          // 过度声称（主导/独立完成 + 资历不符）
+  | 'skill_stuffing'     // 技能堆砌但项目无对应证据
+  | 'timeline_conflict'  // 时间线冲突（如同期多段全职）
+  | 'vague_role';        // 角色模糊（"参与"、"协助"等不可证伪表述）
+
+/**
+ * Comment — V4 评论的最小完整单元
+ *
+ * 比旧 CoreIssue / DeepProblem 更紧凑，字段直接对齐前端 CommentCard
+ */
+export interface V4Comment {
+  id: string;                          // 唯一 ID（用于跳转/折叠）
+  section: ResumeSectionType;          // 段落类型
+  section_label: string;               // 段落显示名（如「实习经历 - 字节跳动」）
+  dimension: V4Dimension;              // 维度
+  status: CellStatus;                  // 状态评级（决定颜色）
+  severity: Severity;                  // must_fix / should_fix / optional / nitpicky
+
+  title: string;                       // 简短标题
+  one_liner: string;                   // 一句话定性
+  why_it_hurts: string;                // 1-3 句讲清问题机制
+
+  impact_on: ImpactSurface[];          // 影响哪些环节（4 档可多选）
+  fix_type: FixType;                   // 自己改 / 需补料 / 不可编造
+
+  evidence_quote: string;              // 简历原句精确摘录
+  evidence_location?: SourceLocation;  // 段落 / 句子定位
+
+  /** 改写示范（V4 字段命名，与旧 RewriteExample 不同） */
+  rewrite?: V4Rewrite | null;
+  insider_view?: string;               // 行业人视角
+
+  source?: V4CommentSource;            // 评论来源（调试用）
+  credibility_concern?: CredibilityConcern; // 来自 CredibilityCheck 时填
+}
+
+/**
+ * MatrixCell — 矩阵格（段落 × 维度）
+ */
+export interface V4MatrixCell {
+  section: ResumeSectionType;
+  section_label: string;
+  dimension: V4Dimension;
+  status: CellStatus;
+  comment_count: number;
+  worst_severity: Severity | null;
+  summary: string;                     // 这一格的一句话总结（点击展开前先看到）
+}
+
+/**
+ * SectionGrade — 段落综合评级（热图横向汇总列）
+ */
+export interface V4SectionGrade {
+  section: ResumeSectionType;
+  section_label: string;
+  status: CellStatus;                  // 该段最差状态
+  comment_count: number;
+  worst_severity: Severity | null;
+}
+
+/**
+ * JdKeywordCoverage — JD 关键词反向覆盖矩阵
+ * 仅在 has_jd 时产生
+ */
+export interface V4JdKeywordCoverage {
+  must_have: Array<{
+    keyword: string;
+    covered: boolean;
+    section_hits: ResumeSectionType[];   // 哪些段命中
+  }>;
+  nice_to_have: Array<{
+    keyword: string;
+    covered: boolean;
+    section_hits: ResumeSectionType[];
+  }>;
+  missing_critical: string[];          // must_have 中未覆盖的关键词
+  coverage_rate: number;               // 0-1（must_have 覆盖率）
+}
+
+/**
+ * CredibilityFlag — 可信度警示标记
+ */
+export interface V4CredibilityFlag {
+  type: CredibilityConcern;
+  description: string;                 // 警示描述
+  evidence: string;                    // 简历原文
+  severity: 'high' | 'medium' | 'low';
+  source_location?: SourceLocation;
+  question_for_candidate?: string;     // 操盘手该问候选人什么
+}
+
+/**
+ * BeforeAfterMetrics — 改前/改后量化对比
+ * 通过 SelfCritiqueLoop 真实测量得到
+ */
+export interface V4BeforeAfterMetrics {
+  overall_score: { before: number; after: number };
+  hr_6s_pass: { before: string; after: string };       // 如 "可能跳过" → "可能通过"
+  ats_match: { before: string; after: string };        // 如 "55%" → "78%"
+  interview_risk: { before: 'low' | 'medium' | 'high'; after: 'low' | 'medium' | 'high' };
+  improvement_summary: string;                          // 一句话总结改后差异
+}
+
+/**
+ * ScoreBreakdown — 总分细分（6 维度加权）
+ *
+ * 默认权重设计依据：
+ * - evidence (0.30)：量化证据是简历核心
+ * - role_fit (0.20)：岗位匹配决定是否进面
+ * - structure / expression (各 0.15)：基础门面
+ * - credibility (0.10) / missing_info (0.10)：辅助维度
+ */
+export interface V4ScoreBreakdown {
+  structure:    { score: number; weight: number };
+  expression:   { score: number; weight: number };
+  evidence:     { score: number; weight: number };
+  role_fit:     { score: number; weight: number };
+  credibility:  { score: number; weight: number };
+  missing_info: { score: number; weight: number };
+  overall: number;                     // 加权总分（0-100）
+}
+
+/** V4 默认权重 */
+export const V4_DEFAULT_WEIGHTS: Record<V4Dimension, number> = {
+  structure:    0.15,
+  expression:   0.15,
+  evidence:     0.30,
+  role_fit:     0.20,
+  credibility:  0.10,
+  missing_info: 0.10,
+};
+
+/**
+ * CrossSectionSummary — 末尾跨段落汇总
+ */
+export interface V4CrossSectionSummary {
+  must_fix_top: V4Comment[];                  // 跨段必改清单（按优先级 top N）
+  rewrite_examples: V4Comment[];              // 改写示例库（仅含带 rewrite 的 comments）
+  jd_keyword_matrix?: V4JdKeywordCoverage;    // 仅 has_jd 时
+  credibility_flags: V4CredibilityFlag[];     // 可信度警示
+  risks: {
+    ats_risk:       { level: 'low' | 'medium' | 'high'; reasons: string[] };
+    hr_risk:        { level: 'low' | 'medium' | 'high'; reasons: string[] };
+    interview_risk: { level: 'low' | 'medium' | 'high'; reasons: string[] };
+  };
+}
+
+/**
+ * DiagnoseReport — V4 主报告
+ *
+ * 与旧 FreeDiagnoseResponse 完全独立
+ * 在 Phase 8 路由中通过 schema_version 字段区分
+ */
+export interface DiagnoseReport {
+  // ── 头部 ──
+  scenario: DiagnoseScenario;          // normal / excellent / insufficient_input
+  overall_score: number;               // 0-100
+  overall_grade: 'excellent' | 'strong' | 'medium' | 'weak';
+  total_assessment: string;            // 给操盘手的总评（专业尖锐，3-6 句）
+  score_breakdown: V4ScoreBreakdown;   // 6 维度加权细分
+
+  // ── 矩阵骨架（顶部热图） ──
+  matrix: {
+    sections: V4SectionGrade[];        // 横轴（段落 + 段落汇总）
+    dimensions: V4Dimension[];         // 纵轴（固定 6 个）
+    cells: V4MatrixCell[];             // sections × dimensions 全量格子
+  };
+
+  // ── 中部分章（按维度组织所有 comments） ──
+  comments_by_dimension: Record<V4Dimension, V4Comment[]>;
+
+  // ── 末尾汇总 ──
+  cross_section_summary: V4CrossSectionSummary;
+
+  // ── 改前/改后对比（来自 SelfCritiqueLoop） ──
+  before_after: V4BeforeAfterMetrics;
+
+  // ── 元数据 ──
+  metadata: {
+    target_role: string;
+    has_jd: boolean;
+    generated_at: string;              // ISO 8601
+    schema_version: '4.0';
+    workflow_steps: string[];          // 实际执行了哪些步骤（调试用）
+    workflow_duration_ms?: number;     // 总耗时
+    cache_hit?: boolean;               // 是否命中缓存
+    role_resolution?: RoleResolution;  // 岗位语义解析（可选）
+    research_providers?: {             // 研究阶段实际使用的 provider
+      role_study: string;              // e.g. 'metaso' | 'deepseek'
+      hr_insider: string;
+      fallback_used: boolean;          // 任一研究步骤是否用了 fallback
+    };
+  };
+
+  // ── 研究阶段产出（后台养料，前端可选展示）──
+  // 由 Phase 1 (R2 RoleStudy + R3 HrInsider) 和 Phase 2 (R5 ResumeStudy) 产生
+  // 类型定义在 lib/diagnose/v4/schemas.ts ResearchContext，这里用 unknown 避免循环引用
+  research_context?: unknown;
+}
+
+/**
+ * V4 请求 — 简化版（无 tier、无 diagnose_mode）
+ */
+export interface DiagnoseReportRequest {
+  resume_text: string;
+  resume_paragraphs?: string[];
+  target_role: string;
+  jd_text?: string;
+  source_type?: 'paste' | 'pdf';
+  uploaded_file_id?: string;
+  /** 绕过 24h 缓存，强制重新诊断 */
+  force_refresh?: boolean;
+}
+
+/** Zod schema for V4 请求校验 */
+export const diagnoseReportRequestSchema = z.object({
+  resume_text: z.string().min(1, '简历文本不能为空'),
+  resume_paragraphs: z.array(z.string()).optional(),
+  target_role: z.string().min(1, '目标岗位不能为空'),
+  jd_text: z.string().optional().default(''),
+  source_type: z.enum(['paste', 'pdf']).optional().default('paste'),
+  uploaded_file_id: z.string().optional(),
+  force_refresh: z.boolean().optional().default(false),
+});
+
+/** 段落类型的中文标签 */
+export const SECTION_LABELS: Record<ResumeSectionType, string> = {
+  personal_info:   '个人信息',
+  education:       '教育背景',
+  work_experience: '工作经历',
+  internship:      '实习经历',
+  project:         '项目经验',
+  skill:           '技能清单',
+  self_evaluation: '自我评价',
+  certificate:     '证书',
+  other:           '其他',
+};
+

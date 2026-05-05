@@ -1,6 +1,6 @@
-import type { FreeDiagnoseResponse } from './types';
-import { runFreeDiagnoseWorkflow } from './workflow';
-import { runDeepDiagnoseWorkflow } from './v2/workflow';
+import type { DiagnoseReport, DiagnoseRequest } from './types';
+import { runV4DiagnoseWorkflow } from './v4/workflow';
+import { getCachedReport, setCachedReport, invalidateCachedReport } from './cache';
 import { logWarn, logInfo } from '../error-handler';
 
 // 惰性导入 prisma，避免 build 阶段 eager 加载 pg 驱动
@@ -9,148 +9,108 @@ async function getPrisma() {
   return prisma;
 }
 
-export interface DiagnoseInput {
+// ════════════════════════════════════════════════════════════════
+// V4 入口（统一工作流）
+// ════════════════════════════════════════════════════════════════
+
+export interface V4DiagnoseInput {
   resume_text: string;
   resume_paragraphs?: string[];
   target_role: string;
   jd_text?: string;
-  tier: 'free' | 'paid';
+  tier?: 'free' | 'paid';                 // 仅供限流，对报告内容无影响
   source_type?: 'paste' | 'pdf';
   uploaded_file_id?: string;
-  diagnose_mode?: 'basic' | 'deep';
+  force_refresh?: boolean;                 // 跳过缓存
 }
 
 /**
- * 运行诊断工作流（共享逻辑，供旧接口和 worker 共用）
+ * V4 诊断主入口：先查缓存，未命中则跑 V4 工作流并写缓存
  */
-export async function runDiagnosis(input: DiagnoseInput): Promise<FreeDiagnoseResponse> {
-  const { resume_text, resume_paragraphs, target_role, jd_text = '', tier, diagnose_mode } = input;
-  const dualAiEnabled = process.env.DUAL_AI_ENABLED === 'true';
-  const mode = diagnose_mode || 'basic';
+export async function runV4Diagnosis(input: V4DiagnoseInput): Promise<DiagnoseReport> {
+  const { resume_text, target_role, jd_text = '', force_refresh = false } = input;
 
-  logInfo('DiagnoseService', '诊断模式决策', {
-    mode,
-    dualAiEnabled,
-    enteringDeepMode: mode === 'deep' && dualAiEnabled,
-  });
-
-  if (mode === 'deep' && dualAiEnabled) {
-    // 深度诊断：先运行基础诊断，再运行深度工作流
-    const basicResult = await runFreeDiagnoseWorkflow({
-      resume_text,
-      resume_paragraphs,
-      target_role,
-      jd_text,
-      tier,
-    });
-
-    logInfo('DiagnoseService', '进入深度诊断工作流', {
-      hasBasicResult: !!basicResult,
-      basicResultScenario: basicResult?.scenario,
-    });
-
-    try {
-      return await runDeepDiagnoseWorkflow({
-        resume_text,
-        resume_paragraphs,
+  // 1. 缓存查询（force_refresh 时跳过）
+  if (!force_refresh) {
+    const cached = getCachedReport({ resume_text, target_role, jd_text });
+    if (cached) {
+      logInfo('V4Diagnose', '缓存命中，直接返回', {
+        cache_hit: true,
         target_role,
-        jd_text,
-        tier,
-      }, basicResult);
-    } catch (deepError) {
-      // 深度诊断失败：返回基础诊断 + 显式 fallback 标记
-      logWarn('DiagnoseService', '深度诊断失败，返回基础诊断 + fallback 标记', {
-        error: deepError instanceof Error ? deepError.message : String(deepError),
       });
-      const result = { ...basicResult };
-      result.metadata.diagnose_mode = 'deep';
-      result.metadata.deep_diagnosis = false;
-      result.metadata.deep_fallback_reason = 'server_unavailable';
-      result.metadata.deep_fallback_message = '服务器开小差，先给你基础诊断结果';
-      return result;
+      return cached;
     }
-  } else if (mode === 'deep' && !dualAiEnabled) {
-    // 用户请求 deep 但 feature flag 未开启
-    logWarn('DiagnoseService', 'deep 模式请求但 DUAL_AI_ENABLED 未开启，返回 basic + fallback 标记');
-    const result = await runFreeDiagnoseWorkflow({
-      resume_text,
-      resume_paragraphs,
-      target_role,
-      jd_text,
-      tier,
-    });
-    result.metadata.diagnose_mode = 'deep';
-    result.metadata.deep_diagnosis = false;
-    result.metadata.deep_fallback_reason = 'server_unavailable';
-    result.metadata.deep_fallback_message = '服务器开小差，先给你基础诊断结果';
-    return result;
   } else {
-    // 基础诊断
-    return runFreeDiagnoseWorkflow({
-      resume_text,
-      resume_paragraphs,
-      target_role,
-      jd_text,
-      tier,
-    });
+    invalidateCachedReport({ resume_text, target_role, jd_text });
+    logInfo('V4Diagnose', 'force_refresh：已主动失效缓存');
   }
+
+  // 2. 跑 V4 工作流
+  const request: DiagnoseRequest = {
+    resume_text,
+    resume_paragraphs: input.resume_paragraphs,
+    target_role,
+    jd_text,
+    tier: input.tier ?? 'free',
+  };
+  const report = await runV4DiagnoseWorkflow(request);
+
+  // 3. 写缓存（即使 force_refresh 也写入，供后续命中）
+  setCachedReport({ resume_text, target_role, jd_text }, report);
+
+  return report;
 }
 
 /**
- * 保存诊断结果到数据库（共享逻辑）
- * 返回 reportId
+ * 把 V4 DiagnoseReport 落库（复用 DiagnoseSession + DiagnoseReport 表）
  */
-export async function saveDiagnosisResult(
-  result: FreeDiagnoseResponse,
-  input: { resume_text: string; target_role: string; jd_text: string; tier: 'free' | 'paid'; source_type?: 'paste' | 'pdf'; uploaded_file_id?: string }
+export async function saveV4DiagnoseReport(
+  report: DiagnoseReport,
+  input: V4DiagnoseInput
 ): Promise<string | null> {
   try {
     const prisma = await getPrisma();
+
+    const meta = report.metadata ?? ({} as DiagnoseReport['metadata']);
+    const totalAssessment = report.total_assessment ?? '（总评数据缺失）';
+    const scenario = report.scenario ?? 'normal';
 
     const session = await prisma.diagnoseSession.create({
       data: {
         targetRole: input.target_role,
         jdText: input.jd_text || null,
         resumeText: input.resume_text,
-        sourceType: input.uploaded_file_id ? 'pdf' : (input.source_type || 'paste'),
+        sourceType: input.uploaded_file_id ? 'pdf' : (input.source_type ?? 'paste'),
         uploadedFileId: input.uploaded_file_id || null,
-        jdQuality: result.metadata.jd_quality || 'none',
-        inputQuality: result.scenario === 'insufficient_input' ? 'insufficient' : 'sufficient',
-        scenario: result.scenario,
-        schemaVersion: result.metadata.schema_version || '2.0',
-        tier: input.tier,
+        jdQuality: meta.has_jd ? 'sufficient' : 'none',
+        inputQuality: scenario === 'insufficient_input' ? 'insufficient' : 'sufficient',
+        scenario,
+        schemaVersion: meta.schema_version ?? '4.0',
+        tier: input.tier ?? 'free',
       },
     });
 
-    const report = await prisma.diagnoseReport.create({
+    const dbReport = await prisma.diagnoseReport.create({
       data: {
         sessionId: session.id,
-        mainJudgment: result.main_judgment,
-        reportJson: JSON.parse(JSON.stringify(result)),
+        mainJudgment: totalAssessment.slice(0, 500),
+        reportJson: JSON.parse(JSON.stringify(report)),
         modelName: 'deepseek-chat',
         confidence: null,
-        auditJson: result.audit_rows ? JSON.parse(JSON.stringify({
-          rows: result.audit_rows,
-          grouped_by_section: result.grouped_issues_by_section || {},
-          grouped_by_dimension: result.grouped_issues_by_dimension || {},
-          missing_info_summary: result.missing_info_summary || [],
-        })) : undefined,
+        auditJson: undefined,
         providerTraceJson: JSON.parse(JSON.stringify({
-          research_provider_requested: result.metadata.research_provider_requested,
-          research_provider_actual: result.metadata.research_provider_actual,
-          research_fallback_used: result.metadata.research_fallback_used,
-          research_fallback_reason: result.metadata.research_fallback_reason,
-          research_fallback_from: result.metadata.research_fallback_from,
-          research_fallback_to: result.metadata.research_fallback_to,
-          deep_diagnosis_executed: result.metadata.deep_diagnosis_executed,
+          schema_version: meta.schema_version,
+          workflow_steps: meta.workflow_steps,
+          workflow_duration_ms: meta.workflow_duration_ms,
+          cache_hit: meta.cache_hit ?? false,
         })) || undefined,
-        coverageVersion: '1.0',
+        coverageVersion: '4.0',
       },
     });
 
-    return report.id;
+    return dbReport.id;
   } catch (dbError) {
-    logWarn('DiagnoseService', '数据库落库失败', {
+    logWarn('V4Diagnose', 'V4 落库失败', {
       error: dbError instanceof Error ? dbError.message : String(dbError),
     });
     return null;
@@ -158,23 +118,19 @@ export async function saveDiagnosisResult(
 }
 
 /**
- * 完整的诊断流程：运行诊断 + 保存结果
+ * V4 完整流程：诊断 + 保存
  */
-export async function runDiagnosisAndSave(
-  input: DiagnoseInput
-): Promise<{ result: FreeDiagnoseResponse; reportId: string | null }> {
-  // 1. 运行诊断
-  const result = await runDiagnosis(input);
+export async function runV4DiagnosisAndSave(
+  input: V4DiagnoseInput
+): Promise<{ report: DiagnoseReport; reportId: string | null }> {
+  const report = await runV4Diagnosis(input);
 
-  // 2. 保存结果
-  const reportId = await saveDiagnosisResult(result, {
-    resume_text: input.resume_text,
-    target_role: input.target_role,
-    jd_text: input.jd_text || '',
-    tier: input.tier,
-    source_type: input.source_type,
-    uploaded_file_id: input.uploaded_file_id,
-  });
+  // 缓存命中时不重复落库
+  if (report.metadata?.cache_hit) {
+    logInfo('V4Diagnose', '缓存命中，跳过落库');
+    return { report, reportId: null };
+  }
 
-  return { result, reportId };
+  const reportId = await saveV4DiagnoseReport(report, input);
+  return { report, reportId };
 }
