@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useMemo, useState, useRef } from "react";
 import { useRouter } from "next/navigation";
 import AppTopNav from "@/components/offerpilot/AppTopNav";
 import type { LoadingStage } from "@/lib/diagnose/types";
@@ -69,9 +69,15 @@ export default function DiagnoseLoading() {
   const [deepFallbackMsg, setDeepFallbackMsg] = useState<string | null>(null);
   const apiDone = useRef(false);
   const resultReady = useRef(false);
+  // 防止 React StrictMode 在 dev 下双调 useEffect 导致 /api/diagnose 被发两次
+  // V4 工作流要跑 ~2 分钟 + 12 次 AI 调用，重复请求代价非常高
+  const apiCalledOnce = useRef(false);
 
   // 根据模式选择配置
-  const STAGE_CONFIG = diagnoseMode === 'deep' ? STAGE_CONFIG_DEEP : STAGE_CONFIG_BASIC;
+  const STAGE_CONFIG = useMemo(
+    () => (diagnoseMode === 'deep' ? STAGE_CONFIG_DEEP : STAGE_CONFIG_BASIC),
+    [diagnoseMode]
+  );
 
   // Smooth progress animation
   useEffect(() => {
@@ -90,7 +96,7 @@ export default function DiagnoseLoading() {
     }, 30);
 
     return () => clearInterval(timer);
-  }, [stage, displayProgress]);
+  }, [stage, displayProgress, STAGE_CONFIG]);
 
   // Advance pre-API stages automatically
   useEffect(() => {
@@ -113,10 +119,14 @@ export default function DiagnoseLoading() {
     }, duration);
 
     return () => clearTimeout(timer);
-  }, [stage]);
+  }, [stage, STAGE_CONFIG]);
 
   // Call API
   useEffect(() => {
+    // 卫兵：StrictMode 双调防护 + 防止任何意外重入
+    if (apiCalledOnce.current) return;
+    apiCalledOnce.current = true;
+
     const diagnoseDataStr = sessionStorage.getItem("diagnoseData");
     if (!diagnoseDataStr) {
       setDiagnoseError("诊断数据不存在，请重新输入");

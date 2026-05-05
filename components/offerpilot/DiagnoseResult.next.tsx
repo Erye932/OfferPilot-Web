@@ -4,11 +4,12 @@ import { useState, useEffect, useCallback, useRef } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import AppTopNav from "@/components/offerpilot/AppTopNav";
-import DeepDiagnoseResult from "@/components/offerpilot/DeepDiagnoseResult";
+import ReportV4 from "@/components/offerpilot/report-v4/ReportV4";
 import type {
   FreeDiagnoseResponse,
   RewriteExample,
   AIAssistantState,
+  DiagnoseReport as V4DiagnoseReport,
 } from "@/lib/diagnose/types";
 
 type DiagnoseReport = FreeDiagnoseResponse;
@@ -182,49 +183,16 @@ export default function DiagnoseResult({ reportId }: DiagnoseResultProps) {
         response: null,
       });
 
-      try {
-        const res = await fetch("/api/explain", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            issue_index:      issueIndex,
-            issue_title:      issue.title,
-            issue_summary:    issue.summary,
-            issue_suggestion: issue.suggestion,
-            resume_excerpt:   issue.evidence,
-            screening_impact: issue.screening_impact,
-            dimension:        issue.dimension,
-            jd_relevance:     issue.jd_relevance,
-            is_structural:    issue.is_structural,
-          }),
-        });
-
-        if (!res.ok) throw new Error(`API error: ${res.status}`);
-
-        const data = await res.json();
-        setAiAssistant((prev) => ({
-          ...prev,
-          loading: false,
-          response: {
-            explanation:         data.explanation || "暂时无法生成解释",
-            corpus_evidence:     data.corpus_evidence,
-            confidence:          data.confidence || "medium",
-            might_be_wrong:      data.might_be_wrong,
-            follow_up_suggestion: data.follow_up_suggestion,
-          },
-        }));
-      } catch (error) {
-        console.error("AI explain error:", error);
-        setAiAssistant((prev) => ({
-          ...prev,
-          loading: false,
-          response: {
-            explanation: `这条诊断基于简历中"${issue.evidence?.substring(0, 30) || "相关内容"}…"部分的分析。${issue.suggestion}`,
-            confidence:  "low" as const,
-            might_be_wrong: "AI 解释服务暂时不可用，以上是基于本地信息的简要说明，仅供参考。",
-          },
-        }));
-      }
+      // V4 主路径不走这里；V3 老报告才会调用，有个 fallback 说明即可
+      setAiAssistant((prev) => ({
+        ...prev,
+        loading: false,
+        response: {
+          explanation: `这条诊断基于简历中"${issue.evidence?.substring(0, 30) || "相关内容"}…"部分的分析。${issue.suggestion ?? ''}`,
+          confidence:  "low" as const,
+          might_be_wrong: "旧版报告不再提供 AI 动态解释，仅供参考。",
+        },
+      }));
     },
     [report, aiAssistant.activeIssueIndex, aiAssistant.response]
   );
@@ -276,6 +244,20 @@ export default function DiagnoseResult({ reportId }: DiagnoseResultProps) {
   }
 
   const { scenario } = report;
+
+  // ─── V4 detection（最高优先级，覆盖所有旧逻辑）───────────────
+  // 当后端返回 schema_version === '4.0' 时，直接渲染新版组件树
+  const v4Maybe = (report as unknown) as V4DiagnoseReport;
+  if (v4Maybe.metadata?.schema_version === '4.0' && Array.isArray(v4Maybe.matrix?.cells)) {
+    return (
+      <div className="min-h-screen bg-neutral-50 text-neutral-800">
+        <AppTopNav current="result" />
+        <main className="w-full">
+          <ReportV4 report={v4Maybe} />
+        </main>
+      </div>
+    );
+  }
 
   // ─── Insufficient input ─────────────────────────────────────
   if (scenario === "insufficient_input") {
@@ -330,12 +312,6 @@ export default function DiagnoseResult({ reportId }: DiagnoseResultProps) {
         </main>
       </div>
     );
-  }
-
-  // ─── Deep mode detection ─────────────────────────────────────
-  const isDeepMode = report.metadata?.diagnose_mode === 'deep' && report.deep_report;
-  if (isDeepMode && report.deep_report) {
-    return <DeepDiagnoseResult report={report} reportId={reportId} />;
   }
 
   // ─── Excellent ──────────────────────────────────────────────

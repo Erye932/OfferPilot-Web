@@ -114,7 +114,6 @@ export default function DiagnoseInput() {
   const [pdfError, setPdfError] = useState<string | null>(null);
   const [inputQualityError, setInputQualityError] = useState<string | null>(null);
   const [canReturnToResult, setCanReturnToResult] = useState(false);
-  const [diagnoseMode, setDiagnoseMode] = useState<'basic' | 'deep'>('basic');
   // PDF parse quality fields
   const [extractionQuality, setExtractionQuality] = useState<'high' | 'medium' | 'low' | null>(null);
   const [uploadedFileId, setUploadedFileId] = useState<string | null>(null);
@@ -147,7 +146,6 @@ export default function DiagnoseInput() {
         // Restore source info for continue-optimize flow
         if (data.sourceType) setSourceType(data.sourceType);
         if (data.uploadedFileId !== undefined) setUploadedFileId(data.uploadedFileId);
-        if (data.diagnoseMode) setDiagnoseMode(data.diagnoseMode);
         if (data.fromResult && sessionStorage.getItem(SS_RESULT)) {
           setCanReturnToResult(true);
         }
@@ -341,7 +339,6 @@ export default function DiagnoseInput() {
       targetRole,
       jobDescription,
       tier: "free" as const,
-      diagnoseMode,
       uploadedFileId,
       sourceType,
     };
@@ -752,81 +749,6 @@ export default function DiagnoseInput() {
                   </div>
                 )}
 
-                {/* 诊断模式选择 */}
-                <div className="mb-6 rounded-lg border border-neutral-300 bg-neutral-100 p-4">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <h3 className="text-sm font-semibold text-neutral-900">诊断模式</h3>
-                      <p className="mt-1 text-xs text-neutral-600">
-                        {diagnoseMode === 'basic'
-                          ? '基础诊断：快速分析核心问题'
-                          : '深度诊断：双AI交叉验证，提供更深层分析'}
-                      </p>
-                    </div>
-                    <div className="flex gap-2">
-                      <button
-                        type="button"
-                        onClick={() => setDiagnoseMode('basic')}
-                        className={`rounded-md px-3 py-1.5 text-sm font-medium transition ${
-                          diagnoseMode === 'basic'
-                            ? 'bg-primary text-white'
-                            : 'bg-white text-neutral-700 border border-neutral-400 hover:bg-neutral-50'
-                        }`}
-                      >
-                        基础诊断
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => setDiagnoseMode('deep')}
-                        className={`rounded-md px-3 py-1.5 text-sm font-medium transition ${
-                          diagnoseMode === 'deep'
-                            ? 'bg-primary text-white'
-                            : 'bg-white text-neutral-700 border border-neutral-400 hover:bg-neutral-50'
-                        }`}
-                      >
-                        深度诊断
-                      </button>
-                    </div>
-                  </div>
-
-                  {/* 深度模式价值说明 */}
-                  {diagnoseMode === 'deep' && (
-                    <div className="mt-4 rounded-lg border border-primary-light bg-white p-4">
-                      <p className="text-xs font-semibold text-primary-dark mb-2">解锁后可获得</p>
-                      <ul className="space-y-1.5 text-xs text-neutral-700">
-                        <li className="flex items-start gap-2">
-                          <span className="text-primary mt-0.5">•</span>
-                          <span>ATS 风险拆解 - 关键词缺口与格式风险分析</span>
-                        </li>
-                        <li className="flex items-start gap-2">
-                          <span className="text-primary mt-0.5">•</span>
-                          <span>HR 6秒/30秒分析 - 模拟真实初筛流程</span>
-                        </li>
-                        <li className="flex items-start gap-2">
-                          <span className="text-primary mt-0.5">•</span>
-                          <span>面试追问风险 - 可能被问到的弱点与准备建议</span>
-                        </li>
-                        <li className="flex items-start gap-2">
-                          <span className="text-primary mt-0.5">•</span>
-                          <span>内容丰富化机会池 - 安全扩写/需补充/禁止编造分类</span>
-                        </li>
-                        <li className="flex items-start gap-2">
-                          <span className="text-primary mt-0.5">•</span>
-                          <span>可直接替换改写包 - 带复制功能的改写示例</span>
-                        </li>
-                        <li className="flex items-start gap-2">
-                          <span className="text-primary mt-0.5">•</span>
-                          <span>全量问题池 - 必改/应改/可选/吹毛求疵四级分类</span>
-                        </li>
-                        <li className="flex items-start gap-2">
-                          <span className="text-primary mt-0.5">•</span>
-                          <span>改前 vs 改后预期变化 - 分数提升与通过率预估</span>
-                        </li>
-                      </ul>
-                    </div>
-                  )}
-                </div>
-
                 {/* Parse review confirmation required */}
                 {sourceType === 'pdf' && (extractionQuality === 'low' || extractionQuality === 'medium') && !parseReviewConfirmed && (
                   <div className="mb-4 rounded-lg border border-amber-200 bg-amber-50 px-4 py-3">
@@ -840,7 +762,7 @@ export default function DiagnoseInput() {
                   disabled={!canStart}
                   className="w-full rounded-md bg-primary px-5 py-3 text-base font-semibold text-white transition hover:bg-primary-dark focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary disabled:cursor-not-allowed disabled:bg-neutral-300"
                 >
-                  {diagnoseMode === 'basic' ? '开始诊断' : '开始深度诊断'}
+                  开始诊断
                 </button>
               </div>
             </section>

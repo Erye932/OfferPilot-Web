@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useCallback, useRef } from "react";
+import { useState, useCallback, useRef } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import AppTopNav from "@/components/offerpilot/AppTopNav";
@@ -24,20 +24,13 @@ const DIMENSION_LABELS: Record<string, { label: string; color: string }> = {
   other:        { label: "其他",    color: "text-[11px] font-medium tracking-widest uppercase text-neutral-500" },
 };
 
-// quality_tier — only show if it carries a concrete action signal
-const QUALITY_TIER_CONFIG: Record<string, { label: string; color: string } | null> = {
-  strong: { label: "整体较强 · 建议直接投递", color: "text-green-600" },
-  weak:   { label: "需重点修改 · 先改核心问题再投", color: "text-orange-600" },
-  medium: null, // not informative enough to show
-};
-
-
 export default function DemoDiagnoseResult() {
   const router = useRouter();
   const [detailId, setDetailId] = useState<string>("");
   const [activeIssueId, setActiveIssueId] = useState<string>("");
-  const [report, setReport] = useState<DiagnoseReport | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
+  // 静态 mock 数据，直接作为初始值赋给状态，避免在 useEffect 中 setState
+  const [report] = useState<DiagnoseReport | null>(demoDiagnoseResult);
+  const [isLoading] = useState(false);
   const [copiedIdx, setCopiedIdx] = useState<number | null>(null);
   // AI assistant: cleaned up — removed unused `visible`, `request`, `chatHistory`
   const [aiAssistant, setAiAssistant] = useState<{
@@ -53,12 +46,6 @@ export default function DemoDiagnoseResult() {
   });
   const lastClickTime = useRef(0);
   const issueRefs = useRef<Map<string, HTMLElement>>(new Map());
-
-  useEffect(() => {
-    // 直接使用静态mock数据，不依赖sessionStorage
-    setReport(demoDiagnoseResult);
-    setIsLoading(false);
-  }, []);
 
 
   // ─── Single click select / double click clear all ─────────
@@ -100,7 +87,7 @@ export default function DemoDiagnoseResult() {
   }, []);
 
   // ─── Continue-optimize (with optional source location) ─────
-  const handleContinueOptimize = (issueIndex?: number) => {
+  const handleContinueOptimize = (_issueIndex?: number) => {
     // demo模式下，继续优化跳转到诊断页面，但清除可能存在的sessionStorage数据
     try {
       sessionStorage.removeItem("diagnoseData");
@@ -129,49 +116,16 @@ export default function DemoDiagnoseResult() {
         response: null,
       });
 
-      try {
-        const res = await fetch("/api/explain", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            issue_index:      issueIndex,
-            issue_title:      issue.title,
-            issue_summary:    issue.summary,
-            issue_suggestion: issue.suggestion,
-            resume_excerpt:   issue.evidence,
-            screening_impact: issue.screening_impact,
-            dimension:        issue.dimension,
-            jd_relevance:     issue.jd_relevance,
-            is_structural:    issue.is_structural,
-          }),
-        });
-
-        if (!res.ok) throw new Error(`API error: ${res.status}`);
-
-        const data = await res.json();
-        setAiAssistant((prev) => ({
-          ...prev,
-          loading: false,
-          response: {
-            explanation:         data.explanation || "暂时无法生成解释",
-            corpus_evidence:     data.corpus_evidence,
-            confidence:          data.confidence || "medium",
-            might_be_wrong:      data.might_be_wrong,
-            follow_up_suggestion: data.follow_up_suggestion,
-          },
-        }));
-      } catch (error) {
-        console.error("AI explain error:", error);
-        setAiAssistant((prev) => ({
-          ...prev,
-          loading: false,
-          response: {
-            explanation: `这条诊断基于简历中"${issue.evidence?.substring(0, 30) || "相关内容"}…"部分的分析。${issue.suggestion}`,
-            confidence:  "low" as const,
-            might_be_wrong: "AI 解释服务暂时不可用，以上是基于本地信息的简要说明，仅供参考。",
-          },
-        }));
-      }
+      // Demo 页面不发请求，直接返回本地 fallback 文案
+      setAiAssistant((prev) => ({
+        ...prev,
+        loading: false,
+        response: {
+          explanation: `这条诊断基于简历中"${issue.evidence?.substring(0, 30) || "相关内容"}…"部分的分析。${issue.suggestion ?? ''}`,
+          confidence:  "low" as const,
+          might_be_wrong: "示例页面不提供 AI 动态解释，仅供参考。",
+        },
+      }));
     },
     [report, aiAssistant.activeIssueIndex, aiAssistant.response]
   );
@@ -344,10 +298,7 @@ export default function DemoDiagnoseResult() {
   // ─── Normal — animated reveal ───────────────────────────────
   const coreIssues     = report.core_issues     || [];
   const rewriteExamples = report.rewrite_examples || [];
-  const minorSuggestions = report.minor_suggestions || [];
   const followUpPrompts = report.follow_up_prompts || [];
-  const qualityTier = report.quality_tier || "medium";
-  const tierConfig = QUALITY_TIER_CONFIG[qualityTier] ?? null;
 
   return (
     <div className="min-h-screen bg-neutral-50 text-neutral-800">
