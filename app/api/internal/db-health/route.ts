@@ -8,7 +8,7 @@ type DbPingStatus = 'ok' | 'fail';
 type DiagnoseTasksTableStatus = 'exists' | 'missing' | 'unknown';
 type HealthStage = 'prisma_init' | 'db_ping' | 'diagnose_tasks_table';
 
-type DbHealthResponse = {
+interface DbHealthResponse {
   ok: boolean;
   prisma_init: PrismaInitStatus;
   db_ping: DbPingStatus;
@@ -20,7 +20,7 @@ type DbHealthResponse = {
     db_ping_ms: number;
     diagnose_tasks_table_ms: number;
   };
-};
+}
 
 class StageTimeoutError extends Error {
   constructor(public readonly stage: HealthStage) {

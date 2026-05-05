@@ -1,8 +1,8 @@
 import type { NextRequest } from 'next/server';
 import { NextResponse } from 'next/server';
-import { runDiagnosisAndSave } from '@/lib/diagnose/service';
+import { runV4DiagnosisAndSave } from '@/lib/diagnose/service';
 import { logInfo, logError, Errors } from '@/lib/error-handler';
-import type { DiagnoseInput } from '@/lib/diagnose/service';
+import type { V4DiagnoseInput } from '@/lib/diagnose/service';
 
 // 惰性导入 prisma
 async function getPrisma() {
@@ -63,11 +63,11 @@ export async function POST(request: NextRequest) {
 
     logInfo('DiagnoseWorker', '开始执行诊断任务', { taskId: task_id });
 
-    // 4. 解析输入并运行诊断
-    const input = task.inputJson as unknown as DiagnoseInput;
+    // 4. 解析输入并运行 V4 诊断
+    const input = task.inputJson as unknown as V4DiagnoseInput;
 
     try {
-      const { result, reportId } = await runDiagnosisAndSave(input);
+      const { reportId } = await runV4DiagnosisAndSave(input);
 
       // 5. 更新任务为 done
       await prisma.diagnoseTask.update({

@@ -52,7 +52,7 @@ export async function GET(
       finished_at: task.finishedAt?.toISOString() || null,
     });
 
-  } catch (error) {
+  } catch {
     const { response, status } = Errors.internalError();
     return NextResponse.json(response, { status });
   }

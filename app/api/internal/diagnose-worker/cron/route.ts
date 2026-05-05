@@ -1,8 +1,9 @@
 import type { NextRequest } from 'next/server';
 import { NextResponse } from 'next/server';
-import { runDiagnosisAndSave } from '@/lib/diagnose/service';
+import { runV4DiagnosisAndSave } from '@/lib/diagnose/service';
 import { logInfo, logError, Errors } from '@/lib/error-handler';
-import type { DiagnoseInput } from '@/lib/diagnose/service';
+import { sweepExpiredResearchCache } from '@/lib/diagnose/v4/research-cache';
+import type { V4DiagnoseInput } from '@/lib/diagnose/service';
 
 // 惰性导入 prisma
 async function getPrisma() {
@@ -28,7 +29,7 @@ export async function POST(request: NextRequest) {
   const cronSecret = process.env.CRON_SECRET;
 
   if (cronSecret && authHeader !== `Bearer ${cronSecret}`) {
-    const { response, status } = Errors.validationError('未授权的 Cron 调用');
+    const { response } = Errors.validationError('未授权的 Cron 调用');
     return NextResponse.json(response, { status: 401 });
   }
 
@@ -69,9 +70,9 @@ export async function POST(request: NextRequest) {
 
         logInfo('DiagnoseCron', '处理任务', { taskId: task.id });
 
-        // 执行诊断
-        const input = task.inputJson as unknown as DiagnoseInput;
-        const { reportId } = await runDiagnosisAndSave(input);
+        // 执行 V4 诊断
+        const input = task.inputJson as unknown as V4DiagnoseInput;
+        const { reportId } = await runV4DiagnosisAndSave(input);
 
         // 更新为 done
         await prisma.diagnoseTask.update({
@@ -100,11 +101,15 @@ export async function POST(request: NextRequest) {
 
     logInfo('DiagnoseCron', '任务处理完成', { success: successCount, failed: failedCount });
 
+    // 顺便清理过期的研究缓存
+    const expiredSwept = await sweepExpiredResearchCache();
+
     return NextResponse.json({
       processed: queuedTasks.length,
       success: successCount,
       failed: failedCount,
       results,
+      research_cache_swept: expiredSwept,
     });
 
   } catch (error) {
