@@ -47,6 +47,12 @@ cache.db
 *.sqlite
 *.sqlite3
 
+# internal AI agent / handover docs (kept locally, not published)
+HANDOVER.md
+CLAUDE.md
+AGENTS.md
+MEMORY.md
+
 # env files (can opt-in for committing if needed)
 .env*
 
