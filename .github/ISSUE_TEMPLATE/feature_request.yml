@@ -1,0 +1,72 @@
+name: Feature request
+description: Suggest a new feature or enhancement
+title: "[feature] "
+labels: ["enhancement", "needs-triage"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for proposing a new feature! Please describe the problem first and the solution second — this helps us avoid solutions in search of a problem.
+  - type: textarea
+    id: problem
+    attributes:
+      label: What problem does this solve?
+      description: Describe the user pain or limitation. Be concrete.
+      placeholder: When I diagnose a resume for a non-tech role, the corpus rules don't apply because...
+    validations:
+      required: true
+  - type: textarea
+    id: solution
+    attributes:
+      label: Proposed solution
+      description: How should we solve it? Sketch the API, UI, or workflow change.
+    validations:
+      required: true
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives considered
+      description: What else did you consider, and why is the proposed solution better?
+    validations:
+      required: false
+  - type: dropdown
+    id: area
+    attributes:
+      label: Affected area
+      options:
+        - Frontend (UI / React)
+        - PDF parsing
+        - V4 diagnosis workflow
+        - AI router / providers
+        - Async task queue
+        - Database / Prisma
+        - Corpus content
+        - Build / deployment
+        - Documentation
+        - Other
+    validations:
+      required: true
+  - type: dropdown
+    id: willing
+    attributes:
+      label: Are you willing to contribute?
+      options:
+        - "Yes, I plan to open a PR"
+        - "Maybe, with some guidance"
+        - "No, just suggesting"
+    validations:
+      required: true
+  - type: textarea
+    id: additional
+    attributes:
+      label: Additional context
+      description: Mockups, links, prior art, etc.
+    validations:
+      required: false
+  - type: checkboxes
+    id: terms
+    attributes:
+      label: Code of Conduct
+      options:
+        - label: I agree to follow this project's [Code of Conduct](../../CODE_OF_CONDUCT.md).
+          required: true

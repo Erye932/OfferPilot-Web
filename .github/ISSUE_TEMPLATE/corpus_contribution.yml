@@ -1,0 +1,69 @@
+name: Corpus contribution
+description: Propose a new diagnostic rule, insider view, or rewrite pattern
+title: "[corpus] "
+labels: ["corpus", "needs-review"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for contributing to the OfferPilot corpus! Every entry must be:
+        - **Sourced** with a public citation (URL, talk, book, or signed-off consulting note)
+        - **Schema-valid** per `offerpilot-corpus/templates/`
+        - **Public** — please don't submit content that is under NDA
+  - type: dropdown
+    id: type
+    attributes:
+      label: Contribution type
+      options:
+        - Diagnostic rule (offerpilot-corpus/distilled/diagnosis-rules.json)
+        - Insider view (offerpilot-corpus/distilled/insider-views.json)
+        - Rewrite pattern (offerpilot-corpus/distilled/rewrite-patterns.json)
+    validations:
+      required: true
+  - type: input
+    id: target_role
+    attributes:
+      label: Target role(s) or industry
+      placeholder: e.g. Backend Engineer, Product Manager, Frontend
+    validations:
+      required: true
+  - type: textarea
+    id: summary
+    attributes:
+      label: One-sentence summary
+      placeholder: Senior backend resumes that lack capacity numbers (QPS / data scale) get filtered at the recruiter screen.
+    validations:
+      required: true
+  - type: textarea
+    id: content
+    attributes:
+      label: Proposed entry (JSON or template-filled)
+      description: Paste the proposed entry following the template in offerpilot-corpus/templates/.
+      render: json
+    validations:
+      required: true
+  - type: textarea
+    id: source
+    attributes:
+      label: Source citation
+      description: URL, talk title, or "consulting note: <date> by <author>" — must be something we can ship publicly.
+    validations:
+      required: true
+  - type: textarea
+    id: rationale
+    attributes:
+      label: Why does this belong in the corpus?
+      description: How is this generalizable beyond a single resume? What evidence supports it?
+    validations:
+      required: true
+  - type: checkboxes
+    id: confirm
+    attributes:
+      label: Pre-submission checklist
+      options:
+        - label: The source is public or I have explicit permission to publish it under MIT.
+          required: true
+        - label: The entry follows the schema in `offerpilot-corpus/templates/`.
+          required: true
+        - label: I agree to follow this project's [Code of Conduct](../../CODE_OF_CONDUCT.md).
+          required: true
