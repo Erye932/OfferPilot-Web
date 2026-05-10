@@ -40,6 +40,13 @@ offerpilot-corpus/distilled/*.new.json
 # debug / smoke-test outputs
 probe-*.json
 
+# local SQLite cache / dev databases
+cache.db
+*.db
+*.db-journal
+*.sqlite
+*.sqlite3
+
 # env files (can opt-in for committing if needed)
 .env*
 
