@@ -16,6 +16,9 @@ async function getPrisma() {
 
 // 每轮最多处理的任务数（避免超时）
 const MAX_TASKS_PER_RUN = 3;
+// 任务在 running 状态超过这个分钟数仍未完成 → 视为 worker 进程被杀，标记为 failed
+// V4 工作流正常 60-120s；设 5 分钟做安全余量
+const STALE_RUNNING_MIN = 5;
 
 /**
  * 定时任务入口：由 Vercel Cron 每分钟触发
@@ -39,6 +42,27 @@ export async function POST(request: NextRequest) {
   try {
     const prisma = await getPrisma();
 
+    // 0. 清扫僵尸 running 任务：worker 进程被 Vercel 60s 超时杀掉时
+    //    数据库里会留下一条永远 running 的脏数据；这里把它们标记为 failed。
+    const staleThreshold = new Date(Date.now() - STALE_RUNNING_MIN * 60 * 1000);
+    const staleSwept = await prisma.diagnoseTask.updateMany({
+      where: {
+        status: 'running',
+        startedAt: { lt: staleThreshold },
+      },
+      data: {
+        status: 'failed',
+        errorMessage: `worker 进程超时被终止（>${STALE_RUNNING_MIN} 分钟未完成）。云端 serverless 受函数超时限制，建议在本地或 Pro 计划下运行 V4。`,
+        finishedAt: new Date(),
+      },
+    });
+    if (staleSwept.count > 0) {
+      logInfo('DiagnoseCron', '清扫僵尸 running 任务', {
+        count: staleSwept.count,
+        threshold_min: STALE_RUNNING_MIN,
+      });
+    }
+
     // 1. 获取待处理任务（最多 MAX_TASKS_PER_RUN 个）
     const queuedTasks = await prisma.diagnoseTask.findMany({
       where: { status: 'queued' },
@@ -52,6 +76,7 @@ export async function POST(request: NextRequest) {
         processed: 0,
         success: 0,
         failed: 0,
+        stale_swept: staleSwept.count,
         message: 'No queued tasks',
       });
     }
@@ -111,6 +136,7 @@ export async function POST(request: NextRequest) {
       processed: queuedTasks.length,
       success: successCount,
       failed: failedCount,
+      stale_swept: staleSwept.count,
       results,
       research_cache_swept: expiredSwept,
     });
