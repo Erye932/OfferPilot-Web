@@ -2,6 +2,7 @@
 
 import type { DiagnoseRequest, NormalizedInput, JdQuality, ResumeSection, ResumeSectionType } from './types';
 import { resolveRole } from './role-resolver';
+import { detectPersona } from './persona';
 import { logInfo } from '../error-handler';
 
 // ─── 段落类型识别策略 ────────────────────────────────────────
@@ -401,32 +402,54 @@ function splitSentences(text: string): string[] {
 
 /**
  * 检测经验级别：社招/校招
+ *
+ * 历史 bug 修复说明：
+ * 1. 旧实现 `/(\d+)\s*年/g` 会把 "2025 年毕业" 匹配成 maxYears = 2025 → 立即 senior。
+ *    任何提到 4 位年份的简历都中招。新实现要求"年"后面紧跟工作语义词（工作/从业/经验/开发等）。
+ * 2. 旧实现把 "管理" 列为 leadership 词，用 sentence.includes 子串匹配。
+ *    "工商管理 / 项目管理课程 / 主修管理学" 全部触发 → 应届简历错判为 senior。
+ *    新实现：教育/课程语境的句子整段豁免 leadership/support 计数；
+ *    "管理"只在和具体动作搭配时才计为 leadership。
  */
-function detectExperienceLevel(resumeText: string, sentences: string[]): 'senior' | 'junior' | 'neutral' {
-  // 1. 年限提取
-  const yearPattern = /(\d+)\s*年/g;
+export function detectExperienceLevel(
+  resumeText: string,
+  sentences: string[]
+): 'senior' | 'junior' | 'neutral' {
+  // ─── 1. 年限提取（要求紧跟工作语义词，避免毕业年份误判）────
+  const workYearPattern =
+    /(\d+)\s*年(?:以上|\+)?\s*(?:工作|从业|经验|开发|研发|设计|运营|管理\s*经验|相关\s*经验)/g;
   let maxYears = 0;
-  let match;
-  while ((match = yearPattern.exec(resumeText)) !== null) {
-    const years = parseInt(match[1], 10);
+  let yearMatch: RegExpExecArray | null;
+  while ((yearMatch = workYearPattern.exec(resumeText)) !== null) {
+    const years = parseInt(yearMatch[1], 10);
     if (years > maxYears) maxYears = years;
   }
 
-  // 2. 主导性词语 vs 支持性词语
-  const leadershipWords = ['负责', '主导', '独立负责', '带领', '管理', '统筹', '牵头'];
+  // ─── 2. 词语统计（教育语境句子整段豁免，避免"工商管理"等误判）──
+  const leadershipWords = ['负责', '主导', '独立负责', '带领', '统筹', '牵头'];
   const supportWords = ['协助', '配合', '参与', '支持', '协同'];
+  // "管理" 只在以下搭配里计 leadership：项目管理 / 团队管理 / 管理团队 / 负责管理 / 管理 N 人
+  const managementVerbPattern =
+    /项目管理|团队管理|管理团队|负责管理|管理\s*\d+\s*[人名]|管理[\u4e00-\u9fa5]{1,4}团队/;
+  // 教育/课程语境句子整段跳过
+  const educationContextRegex =
+    /主修|辅修|专业|课程|学位|本科|硕士|博士|研究生|学院|学历|GPA|绩点/;
+
   let leadershipCount = 0;
   let supportCount = 0;
 
   for (const sentence of sentences) {
-    if (leadershipWords.some(word => sentence.includes(word))) leadershipCount++;
-    if (supportWords.some(word => sentence.includes(word))) supportCount++;
+    if (educationContextRegex.test(sentence)) continue;
+    if (leadershipWords.some((word) => sentence.includes(word))) leadershipCount++;
+    if (managementVerbPattern.test(sentence)) leadershipCount++;
+    if (supportWords.some((word) => sentence.includes(word))) supportCount++;
   }
 
-  // 3. 判断
+  // ─── 3. 判断 ───────────────────────────────────────────
   if (maxYears >= 5 || leadershipCount > supportCount) {
     return 'senior';
-  } else if (maxYears <= 2 && supportCount > leadershipCount) {
+  }
+  if (maxYears <= 2 && supportCount > leadershipCount) {
     return 'junior';
   }
   return 'neutral';
@@ -600,9 +623,21 @@ export async function normalizeInput(request: DiagnoseRequest): Promise<Normaliz
     };
   }
 
+  // 身份识别（应届 / 其他）
+  const persona_resolution = detectPersona({
+    ...baseInput,
+    role_resolution,
+  });
+  logInfo('Normalize', '身份识别完成', {
+    persona: persona_resolution.persona,
+    confidence: persona_resolution.confidence,
+    signals: persona_resolution.signals,
+  });
+
   return {
     ...baseInput,
     role_resolution,
+    persona_resolution,
   };
 }
 

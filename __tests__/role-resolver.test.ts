@@ -41,7 +41,9 @@ describe('Role Resolver', () => {
       const result = await resolveRole(input);
 
       expect(result.raw_role).toBe('网页前端后端工程师');
-      expect(result.canonical_role).toBe('后端工程师'); // “后端工程师”是第一个完整子串匹配
+      // 字典里只有 "后端工程师" 是该输入的连续子串（"前端工程师" 因为中间夹 "后端" 不连续），
+      // 所以最长子串匹配选择 "后端工程师"。
+      expect(result.canonical_role).toBe('后端工程师');
       expect(result.role_family).toBe('后端开发');
       expect(result.alt_roles).toContain('后端开发工程师');
       expect(result.confidence).toBeGreaterThan(0.5);
@@ -104,10 +106,11 @@ describe('Role Resolver', () => {
       input.jd_keywords = ['Python', 'Django', 'MySQL'];
       const result = await resolveRole(input);
 
-      // 词典匹配优先（“工程师”子串匹配“前端工程师”），但技能不一致会降低置信度
-      expect(result.role_family).toBe('前端开发');
+      // “工程师”过短（< 4 字），不再触发反向词典匹配；
+      // 由 JD 技能信号（Python/Django/MySQL）推断为后端开发。
+      expect(result.role_family).toBe('后端开发');
       expect(result.skills_inferred).toEqual(expect.arrayContaining(['Python']));
-      expect(result.confidence).toBeGreaterThan(0.5);
+      expect(result.confidence).toBeGreaterThan(0.3);
       expect(result.ambiguity).toBeDefined();
     });
 
@@ -120,6 +123,47 @@ describe('Role Resolver', () => {
       expect(result.role_family).toBe('前端开发');
       expect(result.confidence).toBeLessThan(0.8);
       expect(result.ambiguity).toContain('不一致');
+    });
+  });
+
+  describe('回归 bug：dictionaryLookup 修复', () => {
+    it('短输入“工程师”不应被反向匹配吸走（< 4 字跳过反向 includes）', async () => {
+      const input = createTestInput('工程师');
+      const result = await resolveRole(input);
+
+      // 没有技能信号、词典也匹配不上，应走兜底分支
+      expect(result.role_family).toBe('未知');
+      expect(result.confidence).toBeLessThan(0.5);
+      expect(result.ambiguity).toBeDefined();
+    });
+
+    it('短输入“开发”不应被反向匹配吸走', async () => {
+      const input = createTestInput('开发');
+      const result = await resolveRole(input);
+
+      expect(result.role_family).toBe('未知');
+      expect(result.confidence).toBeLessThan(0.5);
+    });
+
+    it('多 family 子串命中应被标记为 ambiguous 并降置信度', async () => {
+      // 同时包含 "前端工程师" 和 "Java工程师" 两个不同 family 的子串
+      const input = createTestInput('前端工程师Java工程师');
+      const result = await resolveRole(input);
+
+      expect(result.ambiguity).toBeDefined();
+      expect(result.ambiguity).toContain('前端开发');
+      expect(result.ambiguity).toContain('后端开发');
+      expect(result.confidence).toBeLessThanOrEqual(0.6);
+    });
+
+    it('单 family 多子串命中（最长优先）不应误标 ambiguous', async () => {
+      // 字典里 "前端工程师" 和 "前端开发工程师" 都匹配，但同 family
+      const input = createTestInput('高级前端开发工程师');
+      const result = await resolveRole(input);
+
+      // 不应包含多 family 歧义说明
+      expect(result.ambiguity ?? '').not.toContain('多个岗位族');
+      expect(result.role_family).toBe('前端开发');
     });
   });
 

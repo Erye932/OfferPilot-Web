@@ -189,6 +189,16 @@ function cleanRoleText(rawRole: string): string {
 
 /**
  * 岗位词典映射：尝试匹配标准化岗位名称
+ *
+ * 历史 bug 修复说明：
+ * 1. 旧实现 `for ... of Object.entries(ROLE_DICTIONARY)` 第一个 includes 命中即返，
+ *    结果**完全依赖字典字面量声明顺序**。
+ *    例如 "网页前端后端工程师" 会被任意一个先定义的子串吸走。
+ *    新实现：收集**所有**子串命中、按 key 长度降序排序，最长匹配优先。
+ * 2. 旧实现的 `key.includes(cleanedRole)` 分支在 cleanedRole 极短时（如 "工程师"）
+ *    会命中字典里任意包含该后缀的条目（恰好的第一个），返回错的岗位族。
+ *    新实现：反向匹配要求 cleanedRole 长度 ≥ 4，否则跳过该分支。
+ * 3. 多 family 命中（如 "前端后端工程师"）现在会带上 ambiguity 说明并降置信度。
  */
 function dictionaryLookup(cleanedRole: string): {
   matched: boolean;
@@ -196,10 +206,11 @@ function dictionaryLookup(cleanedRole: string): {
   family?: string;
   alt?: string[];
   confidence: number;
+  ambiguity?: string;
 } {
   if (!cleanedRole) return { matched: false, confidence: 0 };
 
-  // 精确匹配
+  // ─── 1. 精确匹配（最强信号）────────────────────────────────
   if (ROLE_DICTIONARY[cleanedRole]) {
     const entry = ROLE_DICTIONARY[cleanedRole];
     return {
@@ -211,20 +222,52 @@ function dictionaryLookup(cleanedRole: string): {
     };
   }
 
-  // 包含匹配（如"高级前端工程师"包含"前端工程师"）
-  for (const [key, entry] of Object.entries(ROLE_DICTIONARY)) {
-    if (cleanedRole.includes(key) || key.includes(cleanedRole)) {
+  // ─── 2. 子串匹配（输入包含字典 key），最长 key 优先 ──────────
+  const substringHits = Object.entries(ROLE_DICTIONARY)
+    .filter(([key]) => cleanedRole.includes(key))
+    .sort(([a], [b]) => b.length - a.length);
+
+  if (substringHits.length > 0) {
+    const families = new Set(substringHits.map(([, e]) => e.family));
+    const [, topEntry] = substringHits[0];
+    const isAmbiguous = families.size > 1;
+    return {
+      matched: true,
+      canonical: topEntry.canonical,
+      family: topEntry.family,
+      alt: topEntry.alt,
+      confidence: isAmbiguous ? 0.5 : 0.8,
+      ambiguity: isAmbiguous
+        ? `输入 "${cleanedRole}" 包含多个岗位族关键词（${[...families].join('、')}），按最长匹配选择 ${topEntry.canonical}`
+        : undefined,
+    };
+  }
+
+  // ─── 3. 反向匹配（字典 key 包含输入），仅在输入足够具体时启用 ─
+  // 避免 "工程师 / 开发" 这类太短的输入命中字典任意条目
+  if (cleanedRole.length >= 4) {
+    const reverseHits = Object.entries(ROLE_DICTIONARY)
+      .filter(([key]) => key.includes(cleanedRole))
+      .sort(([a], [b]) => a.length - b.length); // 越短的 key 离输入越近，优先
+
+    if (reverseHits.length > 0) {
+      const families = new Set(reverseHits.map(([, e]) => e.family));
+      const [, topEntry] = reverseHits[0];
+      const isAmbiguous = families.size > 1;
       return {
         matched: true,
-        canonical: entry.canonical,
-        family: entry.family,
-        alt: entry.alt,
-        confidence: 0.8, // 包含匹配置信度较低
+        canonical: topEntry.canonical,
+        family: topEntry.family,
+        alt: topEntry.alt,
+        confidence: isAmbiguous ? 0.4 : 0.7,
+        ambiguity: isAmbiguous
+          ? `输入 "${cleanedRole}" 可匹配多个岗位族（${[...families].join('、')}）`
+          : undefined,
       };
     }
   }
 
-  // 分词匹配：将输入按空格分割，检查每个词
+  // ─── 4. 分词匹配（按空格切分） ─────────────────────────────
   const words = cleanedRole.split(/\s+/);
   for (const word of words) {
     if (ROLE_DICTIONARY[word]) {
@@ -390,6 +433,8 @@ export async function resolveRole(input: NormalizedInput): Promise<RoleResolutio
     family = dictResult.family ?? '未知';
     alt = dictResult.alt ?? [];
     confidence = dictResult.confidence;
+    // dictionaryLookup 已检测到的多 family 命中歧义优先保留
+    ambiguity = dictResult.ambiguity;
 
     // 检查技能推断与词典匹配是否一致
     if (skillInference.families.length > 0 && !skillInference.families.includes(family)) {
@@ -398,8 +443,8 @@ export async function resolveRole(input: NormalizedInput): Promise<RoleResolutio
       ambiguity = `岗位描述"${cleaned}"与技能信号不一致，技能偏向${skillInference.families.join('、')}`;
     }
 
-    // 如果置信度较低，标记模糊
-    if (confidence < 0.6) {
+    // 如果置信度较低且没有更具体的歧义说明，标记一个泛化的模糊提示
+    if (confidence < 0.6 && !ambiguity) {
       ambiguity = `岗位描述"${cleaned}"可能不准确`;
     }
   } else {

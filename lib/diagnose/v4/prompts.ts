@@ -9,8 +9,9 @@
  * - 严格 JSON 输出，禁止 markdown / 解释性话术
  */
 
-import type { NormalizedInput, V4Dimension } from '../types';
+import type { NormalizedInput, V4Dimension, Persona } from '../types';
 import { SECTION_LABELS, V4_DIMENSION_LABELS } from '../types';
+import { getSpecializedViewsForPersona } from '../corpus';
 import type {
   BaseAnalyzerOutput,
   HrSimulatorOutput,
@@ -22,6 +23,39 @@ import type {
   HrInsiderOutput,
   ResearchContext,
 } from './schemas';
+
+// ════════════════════════════════════════════════════════════════
+// Persona 专属 insider_views 注入
+// ════════════════════════════════════════════════════════════════
+
+/** persona → 人类可读中文短名（用于 prompt 小标题） */
+const PERSONA_LABELS: Record<Persona, string> = {
+  fresh_grad: '应届毕业生',
+  other: '通用',
+};
+
+/**
+ * 生成 persona 专属 insider_views 的 prompt 片段
+ *
+ * 零回归策略：
+ * - persona 是 'other' 或缺省 → 空字符串（ResumeMaster prompt 完全不变）
+ * - 知识库里没有任何显式 tag 了 persona 的 view → 空字符串（PR#2a 阶段所有 JSON 均无 tag，
+ *   所以此 helper 当前行为就是返回空）
+ * - 只有当 PR#2b 给 JSON 打了特化标签后，这里才会有实质内容注入
+ */
+function buildPersonaInsiderViewsSnippet(input: NormalizedInput): string {
+  const persona = input.persona_resolution?.persona;
+  if (!persona || persona === 'other') return '';
+
+  const specialized = getSpecializedViewsForPersona(persona);
+  if (specialized.length === 0) return '';
+
+  const top = specialized.slice(0, 5); // 控制 prompt 体积
+  const lines = top
+    .map((v) => `- [${v.role_context} · ${v.tone}] ${v.view_text}`)
+    .join('\n');
+  return `\n【${PERSONA_LABELS[persona]}·行业人视角参考（用于校准改写建议的基调）】\n${lines}\n`;
+}
 
 // ════════════════════════════════════════════════════════════════
 // 工具函数：打包简历段落上下文（统一格式）
@@ -219,11 +253,11 @@ export function buildResumeMasterPrompt(
     includeCandidateProfile: true,
     includeRoleMatch: true,
   });
+  const personaSnippet = buildPersonaInsiderViewsSnippet(input);
 
   return `你是顶级简历改写专家（${input.target_role}方向）。任务：对每个段落给出最关键的改写示范 + 表达层提醒。
 ${STYLE_RULES}
-${researchSnippet}
-
+${researchSnippet}${personaSnippet}
 【目标岗位】
 ${buildRoleContext(input)}
 

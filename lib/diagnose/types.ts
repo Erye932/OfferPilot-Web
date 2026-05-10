@@ -2,6 +2,10 @@
 // 所有后端模块和前端消费方必须使用这些类型
 
 import { z } from 'zod';
+import type { Persona, PersonaResolution } from './persona';
+
+// 再导出 persona 相关类型，让下游只从 types.ts 取
+export type { Persona, PersonaResolution } from './persona';
 
 // ─── Audit Layer Types ─────────────────────────────────────────
 
@@ -280,6 +284,8 @@ export interface NormalizedInput {
   experience_level: 'senior' | 'junior' | 'neutral';
   /** 岗位语义解析结果 */
   role_resolution?: RoleResolution;
+  /** 身份识别结果（应届 / 其他），用于 prompt 分层与知识库过滤 */
+  persona_resolution?: PersonaResolution;
 }
 
 /** 简历段落类型 */
@@ -329,6 +335,10 @@ export interface IssueEnrichmentResult {
 }
 
 // ─── Corpus Types ────────────────────────────────────────────
+// applicable_personas 语义：
+// - 缺省（字段不存在）→ 通用条目，对所有 persona 都适用（默认池）
+// - 数组非空 → 仅对数组里列出的 persona 适用（特化池）
+// filter 逻辑见 corpus.ts 的 filterByPersona。
 export interface DiagnosisRule {
   rule_id: string;
   issue_type: string;
@@ -338,6 +348,7 @@ export interface DiagnosisRule {
   typical_bad_patterns: string[];
   priority_level: 'high' | 'medium' | 'low';
   applicable_roles: string[];
+  applicable_personas?: Persona[];
   source_level: string;
   notes: string;
 }
@@ -349,6 +360,7 @@ export interface InsiderView {
   view_text: string;
   tone: string;
   applicable_roles: string[];
+  applicable_personas?: Persona[];
   source_level: string;
   notes: string;
 }
@@ -361,6 +373,7 @@ export interface RewritePattern {
   after_text: string;
   rewrite_logic: string;
   key_transformation: string[];
+  applicable_personas?: Persona[];
   source_level: string;
   difficulty_level: string;
 }
