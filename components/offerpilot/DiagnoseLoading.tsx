@@ -154,9 +154,16 @@ export default function DiagnoseLoading() {
       return;
     }
 
-    const callAPI = async () => {
+    // 异步流程：POST /api/diagnose/tasks → 轮询 /api/diagnose/tasks/[id]
+    // → done 时 GET /api/diagnose/report/[id] → 落 sessionStorage → 跳转
+    const POLL_INTERVAL_MS = 3000;
+    const MAX_POLL_MS = 180_000; // 3 分钟硬上限：V4 正常 60-120s，超过即判失败
+    let cancelled = false;
+
+    const runAsyncDiagnose = async () => {
       try {
-        const response = await fetch("/api/diagnose", {
+        // 1) 创建任务（应在 ≤3s 内返回）
+        const createResp = await fetch("/api/diagnose/tasks", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
@@ -171,17 +178,64 @@ export default function DiagnoseLoading() {
           }),
         });
 
-        if (!response.ok) {
-          const errorData = await response.json().catch(() => ({}));
-          if (response.status === 422) {
-            throw new Error(
-              errorData.error || "输入内容质量不足，无法生成诊断结果。"
-            );
+        if (!createResp.ok) {
+          const errorData = await createResp.json().catch(() => ({}));
+          if (createResp.status === 422 || createResp.status === 400) {
+            throw new Error(errorData.error || "输入内容质量不足，无法生成诊断结果。");
           }
-          throw new Error(errorData.error || `诊断失败: ${response.status}`);
+          throw new Error(errorData.error || `创建诊断任务失败: ${createResp.status}`);
         }
 
-        const result = await response.json();
+        const { task_id: taskId } = await createResp.json();
+        if (!taskId) {
+          throw new Error("服务端未返回任务 ID，请稍后重试");
+        }
+
+        // 2) 轮询任务状态。前端 stage 动画自然推进，不依赖后端节奏
+        const startedAt = Date.now();
+        let reportId: string | null = null;
+
+        while (!cancelled) {
+          if (Date.now() - startedAt > MAX_POLL_MS) {
+            throw new Error(
+              "诊断超时（3 分钟）。云端 serverless 可能受函数超时限制；建议本地运行或重试。"
+            );
+          }
+
+          await delay(POLL_INTERVAL_MS);
+          if (cancelled) return;
+
+          const statusResp = await fetch(`/api/diagnose/tasks/${taskId}`, { cache: "no-store" });
+          if (!statusResp.ok) {
+            // 偶发网络错误：继续轮询，不立刻失败
+            continue;
+          }
+
+          const statusData = await statusResp.json();
+          const status: string = statusData.status;
+
+          if (status === "done") {
+            reportId = statusData.report_id;
+            break;
+          }
+          if (status === "failed") {
+            throw new Error(statusData.error_message || "诊断执行失败，请稍后重试");
+          }
+          // queued / running → 继续轮询
+        }
+
+        if (cancelled) return;
+        if (!reportId) {
+          throw new Error("诊断完成但未返回报告 ID，请重试");
+        }
+
+        // 3) 拉取最终报告
+        const reportResp = await fetch(`/api/diagnose/report/${reportId}`, { cache: "no-store" });
+        if (!reportResp.ok) {
+          const errorData = await reportResp.json().catch(() => ({}));
+          throw new Error(errorData.error || `读取诊断报告失败: ${reportResp.status}`);
+        }
+        const result = await reportResp.json();
         sessionStorage.setItem("diagnoseResult", JSON.stringify(result));
 
         apiDone.current = true;
@@ -195,7 +249,6 @@ export default function DiagnoseLoading() {
 
         if (isDeepFallback) {
           setDeepFallbackMsg(result.metadata.deep_fallback_message);
-          // Show brief fallback transition before jumping to result
           setStage("generating_report");
           await delay(600);
           setStage("formatting_result");
@@ -204,37 +257,21 @@ export default function DiagnoseLoading() {
           await delay(400);
           setIsTransitioning(true);
           await delay(300);
-
-          const reportId = result.report_id;
-          if (reportId && typeof reportId === 'string') {
-            router.push(`/diagnose/result/${reportId}`);
-          } else {
-            router.push("/diagnose/result");
-          }
+          router.push(`/diagnose/result/${reportId}`);
           return;
         }
 
-        // Advance through final stages
         setStage("generating_report");
         await delay(800);
         setStage("formatting_result");
         await delay(500);
         setStage("complete");
         await delay(400);
-
-        // Smooth transition to result
         setIsTransitioning(true);
         await delay(300);
-
-        // 如果响应中包含 report_id，则跳转到可分享的带ID结果页
-        const reportId = result.report_id;
-        if (reportId && typeof reportId === 'string') {
-          router.push(`/diagnose/result/${reportId}`);
-        } else {
-          // 否则回退到传统的 sessionStorage 结果页
-          router.push("/diagnose/result");
-        }
+        router.push(`/diagnose/result/${reportId}`);
       } catch (error) {
+        if (cancelled) return;
         console.error("诊断失败:", error);
         apiDone.current = true;
         setDiagnoseError(
@@ -244,7 +281,11 @@ export default function DiagnoseLoading() {
       }
     };
 
-    callAPI();
+    runAsyncDiagnose();
+
+    return () => {
+      cancelled = true;
+    };
   }, [router]);
 
   const config = STAGE_CONFIG[stage];
@@ -378,7 +419,7 @@ export default function DiagnoseLoading() {
               <p className="mt-6 text-xs text-neutral-500">
                 {stage === "complete"
                   ? "即将跳转到结果页"
-                  : "预计需要 10-30 秒"}
+                  : "预计需要 1-2 分钟，期间会持续查询任务状态"}
               </p>
             )}
 

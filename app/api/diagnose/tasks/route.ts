@@ -34,6 +34,35 @@ async function withStageTimeout<T>(promise: Promise<T>, stage: StageTimeoutError
   }
 }
 
+/**
+ * Best-effort: POST to the worker route to start processing immediately.
+ * We do not await the worker's response (V4 takes ≥60s); we just want the
+ * request to start. Failures are intentionally swallowed.
+ */
+function triggerWorkerInBackground(request: NextRequest, taskId: string): void {
+  try {
+    const origin = new URL(request.url).origin;
+    const workerUrl = `${origin}/api/internal/diagnose-worker`;
+    void fetch(workerUrl, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ task_id: taskId }),
+      // Avoid hanging the connection; we just need the request to be sent.
+      keepalive: true,
+    }).catch((error) => {
+      logWarn('DiagnoseTaskAPI', 'worker fire-and-forget 触发失败（cron 兜底）', {
+        taskId,
+        error: error instanceof Error ? error.message : String(error),
+      });
+    });
+  } catch (error) {
+    logWarn('DiagnoseTaskAPI', 'worker fire-and-forget 准备失败（cron 兜底）', {
+      taskId,
+      error: error instanceof Error ? error.message : String(error),
+    });
+  }
+}
+
 export async function POST(request: NextRequest) {
   const requestStartedAt = Date.now();
 
@@ -75,6 +104,11 @@ export async function POST(request: NextRequest) {
       prisma_import_ms: prismaReadyAt - validatedAt,
       diagnose_task_create_ms: finishedAt - prismaReadyAt,
     });
+
+    // Fire-and-forget: kick off the worker immediately so the user does not
+    // have to wait for the next cron tick. We deliberately do NOT await, and any
+    // failure here is silent — Vercel Cron sweeps queued tasks as a backstop.
+    triggerWorkerInBackground(request, task.id);
 
     return NextResponse.json({ task_id: task.id, status: 'queued' });
   } catch (error) {

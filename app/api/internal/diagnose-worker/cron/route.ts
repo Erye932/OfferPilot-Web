@@ -5,6 +5,9 @@ import { logInfo, logError, Errors } from '@/lib/error-handler';
 import { sweepExpiredResearchCache } from '@/lib/diagnose/v4/research-cache';
 import type { V4DiagnoseInput } from '@/lib/diagnose/service';
 
+// Each cron run can process up to 3 tasks; give it the full Vercel budget.
+export const maxDuration = 60;
+
 // 惰性导入 prisma
 async function getPrisma() {
   const { prisma } = await import('@/lib/prisma');

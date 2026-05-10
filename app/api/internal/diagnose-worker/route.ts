@@ -4,6 +4,10 @@ import { runV4DiagnosisAndSave } from '@/lib/diagnose/service';
 import { logInfo, logError, Errors } from '@/lib/error-handler';
 import type { V4DiagnoseInput } from '@/lib/diagnose/service';
 
+// V4 workflow runs ~12 sequential AI calls; ask Vercel for the full budget.
+// Hobby caps at 60s; Pro extends to 300s.
+export const maxDuration = 60;
+
 // 惰性导入 prisma
 async function getPrisma() {
   const { prisma } = await import('@/lib/prisma');
