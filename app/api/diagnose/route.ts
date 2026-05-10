@@ -5,6 +5,12 @@ import { diagnoseRequestSchema } from '@/lib/diagnose/types';
 import { getOrCreateAnonymousSessionId, checkRateLimit, recordUsage, setAnonymousSessionCookie } from '@/lib/rate-limit';
 import { logError, logWarn, logInfo, Errors } from '@/lib/error-handler';
 import { AIProviderError } from '@/lib/ai/types';
+import { InputQualityError } from '@/lib/diagnose/normalize';
+
+// V4 workflow runs ~12 sequential AI calls and may take >30s on a cold start.
+// Vercel Hobby plan caps non-streaming functions at 60s; that is the max we can request here.
+// For predictable, longer runs, migrate the UI to the async /api/diagnose/tasks endpoint.
+export const maxDuration = 60;
 
 // V4 诊断 API：唯一入口，输出 DiagnoseReport（schema_version: 4.0）
 // 旧版的 diagnose_mode / tier 参数仍兼容接收：
@@ -94,19 +100,22 @@ export async function POST(request: NextRequest) {
       return NextResponse.json(response, { status });
     }
 
-    // 2. JSON 解析失败（V4 工作流里手动抛的）
+    // 2. 输入质量错误（normalize 阶段抛出）→ 用户输入问题，不是服务故障
+    if (error instanceof InputQualityError) {
+      const { response, status } = Errors.validationError(error.message);
+      return NextResponse.json(response, { status });
+    }
+
+    // 3. JSON 解析失败（V4 工作流里手动抛的）
     if (error instanceof Error && (error.message.includes('JSON 解析失败') || error.message.includes('JSON parse failed'))) {
       const { response, status } = Errors.aiServiceUnavailable(error.message);
       return NextResponse.json(response, { status });
     }
 
-    // 3. 真正的未预期错误
-    // TEMP DEBUG: include error message + first stack frame for production diagnosis.
-    // Will be reverted once root cause is identified.
-    const debugDetails = error instanceof Error
-      ? `${error.name}: ${error.message}${error.stack ? ' | ' + error.stack.split('\n').slice(0, 4).join(' | ') : ''}`
-      : String(error);
-    const { response, status } = Errors.internalError(debugDetails);
+    // 4. 真正的未预期错误
+    const { response, status } = Errors.internalError(
+      error instanceof Error ? `${error.name}: ${error.message}` : String(error)
+    );
     return NextResponse.json(response, { status });
   }
 }

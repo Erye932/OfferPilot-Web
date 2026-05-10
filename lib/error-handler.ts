@@ -53,9 +53,9 @@ export function createErrorResponse(
     ...extra
   } = options;
 
-  // TEMP DEBUG (revert after diagnosis): always include details to help debug a production 500 in /api/diagnose.
-  // Sensitive substrings (DATABASE_URL, password, etc.) are still scrubbed by sanitizeExtraData and sanitizeError elsewhere.
-  const exposeDetails = process.env.NODE_ENV === 'development' || process.env.DEBUG_EXPOSE_ERROR_DETAILS === 'true' || true;
+  // details are only exposed in development by default. Set DEBUG_EXPOSE_ERROR_DETAILS=true on a deployment
+  // to surface them in production (useful for short-lived diagnostic sessions).
+  const exposeDetails = process.env.NODE_ENV === 'development' || process.env.DEBUG_EXPOSE_ERROR_DETAILS === 'true';
 
   const response: ApiErrorResponse = {
     error: message,
