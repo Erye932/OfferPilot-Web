@@ -1,24 +1,24 @@
-// 三库加载器
-// 负责加载 diagnosis-rules, insider-views, rewrite-patterns 三个知识库
+// Three-library loader.
+// Loads the diagnosis-rules, insider-views, and rewrite-patterns corpora.
 
 import type { DiagnosisRule, InsiderView, RewritePattern, Persona } from './types';
 
-// 使用 require 导入 JSON 文件，避免 TypeScript 模块解析问题
+// Static JSON imports — sidesteps TypeScript module-resolution edge cases.
 import diagnosisRulesData from '../../offerpilot-corpus/distilled/diagnosis-rules.json';
 import insiderViewsData from '../../offerpilot-corpus/distilled/insider-views.json';
 import rewritePatternsData from '../../offerpilot-corpus/distilled/rewrite-patterns.json';
 
-// 类型断言
+// Typed views over the raw JSON.
 const diagnosisRules = diagnosisRulesData as DiagnosisRule[];
 const insiderViews = insiderViewsData as InsiderView[];
 const rewritePatterns = rewritePatternsData as RewritePattern[];
 
-// 按 issue_type 索引的查找表
+// Lookup tables indexed by issue_type.
 const rulesByIssueType: Record<string, DiagnosisRule> = {};
 const viewsByIssueType: Record<string, InsiderView> = {};
 const patternsByIssueType: Record<string, RewritePattern> = {};
 
-// 构建索引
+// Build indices.
 diagnosisRules.forEach(rule => {
   rulesByIssueType[rule.issue_type] = rule;
 });
@@ -31,38 +31,38 @@ rewritePatterns.forEach(pattern => {
   patternsByIssueType[pattern.issue_type] = pattern;
 });
 
-// 导出函数
+// Public API.
 
 /**
- * 获取所有诊断规则
+ * Return all diagnosis rules.
  */
 export function getDiagnosisRules(): DiagnosisRule[] {
   return diagnosisRules;
 }
 
 /**
- * 按 issue_type 获取诊断规则
+ * Get a diagnosis rule by issue_type.
  */
 export function getRuleByIssueType(issueType: string): DiagnosisRule | undefined {
   return rulesByIssueType[issueType];
 }
 
 /**
- * 按 issue_type 获取内行视角
+ * Get an insider view by issue_type.
  */
 export function getViewByIssueType(issueType: string): InsiderView | undefined {
   return viewsByIssueType[issueType];
 }
 
 /**
- * 按 issue_type 获取改写模式
+ * Get a rewrite pattern by issue_type.
  */
 export function getPatternByIssueType(issueType: string): RewritePattern | undefined {
   return patternsByIssueType[issueType];
 }
 
 /**
- * 获取核心问题类型（免费版 V1 支持的5种）
+ * Core issue types covered by the free V1 tier (5 issues).
  */
 export function getCoreIssueTypes(): string[] {
   return [
@@ -75,77 +75,79 @@ export function getCoreIssueTypes(): string[] {
 }
 
 /**
- * 检查是否为核心问题类型
+ * Whether the given issue_type is a core (free-tier) issue.
  */
 export function isCoreIssueType(issueType: string): boolean {
   return getCoreIssueTypes().includes(issueType);
 }
 
 /**
- * 获取所有内行视角
+ * Return all insider views.
  */
 export function getAllInsiderViews(): InsiderView[] {
   return insiderViews;
 }
 
 /**
- * 获取所有改写模式
+ * Return all rewrite patterns.
  */
 export function getAllRewritePatterns(): RewritePattern[] {
   return rewritePatterns;
 }
 
 // ─── Persona Filter ──────────────────────────────────────────
-// 语义（与 types.ts 的 applicable_personas 一致）：
-//   - 条目 applicable_personas 缺省 / undefined / 空数组 → 通用池，对任何 persona 都入选
-//   - 条目 applicable_personas 非空 → 仅当目标 persona 被列出时才入选
-// 这样"通用池 + persona 特化池"可同时存在，tag 缺省也不会误丢条目。
+// Semantics (matches `applicable_personas` in types.ts):
+//   - field absent / undefined / empty array  →  universal pool: included for any persona
+//   - field present and non-empty              →  specialized pool: included only when the target persona is listed
+// This lets the universal pool and persona-specialized pool coexist without
+// dropping entries that simply forgot to set the field.
 
 interface WithApplicablePersonas {
   applicable_personas?: Persona[];
 }
 
 /**
- * 通用 persona filter：用泛型避免三份重复实现
+ * Generic persona filter — single implementation reused across all three corpora.
  *
- * @param items - 任何带 applicable_personas? 字段的条目
- * @param persona - 目标 persona
- * @returns 命中通用池 + 特化池的条目
+ * @param items   Any entries carrying an optional applicable_personas[] field.
+ * @param persona The persona to filter for.
+ * @returns       Entries that hit either the universal pool or the persona-specialized pool.
  */
 export function filterByPersona<T extends WithApplicablePersonas>(
   items: readonly T[],
   persona: Persona
 ): T[] {
   return items.filter((item) => {
-    // 缺省 / undefined / 空数组 → 通用池
+    // absent / undefined / empty array → universal pool
     if (!item.applicable_personas || item.applicable_personas.length === 0) {
       return true;
     }
-    // 非空 → 特化池，要求包含目标 persona
+    // non-empty → specialized pool: must include the target persona
     return item.applicable_personas.includes(persona);
   });
 }
 
-/** 按 persona 过滤诊断规则 */
+/** Filter diagnosis rules by persona. */
 export function filterRulesByPersona(persona: Persona): DiagnosisRule[] {
   return filterByPersona(diagnosisRules, persona);
 }
 
-/** 按 persona 过滤内行视角 */
+/** Filter insider views by persona. */
 export function filterViewsByPersona(persona: Persona): InsiderView[] {
   return filterByPersona(insiderViews, persona);
 }
 
-/** 按 persona 过滤改写模式 */
+/** Filter rewrite patterns by persona. */
 export function filterPatternsByPersona(persona: Persona): RewritePattern[] {
   return filterByPersona(rewritePatterns, persona);
 }
 
 /**
- * 仅返回**特化池**条目（applicable_personas 明确包含目标 persona 的，排除通用池）。
+ * Return only **specialized** entries — those whose applicable_personas
+ * explicitly include the target persona.
  *
- * 使用场景：prompt 注入时，我们只想加入"这个 persona 特别需要注意的内容"，
- * 而不是把通用信息重复塞给 LLM。
+ * Use case: when injecting into prompts, we only want persona-specific extras,
+ * not the universal entries (those would just duplicate context for the LLM).
  */
 export function filterSpecializedByPersona<T extends WithApplicablePersonas>(
   items: readonly T[],
@@ -159,19 +161,19 @@ export function filterSpecializedByPersona<T extends WithApplicablePersonas>(
   );
 }
 
-/** 获取 persona 专属的内行视角（排除通用池） */
+/** Get persona-specialized insider views (excludes the universal pool). */
 export function getSpecializedViewsForPersona(persona: Persona): InsiderView[] {
   return filterSpecializedByPersona(insiderViews, persona);
 }
 
-/** 获取 persona 专属的改写模式（排除通用池） */
+/** Get persona-specialized rewrite patterns (excludes the universal pool). */
 export function getSpecializedPatternsForPersona(persona: Persona): RewritePattern[] {
   return filterSpecializedByPersona(rewritePatterns, persona);
 }
 
 /**
- * 按 persona + issue_type 取一条诊断规则
- * 仅命中 applicable_personas 匹配的版本；若未命中则回退到缺省条目。
+ * Get a single diagnosis rule by (persona, issue_type).
+ * Returns the persona-matched version if available; otherwise falls back to the universal entry.
  */
 export function getRuleByPersonaAndIssue(
   persona: Persona,
@@ -181,7 +183,7 @@ export function getRuleByPersonaAndIssue(
   return filtered.find((r) => r.issue_type === issueType);
 }
 
-// 导出原始数据（供其他模块使用）
+// Re-export raw data for downstream modules.
 export {
   diagnosisRules,
   insiderViews,

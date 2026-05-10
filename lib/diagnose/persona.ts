@@ -1,28 +1,30 @@
-// 应届生身份识别器（保守策略）
+// Persona detector — conservative fresh-grad / other classifier.
 //
-// 设计原则：宁可漏判也不误判
-// 原因：产品定位"专治项目太学生"，把资深职场人误标成应届会让用户反感；
-//       漏判的情况会走 'other' 通用声部，体验保持现状不退化。
+// Design principle: prefer false-negatives over false-positives.
+// Rationale: the product's edge is helping resumes that read as "all-student-projects".
+// Misclassifying an experienced professional as a fresh grad feels patronizing.
+// False-negatives just route to the universal `other` voice — the existing
+// experience is preserved.
 
 import type { NormalizedInput } from './types';
 
 /**
- * Persona = 简历主体身份
- * - fresh_grad: 中国应届/准应届，校园项目与实习为主，无正式全职
- * - other:     已有职场经验 / 海外经验 / 转行等，默认通用操盘手声部
+ * Persona = the dominant identity of a resume's owner.
+ * - fresh_grad: Chinese new-grad / soon-to-graduate; campus projects + internships only, no full-time work.
+ * - other:      Professional experience / overseas experience / career switch; defaults to the universal voice.
  */
 export type Persona = 'fresh_grad' | 'other';
 
 /**
- * PersonaResolution — 身份识别结果
+ * PersonaResolution — output of persona detection.
  */
 export interface PersonaResolution {
   persona: Persona;
-  /** 置信度 0-1，用于调试与可解释性 */
+  /** Confidence 0–1, mainly for debugging and explainability. */
   confidence: number;
-  /** 命中的触发信号列表，用于日志与回归 */
+  /** Triggered signals, for logs and regression diffing. */
   signals: string[];
-  /** 如果来自前端手动选择，记录原始选项 */
+  /** Original choice if the persona came from a UI override. */
   user_override?: Persona;
 }
 
@@ -47,10 +49,10 @@ const STUDENT_ACTIVITIES = /社团|学生会|班级|校园活动|支教|志愿�
 const EDUCATION_TERMS = /毕业|本科|硕士|博士|学士|研究生|MBA/;
 
 /**
- * 识别简历主体身份
+ * Detect the dominant persona of a resume.
  *
- * @param input    已归一化的输入（需要 resume_text / resume_sections / experience_level）
- * @param override 前端手动选择的身份（优先级最高，完全覆盖自动识别）
+ * @param input    Normalized input (needs resume_text / resume_sections / experience_level).
+ * @param override Manual UI selection — highest priority, fully overrides automatic detection.
  */
 export function detectPersona(
   input: NormalizedInput,

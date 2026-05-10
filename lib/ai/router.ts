@@ -1,19 +1,21 @@
-// AI Router - 根据任务类型路由到合适的 provider
+// AI Router — routes a task to the appropriate provider by task type.
 //
-// Provider 分工（固定，不依赖环境变量）：
-//   - DeepSeek：baseline、verify、explain、synthesize、deep_synthesize、hr_review、rewrite_review
-//     所有最终 JSON 输出任务统一走 DeepSeek
-//   - Metaso：仅 research（中间产物，非 JSON）
-//   - research 允许 fallback 到 DeepSeek
-//   - deep_synthesize 不允许 fallback
-//   - 其余任务 fallback 为 null（不切换到 Metaso）
+// Provider responsibilities (hard-coded, not env-driven):
+//   - DeepSeek: baseline, verify, explain, synthesize, deep_synthesize, hr_review, rewrite_review
+//     (every task whose final output is JSON goes through DeepSeek)
+//   - Metaso:   research only (intermediate, non-JSON output)
+//
+// Fallback policy:
+//   - research          → may fall back to DeepSeek
+//   - deep_synthesize   → no fallback
+//   - everything else   → no fallback (we never switch to Metaso)
 import type { AITask, AIResponse, AIProviderConfig } from './types';
 import { AIProviderError } from './types';
 import { deepseekProvider } from './providers/deepseek';
 import { metasoProvider } from './providers/metaso';
 import { logError, logInfo } from '../error-handler';
 
-// 任务类型 -> 默认 provider 映射
+// Task type → default provider mapping.
 const PROVIDER_MAP: Record<AITask['type'], typeof deepseekProvider | typeof metasoProvider> = {
   research: metasoProvider,
   baseline: deepseekProvider,
@@ -30,8 +32,8 @@ class AIRouter {
     const primaryProvider = this.selectPrimaryProvider(task.type);
     const fallbackProvider = this.selectFallbackProvider(task.type);
 
-    // 结构化日志：任务路由决策
-    logInfo('AIRouter', '任务路由开始', {
+    // Structured log: routing decision.
+    logInfo('AIRouter', 'Routing task', {
       taskType: task.type,
       primaryProvider: primaryProvider.name,
       fallbackProvider: fallbackProvider?.name || 'none',
@@ -41,7 +43,7 @@ class AIRouter {
     try {
       logInfo('AIRouter', `Routing task ${task.type} to ${primaryProvider.name}`);
       const response = await primaryProvider.call(task, config);
-      logInfo('AIRouter', 'Primary provider 调用成功', {
+      logInfo('AIRouter', 'Primary provider call succeeded', {
         taskType: task.type,
         provider: response.provider,
         model: response.model,
@@ -79,7 +81,7 @@ class AIRouter {
         });
         try {
           const fallbackResponse = await fallbackProvider.call(task, config);
-          logInfo('AIRouter', 'Fallback 成功', {
+          logInfo('AIRouter', 'Fallback call succeeded', {
             taskType: task.type,
             finalProvider: fallbackProvider.name,
             fallbackResponseProvider: fallbackResponse.provider,
@@ -115,12 +117,12 @@ class AIRouter {
   }
 
   private selectFallbackProvider(taskType: AITask['type']): typeof deepseekProvider | null {
-    // 仅 research 允许 fallback 到 DeepSeek
+    // research is the only task allowed to fall back to DeepSeek.
     if (taskType === 'research') {
       return deepseekProvider;
     }
 
-    // 其余任务（含 deep_synthesize）不允许 fallback
+    // All other tasks (including deep_synthesize) have no fallback.
     return null;
   }
 }

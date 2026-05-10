@@ -1,11 +1,12 @@
-// 岗位语义解析器
-// 混合方案：规则清洗 + 岗位词典映射 + 技能信号补强 + LLM意图判定（模糊时）
+// Role semantic resolver.
+// Hybrid approach: rule-based cleaning + dictionary lookup + skill-signal
+// reinforcement + LLM disambiguation when the input is ambiguous.
 
 import type { NormalizedInput, RoleResolution } from './types';
 import { aiRouter } from '../ai/router';
 import { logInfo, logWarn } from '../error-handler';
 
-// 岗位词典：标准岗位名称到岗位族系的映射
+// Role dictionary: maps canonical role names to a role family + alternate names.
 const ROLE_DICTIONARY: Record<string, { canonical: string; family: string; alt: string[] }> = {
   // 前端开发族
   '前端工程师': { canonical: '前端工程师', family: '前端开发', alt: ['前端开发工程师', 'Web前端工程师', '前端开发'] },
@@ -78,7 +79,7 @@ const ROLE_DICTIONARY: Record<string, { canonical: string; family: string; alt: 
   '新媒体运营': { canonical: '运营专员', family: '运营', alt: ['新媒体', '社交媒体运营', '内容运营'] },
 };
 
-// 技能关键词到岗位族的映射（用于从简历/JD推断）
+// Skill keyword → candidate role families (used for inference from resume / JD).
 const SKILL_TO_FAMILY: Record<string, string[]> = {
   // 前端技能
   'JavaScript': ['前端开发', '全栈开发'],
@@ -162,7 +163,8 @@ const SKILL_TO_FAMILY: Record<string, string[]> = {
 };
 
 /**
- * 规则清洗：移除无关字符，提取核心岗位描述
+ * Rule-based cleaner: strip irrelevant punctuation, prefixes and suffixes
+ * to expose the core role description.
  */
 function cleanRoleText(rawRole: string): string {
   // 移除括号及其内容
@@ -188,17 +190,21 @@ function cleanRoleText(rawRole: string): string {
 }
 
 /**
- * 岗位词典映射：尝试匹配标准化岗位名称
+ * Dictionary lookup: try to map the cleaned role to a canonical entry.
  *
- * 历史 bug 修复说明：
- * 1. 旧实现 `for ... of Object.entries(ROLE_DICTIONARY)` 第一个 includes 命中即返，
- *    结果**完全依赖字典字面量声明顺序**。
- *    例如 "网页前端后端工程师" 会被任意一个先定义的子串吸走。
- *    新实现：收集**所有**子串命中、按 key 长度降序排序，最长匹配优先。
- * 2. 旧实现的 `key.includes(cleanedRole)` 分支在 cleanedRole 极短时（如 "工程师"）
- *    会命中字典里任意包含该后缀的条目（恰好的第一个），返回错的岗位族。
- *    新实现：反向匹配要求 cleanedRole 长度 ≥ 4，否则跳过该分支。
- * 3. 多 family 命中（如 "前端后端工程师"）现在会带上 ambiguity 说明并降置信度。
+ * Historical bug fixes worth keeping in mind:
+ * 1. The old `for ... of Object.entries(ROLE_DICTIONARY)` returned on the
+ *    first `includes` hit, so the result depended entirely on the literal
+ *    declaration order of the dictionary. "网页前端后端工程师" was always
+ *    swallowed by whichever sub-string was defined first. The new code
+ *    collects **all** sub-string hits and sorts by key length descending so
+ *    the longest match wins.
+ * 2. The old `key.includes(cleanedRole)` reverse-lookup branch fired even when
+ *    cleanedRole was extremely short (e.g. "工程师"), happily matching any
+ *    dictionary entry containing that suffix — returning the wrong family.
+ *    The new code requires `cleanedRole.length >= 4` for that branch.
+ * 3. Multi-family hits (e.g. "前端后端工程师") now carry an `ambiguity` note
+ *    and a reduced confidence score.
  */
 function dictionaryLookup(cleanedRole: string): {
   matched: boolean;
@@ -286,7 +292,7 @@ function dictionaryLookup(cleanedRole: string): {
 }
 
 /**
- * 从简历和JD中提取技能信号
+ * Extract skill signals from the resume's skill section + JD keywords.
  */
 function extractSkillsFromInput(input: NormalizedInput): string[] {
   const skills = new Set<string>();
@@ -322,7 +328,7 @@ function extractSkillsFromInput(input: NormalizedInput): string[] {
 }
 
 /**
- * 基于技能信号推断岗位族
+ * Infer the most likely role family (or families) from a list of skill signals.
  */
 function inferRoleFamilyFromSkills(skills: string[]): { families: string[]; confidence: number } {
   const familyCounts: Record<string, number> = {};
@@ -348,7 +354,8 @@ function inferRoleFamilyFromSkills(skills: string[]): { families: string[]; conf
 }
 
 /**
- * 使用LLM进行岗位意图判定（当模糊时调用）
+ * Use the LLM to disambiguate the role when the dictionary + skill signals
+ * disagree or land below the confidence threshold.
  */
 async function llmRoleDisambiguation(
   rawRole: string,
@@ -401,7 +408,8 @@ ${candidates.map((c, i) => `${i + 1}. ${c.canonical} (${c.family})`).join('\n')}
 }
 
 /**
- * 主解析函数
+ * Main entry: resolve the user-supplied role into a canonical role + family,
+ * inferred skills, and a confidence score.
  */
 export async function resolveRole(input: NormalizedInput): Promise<RoleResolution> {
   const rawRole = input.target_role;
@@ -523,7 +531,8 @@ export async function resolveRole(input: NormalizedInput): Promise<RoleResolutio
 }
 
 /**
- * 集成到NormalizedInput的快捷函数
+ * Convenience helper: run resolveRole and merge the result back into the
+ * NormalizedInput shape.
  */
 export async function normalizeInputWithRoleResolution(input: NormalizedInput): Promise<NormalizedInput> {
   const roleResolution = await resolveRole(input);

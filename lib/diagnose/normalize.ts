@@ -1,4 +1,4 @@
-// 标准化输入模块
+// Input normalization module — entry point for the diagnose pipeline.
 
 import type { DiagnoseRequest, NormalizedInput, JdQuality, ResumeSection, ResumeSectionType } from './types';
 import { resolveRole } from './role-resolver';
@@ -251,7 +251,7 @@ function validateInputQuality(text: string): void {
 }
 
 /**
- * 评估JD质量等级
+ * Assess the quality tier of a job description (none / weak / strong).
  */
 export function assessJdQuality(jdText: string): JdQuality {
   if (!jdText || jdText.trim().length === 0) {
@@ -401,15 +401,18 @@ function splitSentences(text: string): string[] {
 }
 
 /**
- * 检测经验级别：社招/校招
+ * Detect experience level (senior / junior / neutral) from resume text + sentence list.
  *
- * 历史 bug 修复说明：
- * 1. 旧实现 `/(\d+)\s*年/g` 会把 "2025 年毕业" 匹配成 maxYears = 2025 → 立即 senior。
- *    任何提到 4 位年份的简历都中招。新实现要求"年"后面紧跟工作语义词（工作/从业/经验/开发等）。
- * 2. 旧实现把 "管理" 列为 leadership 词，用 sentence.includes 子串匹配。
- *    "工商管理 / 项目管理课程 / 主修管理学" 全部触发 → 应届简历错判为 senior。
- *    新实现：教育/课程语境的句子整段豁免 leadership/support 计数；
- *    "管理"只在和具体动作搭配时才计为 leadership。
+ * Historical bug fixes worth keeping in mind:
+ * 1. The old `/(\d+)\s*年/g` matcher captured "2025 年毕业" as maxYears = 2025
+ *    and immediately classified the resume as senior. Any 4-digit year in the
+ *    resume triggered the bug. The new pattern requires "年" to be followed by
+ *    a work-context noun (工作/从业/经验/开发…).
+ * 2. The old code listed "管理" as a leadership keyword and matched via
+ *    sentence.includes, so "工商管理 / 项目管理课程 / 主修管理学" all triggered
+ *    leadership and miscalled fresh-grad resumes as senior. The new code:
+ *    a) skips entire sentences in education/coursework context; b) only counts
+ *    "管理" as leadership when paired with a concrete verb/object collocation.
  */
 export function detectExperienceLevel(
   resumeText: string,
@@ -456,7 +459,9 @@ export function detectExperienceLevel(
 }
 
 /**
- * 标准化输入
+ * Normalize a diagnose request into the shape consumed by downstream stages:
+ * cleans text, segments paragraphs, classifies sections, runs role + persona
+ * resolution, and assesses JD quality.
  */
 export async function normalizeInput(request: DiagnoseRequest): Promise<NormalizedInput> {
   const { target_role, tier } = request;
@@ -642,7 +647,7 @@ export async function normalizeInput(request: DiagnoseRequest): Promise<Normaliz
 }
 
 /**
- * 提取文本中的关键词
+ * Extract keywords from a piece of text, stripping a small Chinese stop-word list.
  */
 export function extractKeywords(text: string, maxKeywords: number = 50): string[] {
   const stopWords = ['的', '了', '在', '和', '与', '及', '等', '对', '为', '并', '或', '且', '但', '而'];
@@ -654,7 +659,7 @@ export function extractKeywords(text: string, maxKeywords: number = 50): string[
 }
 
 /**
- * 计算文本相似度（简单实现）
+ * Compute a naive token-overlap similarity between two strings.
  */
 export function simpleTextSimilarity(text1: string, text2: string): number {
   if (!text1 || !text2) return 0;
