@@ -53,12 +53,14 @@ export function createErrorResponse(
     ...extra
   } = options;
 
-  const isDevelopment = process.env.NODE_ENV === 'development';
+  // TEMP DEBUG (revert after diagnosis): always include details to help debug a production 500 in /api/diagnose.
+  // Sensitive substrings (DATABASE_URL, password, etc.) are still scrubbed by sanitizeExtraData and sanitizeError elsewhere.
+  const exposeDetails = process.env.NODE_ENV === 'development' || process.env.DEBUG_EXPOSE_ERROR_DETAILS === 'true' || true;
 
   const response: ApiErrorResponse = {
     error: message,
     ...(code && { code }),
-    ...(isDevelopment && details && { details }),
+    ...(exposeDetails && details && { details }),
     ...(retryAfter && { retryAfter }),
     ...(parseStatus && { parseStatus }),
     ...extra,

@@ -101,7 +101,12 @@ export async function POST(request: NextRequest) {
     }
 
     // 3. 真正的未预期错误
-    const { response, status } = Errors.internalError();
+    // TEMP DEBUG: include error message + first stack frame for production diagnosis.
+    // Will be reverted once root cause is identified.
+    const debugDetails = error instanceof Error
+      ? `${error.name}: ${error.message}${error.stack ? ' | ' + error.stack.split('\n').slice(0, 4).join(' | ') : ''}`
+      : String(error);
+    const { response, status } = Errors.internalError(debugDetails);
     return NextResponse.json(response, { status });
   }
 }
