@@ -4,6 +4,7 @@ import { runV4DiagnosisAndSave } from '@/lib/diagnose/service';
 import { diagnoseRequestSchema } from '@/lib/diagnose/types';
 import { getOrCreateAnonymousSessionId, checkRateLimit, recordUsage, setAnonymousSessionCookie } from '@/lib/rate-limit';
 import { logError, logWarn, logInfo, Errors } from '@/lib/error-handler';
+import { AIProviderError } from '@/lib/ai/types';
 
 // V4 诊断 API：唯一入口，输出 DiagnoseReport（schema_version: 4.0）
 // 旧版的 diagnose_mode / tier 参数仍兼容接收：
@@ -78,17 +79,28 @@ export async function POST(request: NextRequest) {
   } catch (error) {
     logError('DiagnoseAPI', error);
 
-    if (error instanceof Error) {
-      if (error.message.includes('DEEPSEEK_API_KEY')) {
+    // 1. AI provider 抛出的错误（最可靠的分类，不依赖错误文案）
+    if (error instanceof AIProviderError) {
+      const msg = error.message;
+
+      // API Key 未配置 → 服务端配置错误（运维问题，不是 AI 服务问题）
+      if (msg.includes('not configured') || msg.includes('未配置') || msg.includes('API_KEY')) {
         const { response, status } = Errors.serverConfigError();
         return NextResponse.json(response, { status });
       }
-      if (error.message.includes('DeepSeek API 错误') || error.message.includes('JSON 解析失败')) {
-        const { response, status } = Errors.aiServiceUnavailable(error.message);
-        return NextResponse.json(response, { status });
-      }
+
+      // 其余 AI provider 错误（Key 失效返回 401、API 报错、超时、断路器等）
+      const { response, status } = Errors.aiServiceUnavailable(msg);
+      return NextResponse.json(response, { status });
     }
 
+    // 2. JSON 解析失败（V4 工作流里手动抛的）
+    if (error instanceof Error && (error.message.includes('JSON 解析失败') || error.message.includes('JSON parse failed'))) {
+      const { response, status } = Errors.aiServiceUnavailable(error.message);
+      return NextResponse.json(response, { status });
+    }
+
+    // 3. 真正的未预期错误
     const { response, status } = Errors.internalError();
     return NextResponse.json(response, { status });
   }
