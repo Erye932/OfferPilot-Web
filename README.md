@@ -5,7 +5,7 @@
 **An open-source, multi-stage AI workflow for diagnosing and rewriting technical resumes.**
 
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](./LICENSE)
-[![Lint](https://github.com/Erye932/OfferPilot-Web/actions/workflows/lint.yml/badge.svg)](https://github.com/Erye932/OfferPilot-Web/actions/workflows/lint.yml)
+[![CI](https://github.com/Erye932/OfferPilot-Web/actions/workflows/lint.yml/badge.svg)](https://github.com/Erye932/OfferPilot-Web/actions/workflows/lint.yml)
 [![Next.js 16](https://img.shields.io/badge/Next.js-16-black?logo=next.js)](https://nextjs.org/)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.9-3178C6?logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
 [![React 19](https://img.shields.io/badge/React-19-61DAFB?logo=react&logoColor=white)](https://react.dev/)

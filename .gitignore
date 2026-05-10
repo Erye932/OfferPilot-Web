@@ -53,6 +53,9 @@ CLAUDE.md
 AGENTS.md
 MEMORY.md
 
+# raw consulting / interview source docs — kept locally, not published
+语料数据库/
+
 # env files (can opt-in for committing if needed)
 .env*
 
