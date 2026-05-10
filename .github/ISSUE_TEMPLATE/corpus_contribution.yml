@@ -1,7 +1,7 @@
 name: Corpus contribution
 description: Propose a new diagnostic rule, insider view, or rewrite pattern
 title: "[corpus] "
-labels: ["corpus", "needs-review"]
+labels: ["documentation", "help wanted"]
 body:
   - type: markdown
     attributes:
