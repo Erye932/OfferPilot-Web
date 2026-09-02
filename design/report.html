@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>OfferPilot — 你的简历诊断报告</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <style>
+    html, body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+      font-feature-settings: "cv02", "cv03", "cv04", "cv11";
+    }
+    .font-mono { font-family: 'JetBrains Mono', ui-monospace, SFMono-Regular, monospace; }
+    .display { letter-spacing: -0.025em; font-feature-settings: "ss01"; }
+    .num     { font-variant-numeric: tabular-nums; letter-spacing: -0.04em; }
+    .kicker  { letter-spacing: 0.18em; }
+    .prose-body p { font-size: 1.0625rem; line-height: 1.85; color: #404040; margin-top: 1.25rem; }
+    .prose-body p strong { color: #0a0a0a; font-weight: 600; }
+    .prose-body p:first-child { margin-top: 0; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+    .fade-in { animation: fadeIn .6s cubic-bezier(.4, 0, .2, 1) backwards; }
+    details > summary { list-style: none; cursor: pointer; user-select: none; }
+    details > summary::-webkit-details-marker { display: none; }
+    details[open] > summary .chev { transform: rotate(180deg); }
+    .chev { transition: transform .25s cubic-bezier(.4, 0, .2, 1); display: inline-block; }
+  </style>
+</head>
+<body class="bg-white text-neutral-900">
+
+  <nav class="border-b border-neutral-200 bg-white">
+    <div class="mx-auto flex h-14 max-w-6xl items-center justify-between px-8">
+      <div class="flex items-center gap-2.5">
+        <div class="flex h-6 w-6 items-center justify-center rounded-md bg-neutral-900">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="h-3 w-3"><path d="M12 2 L4 7 L12 12 L20 7 Z"/><path d="M4 12 L12 17 L20 12"/></svg>
+        </div>
+        <span class="text-sm font-semibold tracking-tight text-neutral-900">OfferPilot</span>
+        <span class="hidden text-xs text-neutral-400 sm:inline">/ 你的简历诊断</span>
+      </div>
+      <div class="flex items-center gap-5 text-sm">
+        <button class="hidden text-neutral-500 transition hover:text-neutral-900 sm:inline">下载 PDF</button>
+        <button class="rounded-full bg-neutral-900 px-4 py-1.5 text-sm font-medium text-white transition hover:bg-neutral-800">新建诊断</button>
+      </div>
+    </div>
+  </nav>
+  <header class="bg-white">
+    <div class="mx-auto max-w-3xl px-8 pt-32 pb-32 text-center sm:pt-40 sm:pb-40">
+      <div class="fade-in" style="animation-delay: 0ms">
+        <div class="num text-[200px] font-semibold leading-[0.85] text-neutral-900 sm:text-[240px]">78</div>
+      </div>
+      <h1 class="display fade-in mx-auto mt-20 max-w-2xl text-2xl font-medium leading-[1.5] text-neutral-700 sm:text-[28px]" style="animation-delay: 200ms">
+        你简历整体不错，主要的问题是<br/>
+        <span class="text-neutral-900 font-semibold">"最强的项目被埋了"</span>
+      </h1>
+      <div class="fade-in mt-16 flex justify-center" style="animation-delay: 360ms">
+        <a href="#section-overall" class="inline-flex items-center gap-2 rounded-full bg-neutral-900 px-6 py-3 text-sm font-medium text-white transition hover:bg-neutral-800">
+          往下读
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" class="h-4 w-4"><path d="M12 5v14M19 12l-7 7-7-7"/></svg>
+        </a>
+      </div>
+    </div>
+  </header>
+  <section id="section-overall" class="border-t border-neutral-200">
+    <div class="mx-auto max-w-3xl px-8 py-32">
+      <h2 class="display text-3xl font-semibold leading-[1.25] text-neutral-900 sm:text-4xl">我看完之后</h2>
+      <div class="prose-body mt-12">
+        <p>
+          你的简历<strong>整体扎实</strong>，能看出你写的时候是认真的——项目里有 <span class="font-mono">12w 单</span>、<span class="font-mono">47%</span>、<span class="font-mono">180ms</span> 这样的具体数字，说明你重视结果，这是好习惯。岗位方向也对，写过的微服务、K8s、MySQL 都贴 JD。
+        </p>
+        <p>
+          但有一件事让我给你扣了分：<strong class="text-red-600">你最强的项目（订单系统）被埋在了简历的第三段。</strong>HR 看一份简历平均只花 6 秒——他大概率根本翻不到那里就把简历翻过去了。
+        </p>
+        <p>
+          下面我先给你看六个维度的评分，让你大致清楚哪里强、哪里弱。然后再一条条讲具体的 10 个改进点。
+        </p>
+      </div>
+    </div>
+  </section>
+  <section class="border-t border-neutral-200">
+    <div class="mx-auto max-w-5xl px-8 py-32">
+      <h2 class="display text-3xl font-semibold leading-[1.25] text-neutral-900 sm:text-4xl">各维度评分</h2>
+
+      <div class="mt-24 grid grid-cols-1 gap-x-20 gap-y-24 sm:grid-cols-2 lg:grid-cols-3">
+
+        <div>
+          <div class="num text-[88px] font-semibold leading-none text-neutral-900">88</div>
+          <div class="mt-8 text-base font-medium text-neutral-900">证据 / 量化</div>
+          <div class="mt-3 h-px w-full bg-neutral-200"><div class="h-px bg-neutral-900" style="width: 88%"></div></div>
+          <p class="mt-5 text-sm leading-[1.7] text-neutral-500">数字够多，可核实，能打动 HR。</p>
+        </div>
+
+        <div>
+          <div class="num text-[88px] font-semibold leading-none text-neutral-900">82</div>
+          <div class="mt-8 text-base font-medium text-neutral-900">表达 / 语言</div>
+          <div class="mt-3 h-px w-full bg-neutral-200"><div class="h-px bg-neutral-900" style="width: 82%"></div></div>
+          <p class="mt-5 text-sm leading-[1.7] text-neutral-500">用词整体具体，节奏 OK。仍有"负责""参与"等空词。</p>
+        </div>
+
+        <div>
+          <div class="num text-[88px] font-semibold leading-none text-neutral-900">80</div>
+          <div class="mt-8 text-base font-medium text-neutral-900">可信度</div>
+          <div class="mt-3 h-px w-full bg-neutral-200"><div class="h-px bg-neutral-900" style="width: 80%"></div></div>
+          <p class="mt-5 text-sm leading-[1.7] text-neutral-500">数据基本可信。"日均百万流量"建议补来源或时间窗。</p>
+        </div>
+
+        <div>
+          <div class="num text-[88px] font-semibold leading-none text-neutral-900">75</div>
+          <div class="mt-8 text-base font-medium text-neutral-900">岗位贴合</div>
+          <div class="mt-3 h-px w-full bg-neutral-200"><div class="h-px bg-neutral-900" style="width: 75%"></div></div>
+          <p class="mt-5 text-sm leading-[1.7] text-neutral-500">JD 6 个关键词命中 4 个。Redis、Kafka 没写进项目。</p>
+        </div>
+
+        <div>
+          <div class="num text-[88px] font-semibold leading-none text-neutral-900">70</div>
+          <div class="mt-8 text-base font-medium text-neutral-900">信息缺失</div>
+          <div class="mt-3 h-px w-full bg-neutral-200"><div class="h-px bg-neutral-900" style="width: 70%"></div></div>
+          <p class="mt-5 text-sm leading-[1.7] text-neutral-500">推荐系统项目缺用户/调用量级。个别经历缺时间区间。</p>
+        </div>
+
+        <div>
+          <div class="num text-[88px] font-semibold leading-none text-red-600">65</div>
+          <div class="mt-8 text-base font-medium text-neutral-900">结构 / 排版</div>
+          <div class="mt-3 h-px w-full bg-neutral-200"><div class="h-px bg-red-600" style="width: 65%"></div></div>
+          <p class="mt-5 text-sm font-medium leading-[1.7] text-red-600">最强项目被埋在第三段，HR 6 秒看不到。</p>
+        </div>
+
+      </div>
+    </div>
+  </section>
+  <section class="border-t border-neutral-200">
+    <div class="mx-auto max-w-3xl px-8 py-32">
+      <h2 class="display text-3xl font-semibold leading-[1.25] text-neutral-900 sm:text-4xl">一条条讲</h2>
+
+      <div class="mt-16 divide-y divide-neutral-200 border-t border-b border-neutral-200">
+        <details>
+          <summary class="flex items-center gap-6 py-7 transition hover:bg-neutral-50/60">
+            <span class="num shrink-0 w-10 text-2xl font-semibold leading-none text-neutral-300">01</span>
+            <span class="shrink-0 text-[11px] font-mono uppercase kicker text-red-600 w-12">必改</span>
+            <span class="flex-1 text-lg font-medium text-neutral-900">把"负责"改成具体动作</span>
+            <svg class="chev h-4 w-4 shrink-0 text-neutral-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+          </summary>
+          <div class="pl-[88px] pr-2 pb-10 space-y-10">
+            <div>
+              <div class="font-mono text-[11px] uppercase kicker text-neutral-400">你的原文</div>
+              <p class="mt-3 text-base leading-[1.8] text-neutral-500">"<span class="text-red-500">负责</span>订单系统的<span class="text-red-500">相关开发工作</span>，<span class="text-red-500">参与</span>系统优化，使性能得到<span class="text-red-500">一定程度</span>的提升。"</p>
+            </div>
+            <div>
+              <div class="font-mono text-[11px] uppercase kicker text-neutral-400">问题在哪</div>
+              <ul class="mt-3 space-y-2 text-base leading-[1.7] text-neutral-700">
+                <li>· <strong>"负责"</strong>是空词，谁都能写。</li>
+                <li>· <strong>"参与"</strong>更糟，意味着你不是主力。</li>
+                <li>· <strong>"一定程度"</strong>是简历禁用语，没量级。</li>
+              </ul>
+            </div>
+            <div>
+              <div class="font-mono text-[11px] uppercase kicker text-neutral-900">建议改成</div>
+              <p class="mt-3 text-base leading-[1.8] text-neutral-900">"<strong>主导</strong>订单系统重构，日均处理 <span class="font-mono font-semibold">12w</span> 单；将 P95 延迟从 <span class="font-mono">340ms</span> 降至 <span class="font-mono font-semibold">180ms</span>，数据库连接数减少 <span class="font-mono font-semibold">47%</span>。"</p>
+            </div>
+            <div>
+              <div class="font-mono text-[11px] uppercase kicker text-neutral-400">为什么这样写</div>
+              <ul class="mt-3 space-y-2 text-base leading-[1.7] text-neutral-700">
+                <li>· <strong>"主导"</strong>代表你拍板（动词具体）。</li>
+                <li>· 12w / 340ms / 180ms / 47% 都是绝对数字（可核实）。</li>
+                <li>· 结果数字放前半句，HR 5 秒就能抓到。</li>
+              </ul>
+            </div>
+          </div>
+        </details>
+        <details>
+          <summary class="flex items-center gap-6 py-7 transition hover:bg-neutral-50/60">
+            <span class="num shrink-0 w-10 text-2xl font-semibold leading-none text-neutral-300">02</span>
+            <span class="shrink-0 text-[11px] font-mono uppercase kicker text-red-600 w-12">必改</span>
+            <span class="flex-1 text-lg font-medium text-neutral-900">技能列表里的 Redis、Kafka 项目里找不到</span>
+            <svg class="chev h-4 w-4 shrink-0 text-neutral-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+          </summary>
+          <div class="pl-[88px] pr-2 pb-10 space-y-10">
+            <div>
+              <div class="font-mono text-[11px] uppercase kicker text-neutral-400">你的简历</div>
+              <p class="mt-3 text-base leading-[1.8] text-neutral-500">技能列表里写了 <span class="font-mono">Redis</span> 和 <span class="font-mono">Kafka</span>。</p>
+            </div>
+            <div>
+              <div class="font-mono text-[11px] uppercase kicker text-neutral-400">问题在哪</div>
+              <p class="mt-3 text-base leading-[1.8] text-neutral-700">我翻遍你的项目经历，<strong>找不到这两个的任何使用场景</strong>。HR 看到这种简历会立刻起疑：是不是听过名字就写上了？这种"堆砌嫌疑"会拖累简历的可信度——比"没写"还糟。</p>
+            </div>
+            <div>
+              <div class="font-mono text-[11px] uppercase kicker text-neutral-900">建议改成</div>
+              <p class="mt-3 text-base leading-[1.8] text-neutral-900">要么写进项目，要么就别列。在订单系统项目里补一句：<br/><span class="mt-3 block">"用 <strong>Redis</strong> 缓存高频商品信息，QPS 从 3000 提升到 8000；用 <strong>Kafka</strong> 削峰填谷，订单写入毛刺消失。"</span></p>
+            </div>
+            <div>
+              <div class="font-mono text-[11px] uppercase kicker text-neutral-400">为什么这样写</div>
+              <ul class="mt-3 space-y-2 text-base leading-[1.7] text-neutral-700">
+                <li>· <strong>用在哪个场景</strong>让 HR 知道你不是堆砌名词。</li>
+                <li>· 顺便补上 JD 缺失的两个关键词，<strong class="text-neutral-900">改一处解决两件事</strong>。</li>
+              </ul>
+            </div>
+          </div>
+        </details>
+        <details>
+          <summary class="flex items-center gap-6 py-7 transition hover:bg-neutral-50/60">
+            <span class="num shrink-0 w-10 text-2xl font-semibold leading-none text-neutral-300">03</span>
+            <span class="shrink-0 text-[11px] font-mono uppercase kicker text-neutral-500 w-12">建议</span>
+            <span class="flex-1 text-lg font-medium text-neutral-900">把"提升 30%"改成绝对数字</span>
+            <svg class="chev h-4 w-4 shrink-0 text-neutral-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+          </summary>
+          <div class="pl-[88px] pr-2 pb-10">
+            <p class="text-base leading-[1.8] text-neutral-700">百分比是相对值，没基线就没说服力。<span class="font-mono">340ms → 180ms</span> 才是绝对数字，任何人都能立刻感受量级。</p>
+          </div>
+        </details>
+        <details>
+          <summary class="flex items-center gap-6 py-7 transition hover:bg-neutral-50/60">
+            <span class="num shrink-0 w-10 text-2xl font-semibold leading-none text-neutral-300">04</span>
+            <span class="shrink-0 text-[11px] font-mono uppercase kicker text-neutral-500 w-12">建议</span>
+            <span class="flex-1 text-lg font-medium text-neutral-900">补充推荐系统项目的用户规模</span>
+            <svg class="chev h-4 w-4 shrink-0 text-neutral-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+          </summary>
+          <div class="pl-[88px] pr-2 pb-10">
+            <p class="text-base leading-[1.8] text-neutral-700">推荐系统项目缺一个量级锚点。DAU、QPS、日均请求数任一个都行，哪怕只一个数字都能把这段经历"变真"。</p>
+          </div>
+        </details>
+        <details>
+          <summary class="flex items-center gap-6 py-7 transition hover:bg-neutral-50/60">
+            <span class="num shrink-0 w-10 text-2xl font-semibold leading-none text-neutral-300">05</span>
+            <span class="shrink-0 text-[11px] font-mono uppercase kicker text-neutral-500 w-12">建议</span>
+            <span class="flex-1 text-lg font-medium text-neutral-900">把订单系统挪到工作经历的第一个</span>
+            <svg class="chev h-4 w-4 shrink-0 text-neutral-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+          </summary>
+          <div class="pl-[88px] pr-2 pb-10">
+            <p class="text-base leading-[1.8] text-neutral-700">这是你最强的项目，现在排在第三段。HR 6 秒看不到。建议直接换到工作经历首位。这条改完能直接拉高"结构"维度的分数。</p>
+          </div>
+        </details>
+        <details>
+          <summary class="flex items-center gap-6 py-7 transition hover:bg-neutral-50/60">
+            <span class="num shrink-0 w-10 text-2xl font-semibold leading-none text-neutral-300">06</span>
+            <span class="shrink-0 text-[11px] font-mono uppercase kicker text-neutral-500 w-12">建议</span>
+            <span class="flex-1 text-lg font-medium text-neutral-900">实习经历精简到 2-3 行</span>
+            <svg class="chev h-4 w-4 shrink-0 text-neutral-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+          </summary>
+          <div class="pl-[88px] pr-2 pb-10">
+            <p class="text-base leading-[1.8] text-neutral-700">实习现在写了 5 行，但内容比较泛，跟正式工作经历"撞"。建议精简到 2-3 行核心动作即可。</p>
+          </div>
+        </details>
+        <details>
+          <summary class="flex items-center gap-6 py-7 transition hover:bg-neutral-50/60">
+            <span class="num shrink-0 w-10 text-2xl font-semibold leading-none text-neutral-300">07</span>
+            <span class="shrink-0 text-[11px] font-mono uppercase kicker text-neutral-500 w-12">建议</span>
+            <span class="flex-1 text-lg font-medium text-neutral-900">个人简介开头加一句"定位"</span>
+            <svg class="chev h-4 w-4 shrink-0 text-neutral-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+          </summary>
+          <div class="pl-[88px] pr-2 pb-10">
+            <p class="text-base leading-[1.8] text-neutral-700">现在简介开头是"热爱编程的工程师"——太通用了。建议改成 "<strong>3 年后端经验，专注高并发分布式系统</strong>"——一句话给你加上锚点。</p>
+          </div>
+        </details>
+        <details>
+          <summary class="flex items-center gap-6 py-7 transition hover:bg-neutral-50/60">
+            <span class="num shrink-0 w-10 text-2xl font-semibold leading-none text-neutral-300">08</span>
+            <span class="shrink-0 text-[11px] font-mono uppercase kicker text-neutral-400 w-12">可选</span>
+            <span class="flex-1 text-lg font-medium text-neutral-900">开源项目可以加上 Star 数</span>
+            <svg class="chev h-4 w-4 shrink-0 text-neutral-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+          </summary>
+          <div class="pl-[88px] pr-2 pb-10">
+            <p class="text-base leading-[1.8] text-neutral-700">如果你的开源项目有一定 Star（≥ 100），写上去会让简历更有说服力。没有的话不用写。</p>
+          </div>
+        </details>
+        <details>
+          <summary class="flex items-center gap-6 py-7 transition hover:bg-neutral-50/60">
+            <span class="num shrink-0 w-10 text-2xl font-semibold leading-none text-neutral-300">09</span>
+            <span class="shrink-0 text-[11px] font-mono uppercase kicker text-neutral-400 w-12">可选</span>
+            <span class="flex-1 text-lg font-medium text-neutral-900">技术博客代表作</span>
+            <svg class="chev h-4 w-4 shrink-0 text-neutral-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+          </summary>
+          <div class="pl-[88px] pr-2 pb-10">
+            <p class="text-base leading-[1.8] text-neutral-700">有写技术博客可以贴 1-2 篇代表作链接。这能让 HR 直观感受你的"深度思考"能力。</p>
+          </div>
+        </details>
+        <details>
+          <summary class="flex items-center gap-6 py-7 transition hover:bg-neutral-50/60">
+            <span class="num shrink-0 w-10 text-2xl font-semibold leading-none text-neutral-300">10</span>
+            <span class="shrink-0 text-[11px] font-mono uppercase kicker text-neutral-400 w-12">可选</span>
+            <span class="flex-1 text-lg font-medium text-neutral-900">奖项 / 比赛</span>
+            <svg class="chev h-4 w-4 shrink-0 text-neutral-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+          </summary>
+          <div class="pl-[88px] pr-2 pb-10">
+            <p class="text-base leading-[1.8] text-neutral-700">如果有 ACM / 蓝桥杯 / 互联网＋ 等奖项，可以补一行。校招 / 社招都加分。</p>
+          </div>
+        </details>
+      </div>
+    </div>
+  </section>
+  <section class="border-t border-neutral-200">
+    <div class="mx-auto max-w-3xl px-8 py-32">
+      <h2 class="display text-3xl font-semibold leading-[1.25] text-neutral-900 sm:text-4xl">岗位 JD 里的 6 个关键词，<br/>你写中了 4 个</h2>
+
+      <div class="mt-12 space-y-8">
+        <p class="font-mono text-lg leading-[1.7] text-neutral-900">Go &nbsp;·&nbsp; 微服务 &nbsp;·&nbsp; K8s &nbsp;·&nbsp; MySQL</p>
+        <p class="font-mono text-lg font-semibold leading-[1.7] text-red-600">Redis &nbsp;·&nbsp; Kafka</p>
+      </div>
+
+      <div class="prose-body mt-12">
+        <p>缺失的 <span class="font-mono">Redis</span> 和 <span class="font-mono">Kafka</span>，正好就是上面 <strong>必改 02</strong> 里建议你补到订单系统项目的两个技能。<strong class="text-neutral-900">改一处，等于解决两个问题</strong>——这是这次诊断里效率最高的一条改动。</p>
+      </div>
+    </div>
+  </section>
+  <section class="border-t border-neutral-200 bg-white">
+    <div class="mx-auto max-w-3xl px-8 py-20 text-center">
+      <p class="mx-auto max-w-md text-base leading-[1.75] text-neutral-700">
+        改完 <span class="font-semibold text-red-600">2 条必改</span>，回来再扫一次。预计能从 <span class="num font-semibold text-neutral-900">78</span> 提到 <span class="num font-semibold text-neutral-900">85+</span>。
+      </p>
+      <div class="mt-8 flex flex-wrap items-center justify-center gap-6 text-sm">
+        <button class="inline-flex items-center gap-2 rounded-full bg-neutral-900 px-6 py-3 font-medium text-white transition hover:bg-neutral-800">
+          重新诊断
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" class="h-4 w-4"><path d="M5 12h14M13 5l7 7-7 7"/></svg>
+        </button>
+        <button class="text-neutral-500 underline-offset-4 transition hover:text-neutral-900 hover:underline">下载 PDF</button>
+      </div>
+    </div>
+  </section>
+  <footer class="border-t border-neutral-200 bg-white">
+    <div class="mx-auto max-w-6xl px-8 py-12 text-center font-mono text-[11px] kicker uppercase text-neutral-400">
+      OfferPilot &nbsp;·&nbsp; V4 &nbsp;·&nbsp; 2026.01.10
+    </div>
+  </footer>
+
+</body>
+</html>

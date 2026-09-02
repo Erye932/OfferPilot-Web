@@ -1,5 +1,5 @@
 import type { DiagnoseReport, DiagnoseRequest } from './types';
-import { runV4DiagnoseWorkflow } from './v4/workflow';
+import { runV4DiagnoseWorkflow, type ProgressCallback } from './v4/workflow';
 import { getCachedReport, setCachedReport, invalidateCachedReport } from './cache';
 import { logWarn, logInfo } from '../error-handler';
 
@@ -24,10 +24,17 @@ export interface V4DiagnoseInput {
   force_refresh?: boolean;                 // 跳过缓存
 }
 
+export interface V4DiagnoseOptions {
+  onProgress?: ProgressCallback;
+}
+
 /**
  * V4 诊断主入口：先查缓存，未命中则跑 V4 工作流并写缓存
  */
-export async function runV4Diagnosis(input: V4DiagnoseInput): Promise<DiagnoseReport> {
+export async function runV4Diagnosis(
+  input: V4DiagnoseInput,
+  options: V4DiagnoseOptions = {}
+): Promise<DiagnoseReport> {
   const { resume_text, target_role, jd_text = '', force_refresh = false } = input;
 
   // 1. 缓存查询（force_refresh 时跳过）
@@ -38,6 +45,7 @@ export async function runV4Diagnosis(input: V4DiagnoseInput): Promise<DiagnoseRe
         cache_hit: true,
         target_role,
       });
+      await options.onProgress?.('cache_hit', '命中历史分析缓存，直接载入报告...', 100);
       return cached;
     }
   } else {
@@ -53,7 +61,7 @@ export async function runV4Diagnosis(input: V4DiagnoseInput): Promise<DiagnoseRe
     jd_text,
     tier: input.tier ?? 'free',
   };
-  const report = await runV4DiagnoseWorkflow(request);
+  const report = await runV4DiagnoseWorkflow(request, { onProgress: options.onProgress });
 
   // 3. 写缓存（即使 force_refresh 也写入，供后续命中）
   setCachedReport({ resume_text, target_role, jd_text }, report);
@@ -121,15 +129,10 @@ export async function saveV4DiagnoseReport(
  * V4 完整流程：诊断 + 保存
  */
 export async function runV4DiagnosisAndSave(
-  input: V4DiagnoseInput
+  input: V4DiagnoseInput,
+  options: V4DiagnoseOptions = {}
 ): Promise<{ report: DiagnoseReport; reportId: string | null }> {
-  const report = await runV4Diagnosis(input);
-
-  // 缓存命中时不重复落库
-  if (report.metadata?.cache_hit) {
-    logInfo('V4Diagnose', '缓存命中，跳过落库');
-    return { report, reportId: null };
-  }
+  const report = await runV4Diagnosis(input, options);
 
   const reportId = await saveV4DiagnoseReport(report, input);
   return { report, reportId };

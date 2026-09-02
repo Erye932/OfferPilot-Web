@@ -36,9 +36,12 @@ import {
 import type { ResearchContext } from './schemas';
 import { assembleDiagnoseReport } from './mappers';
 
+export type ProgressCallback = (step: string, label: string, progress: number) => Promise<void> | void;
+
 export interface V4WorkflowOptions {
   forceRefresh?: boolean;     // 暂时仅作为元信息，缓存层在 service 层处理
   abortSignal?: AbortSignal;
+  onProgress?: ProgressCallback;
 }
 
 /**
@@ -49,14 +52,16 @@ export interface V4WorkflowOptions {
  */
 export async function runV4DiagnoseWorkflow(
   request: DiagnoseRequest,
-  _options: V4WorkflowOptions = {}
+  options: V4WorkflowOptions = {}
 ): Promise<DiagnoseReport> {
   const startTime = Date.now();
   const workflowSteps: string[] = [];
+  const { onProgress } = options;
 
   // ════════════════════════════════════════════════════════════════
   // Phase 0: 准备
   // ════════════════════════════════════════════════════════════════
+  await onProgress?.('normalize', '正在标准化简历并解析岗位意图...', 10);
   workflowSteps.push('normalize');
   const input: NormalizedInput = await normalizeInput(request);
   logInfo('V4Workflow', 'Phase0 normalize complete', {
@@ -74,6 +79,7 @@ export async function runV4DiagnoseWorkflow(
   // ════════════════════════════════════════════════════════════════
   // Phase 1: 研究阶段（并行 R2/R3，按 target_role 缓存）
   // ════════════════════════════════════════════════════════════════
+  await onProgress?.('phase1_role_research', '正在进行全网市场调研与岗位标准分析...', 25);
   workflowSteps.push('phase1_role_research');
   const [roleStudy, hrInsider] = await Promise.all([
     runRoleStudy(input),
@@ -91,6 +97,7 @@ export async function runV4DiagnoseWorkflow(
   // ════════════════════════════════════════════════════════════════
   // Phase 2: 简历研究（吃 R2/R3，得到 R5）
   // ════════════════════════════════════════════════════════════════
+  await onProgress?.('phase2_resume_study', '正在结合市场标准深度研读简历信号...', 45);
   workflowSteps.push('phase2_resume_study');
   const resumeStudy = await runResumeStudy(input, roleStudy, hrInsider);
   logInfo('V4Workflow', 'Phase2 resume_study done', {
@@ -120,6 +127,7 @@ export async function runV4DiagnoseWorkflow(
   });
 
   // Phase 3.2: 并行四路（每路注入对应研究子集）
+  await onProgress?.('parallel_analysis', 'HR初筛模拟与改写专家正在交叉诊断...', 65);
   workflowSteps.push('parallel_analysis');
   const [hr, master, jdCoverage, credibility] = await Promise.all([
     runHrSimulator(input, base, research),
@@ -136,6 +144,7 @@ export async function runV4DiagnoseWorkflow(
   });
 
   // Phase 3.3: SelfCritique（注入 R5 + R3 baseline）
+  await onProgress?.('self_critique', '正在进行自我批判与多维证据校验...', 80);
   workflowSteps.push('self_critique');
   const selfCritique = await runSelfCritique(input, base, master, hr, research);
   logInfo('V4Workflow', 'Phase3 self_critique done', {
@@ -144,6 +153,7 @@ export async function runV4DiagnoseWorkflow(
   });
 
   // Phase 3.4: FinalSynthesis（注入全部研究）
+  await onProgress?.('final_synthesis', '正在生成最终诊断决策与改写建议...', 90);
   workflowSteps.push('final_synthesis');
   const ruleBasedTitles = ruleBasedComments.map((c) => `[${c.section_label}] ${c.title}`);
   const finalSynthesis = await runFinalSynthesis(
@@ -165,6 +175,7 @@ export async function runV4DiagnoseWorkflow(
   // ════════════════════════════════════════════════════════════════
   // Phase 4: assemble
   // ════════════════════════════════════════════════════════════════
+  await onProgress?.('assemble', '正在组装诊断报告...', 98);
   workflowSteps.push('assemble');
   const durationMs = Date.now() - startTime;
   const report = assembleDiagnoseReport({

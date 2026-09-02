@@ -6,6 +6,7 @@ import { getOrCreateAnonymousSessionId, checkRateLimit, recordUsage, setAnonymou
 import { logError, logWarn, logInfo, Errors } from '@/lib/error-handler';
 import { AIProviderError } from '@/lib/ai/types';
 import { InputQualityError } from '@/lib/diagnose/normalize';
+import { createDemoSafeDiagnoseReport, isDemoSafeModeEnabled } from '@/lib/demo-safe-mode';
 
 // V4 workflow runs ~12 sequential AI calls and may take >30s on a cold start.
 // Vercel Hobby plan caps non-streaming functions at 60s; that is the max we can request here.
@@ -36,6 +37,22 @@ export async function POST(request: NextRequest) {
     if (!resume_text?.trim() || !target_role?.trim()) {
       const { response, status } = Errors.validationError('缺少必要参数：resume_text 和 target_role');
       return NextResponse.json(response, { status });
+    }
+
+    if (isDemoSafeModeEnabled()) {
+      const sessionId = getOrCreateAnonymousSessionId(request);
+      const headers = setAnonymousSessionCookie(sessionId);
+      const report = createDemoSafeDiagnoseReport({
+        resume_text,
+        resume_paragraphs,
+        target_role,
+        jd_text: jd_text || '',
+      });
+
+      return NextResponse.json({
+        ...report,
+        report_id: 'demo-safe-report-sync',
+      }, { headers });
     }
 
     // 匿名会话标识与限流（保留 tier 仅用于限流逻辑）

@@ -1,0 +1,16 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "noEmit": true
+  },
+  "include": [
+    "scripts/diagnose-worker.ts",
+    "lib/**/*.ts"
+  ],
+  "exclude": [
+    "node_modules",
+    "components/offerpilot/DiagnoseResult.legacy.tsx",
+    "components/offerpilot/DiagnoseResult.tsx",
+    "vitest.config.ts"
+  ]
+}

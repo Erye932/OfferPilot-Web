@@ -33,6 +33,7 @@ import type {
   DiagnoseReport,
   DiagnoseScenario,
 } from '../types';
+import { logWarn } from '../../error-handler';
 import {
   V4_DIMENSIONS,
   V4_DEFAULT_WEIGHTS,
@@ -114,6 +115,68 @@ export function aiCommentsToV4(
       credibility_concern: c.credibility_concern,
     };
   });
+}
+
+function normalizeEvidence(value: string): string {
+  return value
+    .toLowerCase()
+    .replace(/[，。；：、“”‘’（）()【】[\]{}<>《》,.;:!！?？\s|｜·]/g, '');
+}
+
+function isEvidenceInResume(resumeText: string, evidence: string): boolean {
+  if (!evidence || !evidence.trim()) return false;
+  const normalizedResume = normalizeEvidence(resumeText);
+  const normalizedEvidence = normalizeEvidence(evidence);
+  if (!normalizedEvidence) return false;
+
+  // 1. Direct inclusion
+  if (normalizedResume.includes(normalizedEvidence)) return true;
+
+  // 2. Substring or clause matching
+  const segments = evidence
+    .split(/[，。；：\n\r…—\-.,;!！?？\s|｜·]/)
+    .map((s) => normalizeEvidence(s))
+    .filter((s) => s.length >= 4);
+
+  if (segments.length > 0) {
+    const matchedCount = segments.filter((seg) => normalizedResume.includes(seg)).length;
+    if (matchedCount > 0 && matchedCount / segments.length >= 0.4) {
+      return true;
+    }
+  }
+
+  // 3. Chunk matching (any 6-char substring)
+  if (normalizedEvidence.length >= 6) {
+    for (let i = 0; i <= normalizedEvidence.length - 6; i += 3) {
+      const chunk = normalizedEvidence.slice(i, i + 6);
+      if (normalizedResume.includes(chunk)) return true;
+    }
+  }
+
+  return false;
+}
+
+function filterEvidenceBackedAiComments(
+  input: NormalizedInput,
+  comments: V4Comment[]
+): V4Comment[] {
+  const kept = comments.filter((comment) => {
+    if (comment.evidence_quote.startsWith('（简历中未找到')) return true;
+    if (isEvidenceInResume(input.resume_text, comment.evidence_quote)) return true;
+
+    const snippet = comment.evidence_location?.text_snippet;
+    return !!snippet && isEvidenceInResume(input.resume_text, snippet);
+  });
+
+  const dropped = comments.length - kept.length;
+  if (dropped > 0) {
+    logWarn('V4Mapper', '丢弃证据无法回溯到原始简历的 AI 诊断点', {
+      dropped,
+      kept: kept.length,
+    });
+  }
+
+  return kept;
 }
 
 // ════════════════════════════════════════════════════════════════
@@ -401,7 +464,7 @@ export function assembleDiagnoseReport(args: AssembleArgs): DiagnoseReport {
   } = args;
 
   // 1. 合并 AI 合成的 comments + 规则探针的 missing_info comments
-  const aiComments = aiCommentsToV4(finalSynthesis.comments);
+  const aiComments = filterEvidenceBackedAiComments(input, aiCommentsToV4(finalSynthesis.comments));
   const allComments = [...ruleBasedComments, ...aiComments];
 
   // 2. 矩阵

@@ -238,6 +238,20 @@ describe('/api/pdf/parse', () => {
     expect(mockLogError).toHaveBeenCalled();
   });
 
+  it('解析超时 - 返回400', async () => {
+    const pdfContent = new Uint8Array([37, 80, 68, 70, 45]);
+    const file = createMockFile(pdfContent);
+    mockExtractPdfText.mockRejectedValue(new Error('parse_timeout'));
+
+    const request = createMockRequest(file);
+    const response = await POST(request);
+    const data = await response.json();
+
+    expect(response.status).toBe(400);
+    expect(data.error).toContain('PDF 解析超时');
+    expect(data.pdfErrorCode).toBe('PDF_PARSE_TIMEOUT');
+  });
+
   it('限流触发 - 返回429', async () => {
     const pdfContent = new Uint8Array([37, 80, 68, 70, 45]);
     const file = createMockFile(pdfContent);

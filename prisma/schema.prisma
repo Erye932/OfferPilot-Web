@@ -42,6 +42,7 @@ model DiagnoseSession {
   uploadedFile UploadedFile? @relation(fields: [uploadedFileId], references: [id])
   reports DiagnoseReport[]
   serviceCases ServiceCase[]
+  applicationOutcomes ApplicationOutcome[]
 
   @@index([createdAt])
   @@index([scenario])
@@ -64,6 +65,7 @@ model DiagnoseReport {
 
   session DiagnoseSession @relation(fields: [sessionId], references: [id])
   serviceCases ServiceCase[]
+  applicationOutcomes ApplicationOutcome[]
 
   @@index([sessionId])
   @@map("diagnose_reports")
@@ -275,6 +277,18 @@ enum FeedbackStage {
   day30
 }
 
+enum ApplicationOutcomeStage {
+  not_applied
+  applied
+  no_response
+  rejected
+  written_test
+  first_interview
+  second_interview
+  final_interview
+  offer
+}
+
 enum PatternType {
   diagnosis
   rewrite
@@ -432,6 +446,37 @@ model FeedbackEvent {
   @@index([serviceCaseId])
   @@index([stage])
   @@map("feedback_events")
+}
+
+model ApplicationOutcome {
+  id                     String                  @id @default(cuid())
+  diagnoseReportId       String?                 @map("diagnose_report_id")
+  diagnoseSessionId      String?                 @map("diagnose_session_id")
+  anonymousSessionId     String?                 @map("anonymous_session_id")
+  targetRole             String?                 @map("target_role")
+  companyName            String?                 @map("company_name")
+  jobTitle               String                  @map("job_title")
+  platform               String?
+  jdText                 String?                 @map("jd_text")
+  resumeVersionLabel     String?                 @map("resume_version_label")
+  outcomeStage           ApplicationOutcomeStage @map("outcome_stage")
+  rejectionReason        String?                 @map("rejection_reason")
+  interviewRound         Int?                    @map("interview_round")
+  adoptedSuggestionCount Int?                    @map("adopted_suggestion_count")
+  userNote               String?                 @map("user_note")
+  appliedAt              DateTime?               @map("applied_at")
+  createdAt              DateTime                @default(now()) @map("created_at")
+  updatedAt              DateTime                @updatedAt @map("updated_at")
+
+  diagnoseReport  DiagnoseReport?  @relation(fields: [diagnoseReportId], references: [id])
+  diagnoseSession DiagnoseSession? @relation(fields: [diagnoseSessionId], references: [id])
+
+  @@index([diagnoseReportId])
+  @@index([diagnoseSessionId])
+  @@index([anonymousSessionId])
+  @@index([outcomeStage])
+  @@index([createdAt])
+  @@map("application_outcomes")
 }
 
 // ─── KnowledgePattern（知识模式） ────────────────────────────────

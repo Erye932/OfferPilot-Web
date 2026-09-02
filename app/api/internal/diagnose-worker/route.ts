@@ -27,7 +27,7 @@ async function getPrisma() {
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-    const { task_id } = body;
+    const { task_id, force_restart = false } = body;
 
     if (!task_id || !task_id.trim()) {
       const { response, status } = Errors.validationError('缺少 task_id');
@@ -46,32 +46,96 @@ export async function POST(request: NextRequest) {
       return NextResponse.json(response, { status });
     }
 
-    // 2. 检查任务状态
-    if (task.status !== 'queued') {
+    // 2. 检查任务状态与并发控制
+    // 如果任务已在 running 状态，且未指定 force_restart 并且最近有活跃心跳（<45s），则不重复执行
+    if (task.status === 'running' && !force_restart) {
+      const inputObj = typeof task.inputJson === 'object' && task.inputJson !== null
+        ? (task.inputJson as Record<string, unknown>)
+        : {};
+      const progressMeta = inputObj._progress as { last_heartbeat_at?: string } | undefined;
+      const lastHeartbeat = progressMeta?.last_heartbeat_at
+        ? new Date(progressMeta.last_heartbeat_at).getTime()
+        : task.updatedAt.getTime();
+
+      const isRecentlyActive = (Date.now() - lastHeartbeat) < 45_000;
+      if (isRecentlyActive) {
+        return NextResponse.json({
+          success: true,
+          message: '任务正在活跃诊断中',
+          task_id: task.id,
+          status: 'running',
+        });
+      }
+    }
+
+    if (task.status === 'done') {
       return NextResponse.json({
-        success: false,
-        message: `任务状态不是 queued，当前状态：${task.status}`,
+        success: true,
+        message: '任务已完成',
         task_id: task.id,
-        status: task.status,
+        status: 'done',
+        report_id: task.reportId,
       });
     }
 
-    // 3. 更新任务状态为 running
+    const rawInput = typeof task.inputJson === 'object' && task.inputJson !== null
+      ? (task.inputJson as Record<string, unknown>)
+      : {};
+
+    // 3. 更新任务状态为 running 并初始化心跳
     await prisma.diagnoseTask.update({
       where: { id: task_id },
       data: {
         status: 'running',
-        startedAt: new Date(),
+        startedAt: task.startedAt || new Date(),
+        inputJson: {
+          ...rawInput,
+          _progress: {
+            current_step: 'prep',
+            step_label: '准备启动深度诊断工作流...',
+            progress: 5,
+            last_heartbeat_at: new Date().toISOString(),
+          },
+        },
       },
     });
 
     logInfo('DiagnoseWorker', '开始执行诊断任务', { taskId: task_id });
 
-    // 4. 解析输入并运行 V4 诊断
-    const input = task.inputJson as unknown as V4DiagnoseInput;
+    // 4. 解析输入并运行 V4 诊断（传入心跳回调）
+    const input = rawInput as unknown as V4DiagnoseInput;
+
+    const onProgress = async (step: string, label: string, progress: number) => {
+      try {
+        const latestTask = await prisma.diagnoseTask.findUnique({
+          where: { id: task_id },
+          select: { inputJson: true },
+        });
+        const currentData = typeof latestTask?.inputJson === 'object' && latestTask.inputJson !== null
+          ? (latestTask.inputJson as Record<string, unknown>)
+          : {};
+        await prisma.diagnoseTask.update({
+          where: { id: task_id },
+          data: {
+            status: 'running',
+            inputJson: {
+              ...currentData,
+              _progress: {
+                current_step: step,
+                step_label: label,
+                progress,
+                last_heartbeat_at: new Date().toISOString(),
+              },
+            },
+          },
+        });
+      } catch (err) {
+        logInfo('DiagnoseWorker', '心跳更新略过', { error: String(err) });
+      }
+    };
 
     try {
-      const { reportId } = await runV4DiagnosisAndSave(input);
+      const { reportId } = await runV4DiagnosisAndSave(input, { onProgress });
 
       // 5. 更新任务为 done
       await prisma.diagnoseTask.update({

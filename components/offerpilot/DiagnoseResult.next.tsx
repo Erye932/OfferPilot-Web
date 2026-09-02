@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import AppTopNav from "@/components/offerpilot/AppTopNav";
 import ReportV4 from "@/components/offerpilot/report-v4/ReportV4";
+import ApplicationOutcomePanel from "@/components/offerpilot/ApplicationOutcomePanel";
 import type {
   FreeDiagnoseResponse,
   RewriteExample,
@@ -244,6 +245,7 @@ export default function DiagnoseResult({ reportId }: DiagnoseResultProps) {
   }
 
   const { scenario } = report;
+  const effectiveReportId = reportId ?? (report.metadata as { report_id?: string } | undefined)?.report_id;
 
   // ─── V4 detection（最高优先级，覆盖所有旧逻辑）───────────────
   // 当后端返回 schema_version === '4.0' 时，直接渲染新版组件树
@@ -253,7 +255,7 @@ export default function DiagnoseResult({ reportId }: DiagnoseResultProps) {
       <div className="min-h-screen bg-neutral-50 text-neutral-800">
         <AppTopNav current="result" />
         <main className="w-full">
-          <ReportV4 report={v4Maybe} />
+          <ReportV4 report={v4Maybe} reportId={effectiveReportId} />
         </main>
       </div>
     );
@@ -306,7 +308,7 @@ export default function DiagnoseResult({ reportId }: DiagnoseResultProps) {
               </div>
             </section>
             <aside className="lg:col-span-4">
-              <ActionSidebar report={report} onContinue={() => handleContinueOptimize()} />
+              <ActionSidebar report={report} reportId={effectiveReportId} onContinue={() => handleContinueOptimize()} />
             </aside>
           </div>
         </main>
@@ -368,7 +370,7 @@ export default function DiagnoseResult({ reportId }: DiagnoseResultProps) {
               </div>
             </section>
             <aside className="lg:col-span-4">
-              <ActionSidebar report={report} onContinue={() => handleContinueOptimize()} />
+              <ActionSidebar report={report} reportId={effectiveReportId} onContinue={() => handleContinueOptimize()} />
             </aside>
           </div>
         </main>
@@ -570,7 +572,7 @@ export default function DiagnoseResult({ reportId }: DiagnoseResultProps) {
 
         {/* ActionSidebar moved to bottom to avoid interference with issue details */}
         <div className="mt-6 lg:mt-8">
-          <ActionSidebar report={report} onContinue={() => handleContinueOptimize()} />
+          <ActionSidebar report={report} reportId={effectiveReportId} onContinue={() => handleContinueOptimize()} />
         </div>
       </main>
 
@@ -890,9 +892,11 @@ function DetailPanel({
 // ─── Action Sidebar ──────────────────────────────────────────
 function ActionSidebar({
   report,
+  reportId,
   onContinue,
 }: {
   report: DiagnoseReport;
+  reportId?: string;
   onContinue: () => void;
 }) {
   const priorityActions = report.priority_actions || [];
@@ -979,6 +983,8 @@ function ActionSidebar({
             </Link>
           </div>
         </div>
+
+        <ApplicationOutcomePanel reportId={reportId} targetRole={report.metadata?.target_role} />
 
         {report.metadata?.target_role && (
           <div className="rounded-xl bg-neutral-50/50 px-4 py-3">

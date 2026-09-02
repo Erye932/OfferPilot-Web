@@ -111,7 +111,7 @@ export async function GET() {
     const tableCheckStartedAt = Date.now();
     const tableRows = await withTimeout<Array<{ exists: string | null }>>(
       prisma.$queryRaw`
-        SELECT to_regclass('public.diagnose_tasks') AS exists
+        SELECT to_regclass('public.diagnose_tasks')::text AS exists
       `,
       'diagnose_tasks_table'
     );

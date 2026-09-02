@@ -1,6 +1,7 @@
 import type { NextRequest } from 'next/server';
 import { NextResponse } from 'next/server';
 import type { FreeDiagnoseResponse } from '@/lib/diagnose/types';
+import { createDemoSafeDiagnoseReport, isDemoSafeReportId } from '@/lib/demo-safe-mode';
 
 // 惰性导入 prisma，避免 build 阶段 eager 加载 pg 驱动
 async function getPrisma() {
@@ -20,6 +21,24 @@ export async function GET(
         { error: '缺少报告ID' },
         { status: 400 }
       );
+    }
+
+    if (isDemoSafeReportId(id)) {
+      const report = createDemoSafeDiagnoseReport({
+        resume_text: '比赛安全模式演示简历：参与校园招聘系统项目，负责需求梳理、数据看板和简历诊断流程设计。',
+        target_role: 'AI 产品经理 / 就业服务平台运营',
+        jd_text: '负责 AI 产品方案、数据分析、用户增长和业务闭环设计。',
+      });
+
+      return NextResponse.json({
+        ...report,
+        metadata: {
+          ...report.metadata,
+          report_id: id,
+          session_id: 'demo-safe-session',
+          created_at: report.metadata.generated_at,
+        },
+      });
     }
 
     const prisma = await getPrisma();

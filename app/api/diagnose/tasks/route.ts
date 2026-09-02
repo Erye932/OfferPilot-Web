@@ -2,8 +2,10 @@ import type { NextRequest } from 'next/server';
 import { NextResponse } from 'next/server';
 import { diagnoseRequestSchema } from '@/lib/diagnose/types';
 import { logInfo, logWarn, Errors } from '@/lib/error-handler';
+import { createDemoSafeReportId, createDemoSafeTaskId, isDemoSafeModeEnabled } from '@/lib/demo-safe-mode';
 
-const DB_STEP_TIMEOUT_MS = 2500;
+const DB_STEP_TIMEOUT_MS = Number(process.env.DIAGNOSE_DB_STEP_TIMEOUT_MS ?? 10_000);
+const INLINE_WORKER_TRIGGER_ENABLED = process.env.DIAGNOSE_INLINE_WORKER_TRIGGER !== 'false';
 
 class StageTimeoutError extends Error {
   constructor(public readonly stage: 'prisma_import' | 'diagnose_task_create') {
@@ -43,9 +45,13 @@ function triggerWorkerInBackground(request: NextRequest, taskId: string): void {
   try {
     const origin = new URL(request.url).origin;
     const workerUrl = `${origin}/api/internal/diagnose-worker`;
+    const workerSecret = process.env.INTERNAL_WORKER_SECRET || process.env.CRON_SECRET;
     void fetch(workerUrl, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: {
+        'Content-Type': 'application/json',
+        ...(workerSecret ? { Authorization: `Bearer ${workerSecret}` } : {}),
+      },
       body: JSON.stringify({ task_id: taskId }),
       // Avoid hanging the connection; we just need the request to be sent.
       keepalive: true,
@@ -82,6 +88,16 @@ export async function POST(request: NextRequest) {
       return NextResponse.json(response, { status });
     }
 
+    if (isDemoSafeModeEnabled()) {
+      const taskId = createDemoSafeTaskId();
+      return NextResponse.json({
+        task_id: taskId,
+        status: 'done',
+        report_id: createDemoSafeReportId(taskId),
+        mode: 'demo_safe',
+      });
+    }
+
     const validatedAt = Date.now();
     const prisma = await withStageTimeout(getPrisma(), 'prisma_import');
     const prismaReadyAt = Date.now();
@@ -108,7 +124,9 @@ export async function POST(request: NextRequest) {
     // Fire-and-forget: kick off the worker immediately so the user does not
     // have to wait for the next cron tick. We deliberately do NOT await, and any
     // failure here is silent — Vercel Cron sweeps queued tasks as a backstop.
-    triggerWorkerInBackground(request, task.id);
+    if (INLINE_WORKER_TRIGGER_ENABLED) {
+      triggerWorkerInBackground(request, task.id);
+    }
 
     return NextResponse.json({ task_id: task.id, status: 'queued' });
   } catch (error) {

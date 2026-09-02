@@ -5,7 +5,7 @@ import { logError } from '../error-handler';
 
 // 资源保护配置
 const MAX_PDF_PAGES = 50; // 最多处理50页
-const EXTRACT_TIMEOUT_MS = 30000; // 30秒超时
+const EXTRACT_TIMEOUT_MS = Number.parseInt(process.env.PDF_PARSE_TIMEOUT_MS || '30000', 10); // 30秒超时
 
 // pdfjs TextItem 的最小接口
 export interface TextItem {
@@ -360,6 +360,9 @@ export async function extractPdfText(data: Uint8Array, fileName: string): Promis
     }
     if (/invalid|corrupt|malformed|unexpected/i.test(msg)) {
       throw new Error('corrupt');
+    }
+    if (/timeout|超时/i.test(msg)) {
+      throw new Error('parse_timeout');
     }
     throw new Error('parse_failed');
   }

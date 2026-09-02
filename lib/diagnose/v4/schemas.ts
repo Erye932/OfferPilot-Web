@@ -192,7 +192,7 @@ export const resumeMasterOutputSchema = z.object({
       severity: severitySchema,
       affected_sections: z.array(sectionTypeSchema),
     })
-  ),
+  ).default([]),
 });
 
 export type ResumeMasterOutput = z.infer<typeof resumeMasterOutputSchema>;
@@ -289,7 +289,15 @@ const synthesizedCommentSchema = z.object({
   title: z.string(),
   one_liner: z.string(),
   why_it_hurts: z.string(),
-  impact_on: z.array(impactSurfaceSchema).default([]),
+  impact_on: z
+    .array(z.string())
+    .nullish()
+    .transform((arr) => {
+      if (!arr) return [];
+      const valid = new Set(['ats', 'hr_6s', 'hr_30s', 'interview', 'combined']);
+      return arr.filter((x): x is ImpactSurface => valid.has(x));
+    })
+    .default([]),
   fix_type: fixTypeSchema,
   evidence_quote: z.string(),
   evidence_location: sourceLocationSchema,
@@ -299,32 +307,67 @@ const synthesizedCommentSchema = z.object({
   credibility_concern: credibilityConcernSchema.nullish().transform((v) => v ?? undefined),
 });
 
-export const finalSynthesisOutputSchema = z.object({
+export const finalSynthesisOutputSchema = z.preprocess((val: any) => {
+  if (typeof val !== 'object' || val === null) return val;
+  const copy = { ...val };
+  // 1. total_assessment normalization
+  if (!copy.total_assessment) {
+    copy.total_assessment = copy.overall_assessment || copy.total_evaluation || copy.summary || copy.overview || copy.one_line_verdict || '';
+  }
+  // 2. scenario normalization
+  if (!copy.scenario || !['normal', 'excellent', 'insufficient_input'].includes(copy.scenario)) {
+    copy.scenario = 'normal';
+  }
+  // 3. risks normalization
+  if (!copy.risks || typeof copy.risks !== 'object') {
+    copy.risks = {
+      ats_risk: { level: 'medium', reasons: [] },
+      hr_risk: { level: 'medium', reasons: [] },
+      interview_risk: { level: 'medium', reasons: [] },
+    };
+  } else {
+    for (const k of ['ats_risk', 'hr_risk', 'interview_risk'] as const) {
+      if (!copy.risks[k]) {
+        copy.risks[k] = { level: 'medium', reasons: [] };
+      } else {
+        if (!copy.risks[k].level || !['low', 'medium', 'high'].includes(copy.risks[k].level)) {
+          copy.risks[k].level = 'medium';
+        }
+        if (!Array.isArray(copy.risks[k].reasons)) copy.risks[k].reasons = [];
+      }
+    }
+  }
+  // 4. comments normalization
+  if (!Array.isArray(copy.comments)) {
+    copy.comments = [];
+  }
+  return copy;
+}, z.object({
   /** AI 整合后的全量 comment 列表（不含规则探针出的 missing_info — 那个由代码合并） */
-  comments: z.array(synthesizedCommentSchema),
+  comments: z.array(synthesizedCommentSchema).default([]),
 
   /** 顶部总评 */
-  total_assessment: z.string(),
+  total_assessment: z.string().default(''),
 
   /** 整体场景（normal / excellent / insufficient_input） */
-  scenario: z.enum(['normal', 'excellent', 'insufficient_input']),
+  scenario: z.enum(['normal', 'excellent', 'insufficient_input']).default('normal'),
 
   /** 跨段风险结论 */
   risks: z.object({
     ats_risk: z.object({
-      level: z.enum(['low', 'medium', 'high']),
-      reasons: z.array(z.string()),
+      level: z.enum(['low', 'medium', 'high']).default('medium'),
+      reasons: z.array(z.string()).default([]),
     }),
     hr_risk: z.object({
-      level: z.enum(['low', 'medium', 'high']),
-      reasons: z.array(z.string()),
+      level: z.enum(['low', 'medium', 'high']).default('medium'),
+      reasons: z.array(z.string()).default([]),
     }),
     interview_risk: z.object({
-      level: z.enum(['low', 'medium', 'high']),
-      reasons: z.array(z.string()),
+      level: z.enum(['low', 'medium', 'high']).default('medium'),
+      reasons: z.array(z.string()).default([]),
     }),
   }),
-});
+}));
 
 export type FinalSynthesisOutput = z.infer<typeof finalSynthesisOutputSchema>;
 export type SynthesizedComment = z.infer<typeof synthesizedCommentSchema>;

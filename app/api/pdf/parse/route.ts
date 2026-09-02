@@ -4,6 +4,9 @@ import { getOrCreateAnonymousSessionId, checkRateLimit, recordUsage, setAnonymou
 import { logError, logWarn, Errors, createErrorResponse } from '@/lib/error-handler';
 export const runtime = "nodejs";
 
+const PDF_MAX_UPLOAD_MB = Number.parseInt(process.env.PDF_MAX_UPLOAD_MB || '10', 10);
+const PDF_MAX_UPLOAD_BYTES = PDF_MAX_UPLOAD_MB * 1024 * 1024;
+
 // 扩展点说明：
 // 1. 文件存储：集成云存储服务（如S3、OSS）保存原始PDF文件
 // 2. 病毒扫描：上传前进行恶意文件检测
@@ -18,15 +21,17 @@ type PdfErrorType =
   | 'encrypted'
   | 'no_text'
   | 'corrupt'
+  | 'parse_timeout'
   | 'parse_failed';
 
 const PDF_ERRORS: Record<PdfErrorType, { code: string; message: string; status: number }> = {
   no_file:      { code: 'PDF_NO_FILE',       message: '未上传文件',                                                                 status: 400 },
   invalid_type: { code: 'PDF_INVALID_TYPE',  message: '仅支持 PDF 文件，请选择 PDF 或改为手动粘贴文本',                                 status: 400 },
-  too_large:    { code: 'PDF_TOO_LARGE',     message: '文件大小不能超过 10MB',                                                      status: 400 },
+  too_large:    { code: 'PDF_TOO_LARGE',     message: `文件大小不能超过 ${PDF_MAX_UPLOAD_MB}MB`,                                     status: 400 },
   encrypted:    { code: 'PDF_ENCRYPTED',     message: 'PDF 文件已加密，请先解除密码保护再上传，或改为手动粘贴文本',                          status: 400 },
   no_text:      { code: 'PDF_NO_TEXT_LAYER', message: 'PDF 未提取到文本，可能是扫描版 / 图片 PDF，请改为手动粘贴',                          status: 400 },
   corrupt:      { code: 'PDF_CORRUPT',       message: 'PDF 文件可能已损坏，请重新导出后上传，或改为手动粘贴文本',                             status: 400 },
+  parse_timeout:{ code: 'PDF_PARSE_TIMEOUT', message: 'PDF 解析超时，请尝试减小文件大小或页数，或改为手动粘贴文本',                           status: 400 },
   parse_failed: { code: 'PDF_PARSE_FAILED',  message: 'PDF 解析失败，请确保文件为文本型 PDF（非扫描 / 图片版），或改为手动粘贴文本',            status: 500 },
 };
 
@@ -100,7 +105,7 @@ export async function POST(request: NextRequest) {
     if (file.type !== 'application/pdf' && !file.name.toLowerCase().endsWith('.pdf')) {
       return errorResponse('invalid_type', undefined, headers);
     }
-    if (file.size > 10 * 1024 * 1024) return errorResponse('too_large', undefined, headers);
+    if (file.size > PDF_MAX_UPLOAD_BYTES) return errorResponse('too_large', undefined, headers);
 
     // 匿名会话标识与限流（使用已生成的 sessionId）
     const rateLimit = await checkRateLimit(sessionId, 'pdf_parse', 'free');
@@ -184,11 +189,13 @@ export async function POST(request: NextRequest) {
       // 根据错误消息类型返回相应的错误响应
       if (msg === 'encrypted') return errorResponse('encrypted', { uploadedFileId }, headers);
       if (msg === 'corrupt') return errorResponse('corrupt', { uploadedFileId }, headers);
+      if (msg === 'parse_timeout') return errorResponse('parse_timeout', { uploadedFileId }, headers);
       if (msg === 'parse_failed') return errorResponse('parse_failed', { uploadedFileId }, headers);
 
       // 如果是其他错误，检查是否包含特定关键词
       if (/password/i.test(msg)) return errorResponse('encrypted', { uploadedFileId }, headers);
       if (/invalid|corrupt|malformed|unexpected/i.test(msg)) return errorResponse('corrupt', { uploadedFileId }, headers);
+      if (/timeout|超时/i.test(msg)) return errorResponse('parse_timeout', { uploadedFileId }, headers);
 
       return errorResponse('parse_failed', { uploadedFileId }, headers);
     }

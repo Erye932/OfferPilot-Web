@@ -11,25 +11,18 @@ export interface NavItem {
 }
 
 export interface CommonNavProps {
-  /** 导航项列表，如果未提供则使用默认值 */
   navItems?: NavItem[];
-  /** 当前激活的页面 key（可选） */
   current?: string;
-  /** 是否显示在 landing 页面（影响一些样式细节） */
   variant?: "landing" | "app";
-  /** AuthModal 按钮的类名（可选） */
   authButtonClassName?: string;
-  /** 是否显示品牌 Logo 链接 */
   showBrand?: boolean;
-  /** 品牌链接的类名（可选） */
   brandClassName?: string;
 }
 
 const DEFAULT_NAV_ITEMS: NavItem[] = [
-  { key: "home", label: "首页", href: "/" },
-  { key: "recommendations", label: "岗位推荐", href: "/recommendations" },
-  { key: "interview", label: "面试追问", href: "/interview" },
-  { key: "sample", label: "示例结果", href: "/demo/result" },
+  { key: "diagnose", label: "开始诊断", href: "/diagnose" },
+  { key: "sample", label: "诊断样例", href: "/demo/result" },
+  { label: "学校端", href: "/school/dashboard" },
 ];
 
 export default function CommonNav({
@@ -42,7 +35,6 @@ export default function CommonNav({
 }: CommonNavProps) {
   const [mobileOpen, setMobileOpen] = useState(false);
 
-  // ESC 键关闭移动菜单
   useEffect(() => {
     if (!mobileOpen) return;
 
@@ -56,14 +48,9 @@ export default function CommonNav({
     return () => window.removeEventListener("keydown", handleEsc);
   }, [mobileOpen]);
 
-  // 根据 variant 决定样式变量
-  const borderColor = variant === "landing" ? "border-neutral-200" : "border-neutral-300";
-  const hoverBorderColor = variant === "landing" ? "hover:border-neutral-400" : "hover:border-neutral-500";
-  const mobileMenuBorderColor = variant === "landing" ? "border-neutral-200" : "border-neutral-300";
-  const mobileMenuTop = variant === "landing" ? "top-20" : "top-16";
-  const mobileMenuRounded = variant === "landing" ? "rounded-xl" : "rounded-lg";
+  const borderColor = "border-neutral-200";
+  const hoverBorderColor = "hover:border-neutral-900";
 
-  // 检查是否是激活状态
   const isActive = (item: NavItem) => {
     if (!current) return false;
     return item.key ? current === item.key : false;
@@ -71,31 +58,30 @@ export default function CommonNav({
 
   return (
     <>
-      <header className={variant === "landing" ? "relative z-10" : "border-b border-neutral-200 bg-white"}>
-        <div className={`mx-auto flex items-center justify-between gap-6 py-2 ${variant === "landing" ? "max-w-6xl" : "h-14 w-full max-w-7xl px-4 sm:px-6 lg:px-8"}`}>
+      <header className="sticky top-0 z-40 h-14 border-b border-neutral-200 bg-white/95 backdrop-blur-md">
+        <div className="mx-auto flex h-full max-w-6xl items-center justify-between px-4 sm:px-6 lg:px-8">
           {showBrand && (
             <Link
               href="/"
-              className={brandClassName || "text-lg font-semibold tracking-tight text-neutral-900 transition hover:text-neutral-700"}
+              className={brandClassName || "flex items-center gap-2.5 text-sm font-bold tracking-tight text-neutral-950"}
             >
-              OFFERPILOT
+              <span className="h-2 w-2 bg-neutral-950" />
+              OfferPilot
             </Link>
           )}
 
-          <div className="hidden items-center gap-6 md:flex">
-            <nav className="flex items-center gap-6 text-sm text-neutral-600">
-              {navItems.map((item) => {
+          <div className="hidden items-center gap-8 md:flex">
+            <nav className="flex items-center gap-6 text-xs font-medium text-neutral-600">
+              {navItems.map((item, index) => {
                 const active = isActive(item);
                 return (
                   <Link
-                    key={item.key || item.href}
+                    key={item.key || `${item.href}-${index}`}
                     href={item.href}
                     className={
-                      current
-                        ? active
-                          ? "font-medium text-neutral-900"
-                          : "font-medium text-neutral-600 transition hover:text-neutral-900"
-                        : "transition hover:text-neutral-900"
+                      active
+                        ? "text-neutral-950 font-bold border-b border-neutral-950 pb-0.5"
+                        : "transition hover:text-neutral-950"
                     }
                   >
                     {item.label}
@@ -107,7 +93,7 @@ export default function CommonNav({
             <AuthModal
               buttonClassName={
                 authButtonClassName ||
-                `rounded-md border ${borderColor} bg-white px-4 py-2 text-sm font-medium text-neutral-700 transition ${hoverBorderColor} hover:text-neutral-900 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary`
+                `border ${borderColor} bg-white px-3.5 py-1.5 text-xs font-medium text-neutral-900 transition-colors ${hoverBorderColor} hover:bg-neutral-50`
               }
             />
           </div>
@@ -118,31 +104,15 @@ export default function CommonNav({
             aria-label={mobileOpen ? "关闭导航" : "打开导航"}
             aria-expanded={mobileOpen}
             onClick={() => setMobileOpen((prev) => !prev)}
-            className={`inline-flex h-10 w-10 items-center justify-center rounded-md border ${borderColor} bg-white text-neutral-700 transition ${hoverBorderColor} hover:text-neutral-900 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary md:hidden`}
+            className={`inline-flex h-9 w-9 items-center justify-center border ${borderColor} bg-white text-neutral-900 transition-colors ${hoverBorderColor} md:hidden`}
           >
             {mobileOpen ? (
-              <svg
-                viewBox="0 0 24 24"
-                className="h-5 w-5"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="1.9"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              >
+              <svg viewBox="0 0 24 24" className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth="2">
                 <path d="M18 6 6 18" />
                 <path d="m6 6 12 12" />
               </svg>
             ) : (
-              <svg
-                viewBox="0 0 24 24"
-                className="h-5 w-5"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="1.9"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              >
+              <svg viewBox="0 0 24 24" className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth="2">
                 <path d="M4 7h16" />
                 <path d="M4 12h16" />
                 <path d="M4 17h16" />
@@ -156,22 +126,22 @@ export default function CommonNav({
       {mobileOpen && (
         <div className="md:hidden">
           <div
-            className="fixed inset-0 z-40 bg-neutral-900/15"
+            className="fixed inset-0 z-40 bg-neutral-900/20"
             onClick={() => setMobileOpen(false)}
           />
-          <div className={`fixed inset-x-4 ${mobileMenuTop} z-50 ${mobileMenuRounded} border ${mobileMenuBorderColor} bg-white p-6`}>
-            <nav className="flex flex-col gap-0.5">
-              {navItems.map((item) => {
+          <div className="fixed inset-x-0 top-14 z-50 border-b border-neutral-200 bg-white p-6 shadow-sm">
+            <nav className="flex flex-col gap-2">
+              {navItems.map((item, index) => {
                 const active = isActive(item);
                 return (
                   <Link
-                    key={item.key || item.href}
+                    key={item.key || `${item.href}-${index}`}
                     href={item.href}
                     onClick={() => setMobileOpen(false)}
                     className={
-                      current && active
-                        ? `rounded-md bg-neutral-100 px-4 py-3 text-sm font-medium text-neutral-900`
-                        : `rounded-md px-4 py-3 text-sm font-medium text-neutral-700 transition hover:bg-neutral-100 hover:text-neutral-900 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary`
+                      active
+                        ? "bg-neutral-100 px-3 py-2 text-xs font-bold text-neutral-950"
+                        : "px-3 py-2 text-xs font-medium text-neutral-700 transition hover:bg-neutral-50 hover:text-neutral-950"
                     }
                   >
                     {item.label}
@@ -180,10 +150,10 @@ export default function CommonNav({
               })}
             </nav>
 
-            <div className={`mt-4 border-t ${borderColor} pt-4`}>
+            <div className="mt-4 border-t border-neutral-100 pt-4">
               <AuthModal
                 buttonLabel="登录"
-                buttonClassName={`w-full rounded-md border ${borderColor} bg-white px-4 py-3 text-sm font-medium text-neutral-700 transition ${hoverBorderColor} hover:text-neutral-900 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary`}
+                buttonClassName="w-full border border-neutral-200 bg-white px-4 py-2 text-xs font-medium text-neutral-900 transition-colors hover:border-neutral-900"
               />
             </div>
           </div>
