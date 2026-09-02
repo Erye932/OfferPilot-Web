@@ -93,17 +93,11 @@ interface SchoolDashboardData {
 }
 
 const REVIEW_STATUS_META: Record<ReviewStatus, { label: string; className: string }> = {
-  not_submitted: { label: '未提交', className: 'border-neutral-200 bg-neutral-50 text-neutral-500' },
-  submitted: { label: '待审核', className: 'border-sky-300 bg-sky-50 text-sky-800' },
-  needs_revision: { label: '需修改', className: 'border-amber-300 bg-amber-50 text-amber-800' },
-  passed: { label: '已通过', className: 'border-emerald-300 bg-emerald-50 text-emerald-800' },
-  key_guidance: { label: '重点辅导', className: 'border-red-300 bg-red-50 text-red-800' },
-};
-
-const WORKFLOW_STATUS_META: Record<WorkflowStatus, { badge: string; label: string }> = {
-  done: { badge: 'bg-emerald-50 text-emerald-800 border-emerald-300', label: '已完成' },
-  active: { badge: 'bg-neutral-950 text-white border-neutral-950', label: '进行中' },
-  pending: { badge: 'bg-neutral-50 text-neutral-400 border-neutral-200', label: '待开始' },
+  not_submitted: { label: '未提交', className: 'text-neutral-400 bg-neutral-100' },
+  submitted: { label: '待审核', className: 'text-sky-700 bg-sky-50' },
+  needs_revision: { label: '需修改', className: 'text-amber-700 bg-amber-50' },
+  passed: { label: '已通过', className: 'text-emerald-700 bg-emerald-50' },
+  key_guidance: { label: '重点辅导', className: 'text-rose-700 bg-rose-50' },
 };
 
 const LOCAL_REVIEW_STATUS_KEY = 'offerpilot.schoolDashboard.reviewStatuses.v1';
@@ -112,79 +106,6 @@ const REVIEW_ACTIONS: Array<{ status: ReviewStatus; label: string }> = [
   { status: 'needs_revision', label: '需修改' },
   { status: 'key_guidance', label: '重点辅导' },
 ];
-
-function MetricCard({ label, value, suffix }: { label: string; value: string | number; suffix?: string }) {
-  return (
-    <div className="rounded-none border border-neutral-200 bg-white p-5">
-      <p className="text-xs font-mono text-neutral-400 uppercase">{label}</p>
-      <div className="mt-2 flex items-baseline gap-1">
-        <span className="text-2xl font-bold font-mono tracking-tight text-neutral-950 sm:text-3xl">{value}</span>
-        {suffix && <span className="text-xs text-neutral-400 font-mono">{suffix}</span>}
-      </div>
-    </div>
-  );
-}
-
-function ProgressMetric({ label, value, detail }: { label: string; value: number; detail: string }) {
-  return (
-    <div className="rounded-none border border-neutral-200 bg-white p-5">
-      <div className="flex items-center justify-between gap-3">
-        <span className="text-xs font-mono text-neutral-500">{label}</span>
-        <span className="text-base font-bold font-mono text-neutral-950">{value}%</span>
-      </div>
-      <div className="mt-3 h-1.5 w-full bg-neutral-100 rounded-none overflow-hidden">
-        <div className="h-full bg-neutral-950 rounded-none" style={{ width: `${Math.min(Math.max(value, 0), 100)}%` }} />
-      </div>
-      <p className="mt-2 text-[11px] font-mono text-neutral-400">{detail}</p>
-    </div>
-  );
-}
-
-function CountList({ items, emptyText }: { items: NamedCount[]; emptyText: string }) {
-  const max = Math.max(...items.map((item) => item.count), 1);
-
-  if (items.length === 0) {
-    return <p className="text-xs text-neutral-400">{emptyText}</p>;
-  }
-
-  return (
-    <div className="space-y-3.5">
-      {items.map((item) => (
-        <div key={item.name}>
-          <div className="mb-1 flex items-center justify-between gap-3 text-xs">
-            <span className="line-clamp-1 text-neutral-700 font-medium">{item.name}</span>
-            <span className="font-mono font-bold text-neutral-950">{item.count}</span>
-          </div>
-          <div className="h-1.5 w-full bg-neutral-100 rounded-none overflow-hidden">
-            <div className="h-full bg-neutral-900 rounded-none" style={{ width: `${Math.max((item.count / max) * 100, 6)}%` }} />
-          </div>
-        </div>
-      ))}
-    </div>
-  );
-}
-
-function SectionCard({ title, children, action }: { title: string; children: React.ReactNode; action?: React.ReactNode }) {
-  return (
-    <section className="rounded-none border border-neutral-200 bg-white p-6 sm:p-8">
-      <div className="flex flex-col gap-3 sm:flex-row sm:items-baseline sm:justify-between border-b border-neutral-100 pb-4">
-        <h2 className="text-base font-bold tracking-tight text-neutral-950">{title}</h2>
-        {action}
-      </div>
-      <div className="mt-6">{children}</div>
-    </section>
-  );
-}
-
-function ReviewStatusBadge({ status }: { status: ReviewStatus }) {
-  const meta = REVIEW_STATUS_META[status] ?? REVIEW_STATUS_META.submitted;
-
-  return (
-    <span className={`inline-flex rounded-none border px-2 py-0.5 text-[11px] font-mono font-medium ${meta.className}`}>
-      {meta.label}
-    </span>
-  );
-}
 
 function readLocalReviewStatuses(): Record<string, ReviewStatus> {
   if (typeof window === 'undefined') return {};
@@ -406,10 +327,8 @@ export default function SchoolDashboardPage() {
     return (
       <div className="min-h-screen bg-white text-neutral-900">
         <AppTopNav current="diagnose" />
-        <main className="mx-auto max-w-7xl px-4 py-10 sm:px-6 lg:px-8">
-          <div className="rounded-none border border-neutral-200 bg-white p-8 text-xs font-mono text-neutral-400">
-            正在加载学校工作台数据...
-          </div>
+        <main className="mx-auto max-w-6xl px-6 py-20 text-xs font-mono text-neutral-400">
+          正在加载学校工作台数据...
         </main>
       </div>
     );
@@ -419,292 +338,361 @@ export default function SchoolDashboardPage() {
     return (
       <div className="min-h-screen bg-white text-neutral-900">
         <AppTopNav current="diagnose" />
-        <main className="mx-auto max-w-7xl px-4 py-10 sm:px-6 lg:px-8">
-          <div className="rounded-none border border-neutral-200 bg-white p-8">
-            <p className="text-xs font-mono text-neutral-500">学校看板暂时不可用。</p>
-          </div>
+        <main className="mx-auto max-w-6xl px-6 py-20">
+          <p className="text-xs font-mono text-neutral-500">学校看板暂时不可用。</p>
         </main>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-white text-neutral-900 font-sans">
+    <div className="min-h-screen bg-white text-neutral-900 font-sans pb-32">
       <AppTopNav current="diagnose" />
-      <main className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8 lg:py-12">
-        {/* Header (极简方正纸片风) */}
-        <header className="flex flex-col gap-6 border-b border-neutral-200 pb-8 lg:flex-row lg:items-end lg:justify-between">
+
+      <main className="mx-auto max-w-6xl px-6 sm:px-8 pt-10 sm:pt-14">
+        
+        {/* ── 顶部标题栏（开阔通透、纯净呼吸感） ── */}
+        <div className="flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between pb-8 border-b border-neutral-200">
           <div>
-            <div className="mb-3 inline-flex items-center gap-2 text-xs font-mono text-neutral-400">
+            <div className="flex items-center gap-2 text-xs font-mono text-neutral-400 mb-3">
               <span className="h-1.5 w-1.5 bg-blue-600" />
-              <span>{data.dataMode === 'demo' ? 'DEMO DATA' : 'LIVE DATA'} · {new Date(data.generatedAt).toLocaleString('zh-CN')}</span>
+              <span>{data.dataMode === 'demo' ? 'DEMO DATA' : 'LIVE DATA'} · {new Date(data.generatedAt).toLocaleDateString('zh-CN')}</span>
             </div>
             <h1 className="text-3xl font-extrabold tracking-tight text-neutral-950 sm:text-4xl">
               就业材料质量管理工作台
             </h1>
-            <p className="mt-3 max-w-3xl text-xs sm:text-sm leading-relaxed text-neutral-500">
-              面向学校 / 老师的任务制闭环：创建诊断任务、追踪学生提交、查看 AI 诊断、审核修改结果，并导出班级质量报告。
+            <p className="mt-2.5 max-w-2xl text-xs sm:text-sm leading-relaxed text-neutral-500">
+              面向学校与老师的任务制闭环：追踪学生提交、审核 AI 诊断报告，并导出班级质量分析。
             </p>
           </div>
-          <div className="flex flex-wrap items-center gap-3">
+
+          {/* 顶部操作链接 */}
+          <div className="flex flex-wrap items-center gap-4 text-xs font-medium">
             <Link
               href="/school/task/submit"
-              className="inline-flex h-9 items-center justify-center rounded-none border border-neutral-300 bg-white px-4 text-xs font-medium text-neutral-800 transition hover:border-neutral-900 hover:text-neutral-950"
+              className="text-neutral-600 hover:text-neutral-950 hover:underline underline-offset-4 transition-colors"
             >
-              学生提交入口
+              学生提交入口 ↗
             </Link>
             <button
               type="button"
               onClick={() => downloadQualityReport(data)}
-              className="inline-flex h-9 items-center justify-center rounded-none border border-neutral-300 bg-white px-4 text-xs font-medium text-neutral-800 transition hover:border-neutral-900 hover:text-neutral-950"
+              className="text-neutral-600 hover:text-neutral-950 hover:underline underline-offset-4 transition-colors"
             >
-              导出质量报告
+              导出质量报告 ↗
             </button>
             <Link
               href="/diagnose"
-              className="inline-flex h-9 items-center justify-center rounded-none bg-neutral-950 px-5 text-xs font-bold text-white transition hover:bg-neutral-800"
+              className="inline-flex h-9 items-center justify-center bg-neutral-950 px-5 text-xs font-bold text-white transition-colors hover:bg-neutral-800"
             >
               新增学生诊断 ➔
             </Link>
           </div>
-        </header>
+        </div>
 
-        {/* Task Card (连贯网格，彻底消除孤岛圆角盒) */}
-        <section className="mt-8 rounded-none border border-neutral-200 bg-white">
-          <div className="grid grid-cols-1 lg:grid-cols-[1.2fr_1fr]">
-            {/* Left side info */}
-            <div className="p-6 sm:p-8 border-b lg:border-b-0 lg:border-r border-neutral-200 flex flex-col justify-between space-y-6">
-              <div>
-                <div className="flex items-center justify-between">
-                  <span className="font-mono text-xs font-semibold text-neutral-400">
-                    {data.activeTask.id}
-                  </span>
-                  <span className="inline-flex rounded-none bg-neutral-950 px-2 py-0.5 text-[11px] font-mono font-medium text-white">
-                    {data.activeTask.status}
-                  </span>
-                </div>
-                <h2 className="mt-3 text-2xl font-bold tracking-tight text-neutral-950">
-                  {data.activeTask.title}
-                </h2>
-                <p className="mt-2 text-xs font-mono text-neutral-500">
-                  {data.activeTask.cohort}
-                </p>
+        {/* ── 核心任务大看板（开放式排版，拒绝冰冷格子） ── */}
+        <section className="pt-10 pb-12 border-b border-neutral-200">
+          <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-4">
+            <div>
+              <div className="flex items-center gap-3">
+                <span className="font-mono text-xs font-semibold text-neutral-400">
+                  {data.activeTask.id}
+                </span>
+                <span className="text-[11px] font-mono font-medium text-emerald-700 bg-emerald-50 px-2 py-0.5">
+                  {data.activeTask.status}
+                </span>
               </div>
-
-              <div className="grid gap-3 sm:grid-cols-2 border-t border-neutral-100 pt-4">
-                <div className="border-l border-neutral-900 pl-3">
-                  <span className="text-[11px] font-mono text-neutral-400 block">负责方</span>
-                  <span className="text-xs font-bold text-neutral-800">{data.activeTask.owner}</span>
-                </div>
-                <div className="border-l border-neutral-300 pl-3">
-                  <span className="text-[11px] font-mono text-neutral-400 block">截止日期</span>
-                  <span className="text-xs font-bold font-mono text-neutral-800">{data.activeTask.deadline}</span>
-                </div>
+              <h2 className="mt-2 text-2xl font-bold tracking-tight text-neutral-950 sm:text-3xl">
+                {data.activeTask.title}
+              </h2>
+              <div className="mt-2.5 flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-neutral-500 font-mono">
+                <span>{data.activeTask.cohort}</span>
+                <span>•</span>
+                <span>负责老师：{data.activeTask.owner}</span>
+                <span>•</span>
+                <span>截止时间：{data.activeTask.deadline}</span>
               </div>
             </div>
+          </div>
 
-            {/* Right side 2x2 connected metric grid */}
-            <div className="grid grid-cols-2 bg-neutral-50/40">
-              <div className="p-6 border-b border-r border-neutral-200">
-                <span className="text-xs font-mono text-neutral-400 block">任务学生数</span>
-                <span className="mt-2 block text-3xl font-bold font-mono text-neutral-950">{data.activeTask.studentTotal}</span>
+          {/* 4 项关键指标（开放排列，轻量发丝分割） */}
+          <div className="mt-10 grid grid-cols-2 md:grid-cols-4 gap-8 pt-8 border-t border-neutral-100">
+            <div>
+              <span className="text-xs font-mono text-neutral-400 block">任务学生数</span>
+              <span className="mt-1 block text-3xl font-extrabold font-mono tracking-tight text-neutral-950">
+                {data.activeTask.studentTotal}
+              </span>
+            </div>
+            <div>
+              <span className="text-xs font-mono text-neutral-400 block">已提交材料</span>
+              <span className="mt-1 block text-3xl font-extrabold font-mono tracking-tight text-neutral-950">
+                {data.activeTask.submittedCount}
+              </span>
+            </div>
+            <div>
+              <span className="text-xs font-mono text-neutral-400 block">已修改经历</span>
+              <span className="mt-1 block text-3xl font-extrabold font-mono tracking-tight text-neutral-950">
+                {data.activeTask.revisedCount}
+              </span>
+            </div>
+            <div>
+              <span className="text-xs font-mono text-neutral-400 block">达到通过标准</span>
+              <span className="mt-1 block text-3xl font-extrabold font-mono tracking-tight text-neutral-950">
+                {data.activeTask.passedCount}
+              </span>
+            </div>
+          </div>
+
+          {/* 3 条轻薄进度 */}
+          <div className="mt-10 grid grid-cols-1 md:grid-cols-3 gap-8 pt-8 border-t border-neutral-100">
+            <div>
+              <div className="flex items-baseline justify-between text-xs mb-2">
+                <span className="text-neutral-500">提交率</span>
+                <span className="font-mono font-bold text-neutral-950">{data.taskMetrics.submissionRate}%</span>
               </div>
-              <div className="p-6 border-b border-neutral-200">
-                <span className="text-xs font-mono text-neutral-400 block">已提交</span>
-                <span className="mt-2 block text-3xl font-bold font-mono text-neutral-950">{data.activeTask.submittedCount}</span>
+              <div className="h-1 w-full bg-neutral-100 overflow-hidden">
+                <div className="h-full bg-neutral-950" style={{ width: `${data.taskMetrics.submissionRate}%` }} />
               </div>
-              <div className="p-6 border-r border-neutral-200">
-                <span className="text-xs font-mono text-neutral-400 block">已修改</span>
-                <span className="mt-2 block text-3xl font-bold font-mono text-neutral-950">{data.activeTask.revisedCount}</span>
+              <span className="mt-2 block text-[11px] font-mono text-neutral-400">
+                {data.activeTask.submittedCount} / {data.activeTask.studentTotal} 人已提交
+              </span>
+            </div>
+
+            <div>
+              <div className="flex items-baseline justify-between text-xs mb-2">
+                <span className="text-neutral-500">修改率</span>
+                <span className="font-mono font-bold text-neutral-950">{data.taskMetrics.revisionRate}%</span>
               </div>
-              <div className="p-6">
-                <span className="text-xs font-mono text-neutral-400 block">已通过</span>
-                <span className="mt-2 block text-3xl font-bold font-mono text-neutral-950">{data.activeTask.passedCount}</span>
+              <div className="h-1 w-full bg-neutral-100 overflow-hidden">
+                <div className="h-full bg-neutral-950" style={{ width: `${data.taskMetrics.revisionRate}%` }} />
               </div>
+              <span className="mt-2 block text-[11px] font-mono text-neutral-400">
+                {data.activeTask.revisedCount} 人完成至少一轮修改
+              </span>
+            </div>
+
+            <div>
+              <div className="flex items-baseline justify-between text-xs mb-2">
+                <span className="text-neutral-500">通过率</span>
+                <span className="font-mono font-bold text-neutral-950">{data.taskMetrics.passRate}%</span>
+              </div>
+              <div className="h-1 w-full bg-neutral-100 overflow-hidden">
+                <div className="h-full bg-neutral-950" style={{ width: `${data.taskMetrics.passRate}%` }} />
+              </div>
+              <span className="mt-2 block text-[11px] font-mono text-neutral-400">
+                {data.activeTask.passedCount} 人达到投递标准
+              </span>
             </div>
           </div>
         </section>
 
-        {/* 3 Progress Bars */}
-        <section className="mt-6 grid gap-4 md:grid-cols-3">
-          <ProgressMetric label="提交率" value={data.taskMetrics.submissionRate} detail={`${data.activeTask.submittedCount} / ${data.activeTask.studentTotal} 人已提交`} />
-          <ProgressMetric label="修改率" value={data.taskMetrics.revisionRate} detail={`${data.activeTask.revisedCount} 人已完成至少一轮修改`} />
-          <ProgressMetric label="通过率" value={data.taskMetrics.passRate} detail={`${data.activeTask.passedCount} 人已达到投递标准`} />
-        </section>
+        {/* ── B2B2C 闭环流程（优雅平铺时间轴，彻底消除 7 个拥挤小框） ── */}
+        <section className="pt-10 pb-12 border-b border-neutral-200">
+          <div className="mb-8">
+            <span className="text-xs font-mono uppercase tracking-widest text-neutral-400 block">
+              Workflow
+            </span>
+            <h3 className="mt-1 text-lg font-bold text-neutral-950">
+              B2B2C 任务闭环流程
+            </h3>
+          </div>
 
-        {/* B2B2C Workflow (7联版连贯方正网格) */}
-        <div className="mt-8">
-          <SectionCard title="B2B2C 任务闭环流程">
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 xl:grid-cols-7 border border-neutral-200 bg-white">
-              {data.workflow.map((step, index) => {
-                const meta = WORKFLOW_STATUS_META[step.status] ?? WORKFLOW_STATUS_META.pending;
-                return (
-                  <div
-                    key={`${step.label}-${index}`}
-                    className={`p-4 sm:p-5 flex flex-col justify-between ${
-                      index !== data.workflow.length - 1 ? 'border-b xl:border-b-0 xl:border-r border-neutral-200' : ''
-                    } ${step.status === 'active' ? 'bg-neutral-50/70' : 'bg-white'}`}
-                  >
-                    <div>
-                      <div className="flex items-center justify-between">
-                        <span className="font-mono text-xs font-bold text-neutral-300">0{index + 1}</span>
-                        <span className={`inline-flex rounded-none border px-1.5 py-0.5 text-[10px] font-mono font-medium ${meta.badge}`}>
-                          {meta.label}
-                        </span>
-                      </div>
-                      <h4 className="mt-3 text-xs font-bold text-neutral-950">{step.label}</h4>
-                      <p className="mt-1.5 text-[11px] leading-relaxed text-neutral-500">{step.description}</p>
-                    </div>
+          <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-7 gap-6">
+            {data.workflow.map((step, index) => {
+              return (
+                <div key={`${step.label}-${index}`} className="space-y-1.5">
+                  <div className="flex items-center gap-1.5 font-mono text-xs">
+                    <span className="font-bold text-neutral-400">0{index + 1}</span>
+                    <span className="text-neutral-300">/</span>
+                    <span className={`text-[11px] ${step.status === 'done' ? 'text-emerald-700 font-medium' : step.status === 'active' ? 'text-neutral-950 font-bold' : 'text-neutral-400'}`}>
+                      {step.status === 'done' ? '完成' : step.status === 'active' ? '当前' : '未开始'}
+                    </span>
                   </div>
-                );
-              })}
+                  <h4 className="text-xs font-bold text-neutral-950 pt-1">
+                    {step.label}
+                  </h4>
+                  <p className="text-[11px] leading-relaxed text-neutral-500">
+                    {step.description}
+                  </p>
+                </div>
+              );
+            })}
+          </div>
+        </section>
+
+        {/* ── 全局质量全景与提升（开放数据行） ── */}
+        <section className="pt-10 pb-12 border-b border-neutral-200">
+          <div className="mb-8">
+            <span className="text-xs font-mono uppercase tracking-widest text-neutral-400 block">
+              Overview
+            </span>
+            <h3 className="mt-1 text-lg font-bold text-neutral-950">
+              全景数据与提分变化
+            </h3>
+          </div>
+
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-8">
+            <div>
+              <span className="text-xs font-mono text-neutral-400 block">服务学生数</span>
+              <span className="mt-1 block text-2xl font-bold font-mono text-neutral-950">{data.metrics.studentCount}</span>
             </div>
-          </SectionCard>
-        </div>
-
-        {/* Global Overview Metrics */}
-        <section className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-          <MetricCard label="学生 / 会话" value={data.metrics.studentCount} />
-          <MetricCard label="诊断报告" value={data.metrics.reportCount} />
-          <MetricCard label="待老师审核" value={data.taskMetrics.pendingReviewCount} />
-          <MetricCard label="需修改 / 重点辅导" value={data.taskMetrics.needsRevisionCount} />
+            <div>
+              <span className="text-xs font-mono text-neutral-400 block">累计诊断报告</span>
+              <span className="mt-1 block text-2xl font-bold font-mono text-neutral-950">{data.metrics.reportCount}</span>
+            </div>
+            <div>
+              <span className="text-xs font-mono text-neutral-400 block">待审核学生</span>
+              <span className="mt-1 block text-2xl font-bold font-mono text-sky-700">{data.taskMetrics.pendingReviewCount}</span>
+            </div>
+            <div>
+              <span className="text-xs font-mono text-neutral-400 block">需重点辅导</span>
+              <span className="mt-1 block text-2xl font-bold font-mono text-amber-700">{data.taskMetrics.needsRevisionCount}</span>
+            </div>
+            <div>
+              <span className="text-xs font-mono text-neutral-400 block">改前平均分</span>
+              <span className="mt-1 block text-2xl font-bold font-mono text-neutral-500">{data.metrics.averageScoreBefore ?? '-'}</span>
+            </div>
+            <div>
+              <span className="text-xs font-mono text-neutral-400 block">改后提升</span>
+              <span className="mt-1 block text-2xl font-bold font-mono text-emerald-700">
+                {improvement === null ? '-' : `+${improvement} 分`}
+              </span>
+            </div>
+          </div>
         </section>
 
-        <section className="mt-4 grid gap-4 sm:grid-cols-3">
-          <MetricCard label="改前平均分" value={data.metrics.averageScoreBefore ?? '-'} />
-          <MetricCard label="改后预估分" value={data.metrics.averageScoreAfter ?? '-'} />
-          <MetricCard label="准备度提升" value={improvement === null ? '-' : `+${improvement}`} />
-        </section>
+        {/* ── 老师审核队列（优雅开阔的极简数据表） ── */}
+        <section className="pt-10 pb-12 border-b border-neutral-200">
+          <div className="flex flex-col sm:flex-row sm:items-baseline sm:justify-between mb-6 gap-2">
+            <div>
+              <span className="text-xs font-mono uppercase tracking-widest text-neutral-400 block">
+                Queue
+              </span>
+              <h3 className="mt-1 text-lg font-bold text-neutral-950">
+                老师审核队列
+              </h3>
+            </div>
+            <span className="text-xs font-mono text-neutral-400">
+              共 {data.reviewQueue.length} 位学生待跟踪
+            </span>
+          </div>
 
-        {/* Teacher Review Queue */}
-        <div className="mt-8">
-          <SectionCard
-            title="老师审核队列"
-            action={<span className="text-xs font-mono text-neutral-400">通过 / 需修改 / 重点辅导</span>}
-          >
-            <div className="overflow-x-auto rounded-none border border-neutral-200">
-              <table className="w-full min-w-[1080px] border-collapse text-left text-xs">
-                <thead className="bg-neutral-50 text-neutral-500 font-mono">
-                  <tr>
-                    <th className="px-4 py-3 font-semibold">学生</th>
-                    <th className="px-4 py-3 font-semibold">班级</th>
-                    <th className="px-4 py-3 font-semibold">目标岗位</th>
-                    <th className="px-4 py-3 font-semibold">状态</th>
-                    <th className="px-4 py-3 font-semibold">分数</th>
-                    <th className="px-4 py-3 font-semibold">修改轮次</th>
-                    <th className="px-4 py-3 font-semibold">主要问题</th>
-                    <th className="px-4 py-3 font-semibold">老师操作</th>
-                    <th className="px-4 py-3 font-semibold">更新</th>
+          <div className="overflow-x-auto">
+            <table className="w-full min-w-[900px] text-left text-xs border-collapse">
+              <thead>
+                <tr className="border-b border-neutral-200 text-neutral-400 font-mono">
+                  <th className="py-3 pr-4 font-normal">学生 / 学号</th>
+                  <th className="py-3 pr-4 font-normal">班级</th>
+                  <th className="py-3 pr-4 font-normal">求职意向</th>
+                  <th className="py-3 pr-4 font-normal">状态</th>
+                  <th className="py-3 pr-4 font-normal">评分</th>
+                  <th className="py-3 pr-4 font-normal">轮次</th>
+                  <th className="py-3 pr-4 font-normal">核心痛点</th>
+                  <th className="py-3 pr-4 font-normal">快速操作</th>
+                  <th className="py-3 font-normal text-right">更新时间</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-neutral-100">
+                {data.reviewQueue.map((student) => (
+                  <tr key={student.id} className="hover:bg-neutral-50/60 transition-colors">
+                    <td className="py-3.5 pr-4">
+                      <span className="font-bold text-neutral-950 block">{student.name}</span>
+                      <span className="font-mono text-[11px] text-neutral-400">{student.id}</span>
+                    </td>
+                    <td className="py-3.5 pr-4 text-neutral-600 font-mono">{student.className}</td>
+                    <td className="py-3.5 pr-4 font-medium text-neutral-900">{student.targetRole}</td>
+                    <td className="py-3.5 pr-4">
+                      <span className={`px-2 py-0.5 text-[11px] font-mono font-medium ${REVIEW_STATUS_META[student.status]?.className}`}>
+                        {REVIEW_STATUS_META[student.status]?.label}
+                      </span>
+                    </td>
+                    <td className="py-3.5 pr-4 font-mono font-bold text-neutral-950">
+                      <span className={student.score < 60 ? 'text-red-600 font-bold' : ''}>
+                        {student.score}
+                      </span>
+                    </td>
+                    <td className="py-3.5 pr-4 font-mono text-neutral-500">R{student.revisionCount}</td>
+                    <td className="py-3.5 pr-4 text-neutral-600 max-w-[220px] truncate">{student.issue}</td>
+                    <td className="py-3.5 pr-4">
+                      <div className="flex items-center gap-1">
+                        {REVIEW_ACTIONS.map((action) => {
+                          const isActive = student.status === action.status;
+                          return (
+                            <button
+                              key={action.status}
+                              type="button"
+                              onClick={() => handleReviewStatusChange(student.id, action.status)}
+                              className={`px-2 py-0.5 text-[11px] font-mono transition-colors ${
+                                isActive
+                                  ? 'bg-neutral-950 text-white font-bold'
+                                  : 'text-neutral-500 hover:text-neutral-950 hover:bg-neutral-100'
+                              }`}
+                            >
+                              {action.label}
+                            </button>
+                          );
+                        })}
+                      </div>
+                    </td>
+                    <td className="py-3.5 font-mono text-[11px] text-neutral-400 text-right">{student.lastUpdated}</td>
                   </tr>
-                </thead>
-                <tbody className="divide-y divide-neutral-100">
-                  {data.reviewQueue.map((student) => (
-                    <tr key={student.id} className="bg-white hover:bg-neutral-50/50 transition-colors">
-                      <td className="px-4 py-3">
-                        <div className="font-bold text-neutral-950">{student.name}</div>
-                        <div className="text-[11px] font-mono text-neutral-400">{student.id}</div>
-                      </td>
-                      <td className="px-4 py-3 text-neutral-600 font-mono">{student.className}</td>
-                      <td className="px-4 py-3 font-medium text-neutral-900">{student.targetRole}</td>
-                      <td className="px-4 py-3"><ReviewStatusBadge status={student.status} /></td>
-                      <td className={student.score < 60 ? 'px-4 py-3 font-bold font-mono text-red-600' : 'px-4 py-3 font-bold font-mono text-neutral-950'}>{student.score}</td>
-                      <td className="px-4 py-3 font-mono text-neutral-600">{student.revisionCount}</td>
-                      <td className="px-4 py-3 text-neutral-600 max-w-[200px] truncate">{student.issue}</td>
-                      <td className="px-4 py-3">
-                        <div className="flex flex-wrap gap-1.5">
-                          {REVIEW_ACTIONS.map((action) => {
-                            const isActive = student.status === action.status;
-                            const isLocallySaved = localReviewStatuses[student.id] === action.status;
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </section>
 
-                            return (
-                              <button
-                                key={action.status}
-                                type="button"
-                                onClick={() => handleReviewStatusChange(student.id, action.status)}
-                                className={`rounded-none border px-2 py-0.5 text-[11px] font-mono transition ${
-                                  isActive
-                                    ? 'border-neutral-950 bg-neutral-950 text-white font-bold'
-                                    : 'border-neutral-200 bg-white text-neutral-600 hover:border-neutral-900 hover:text-neutral-950'
-                                }`}
-                              >
-                                {action.label}{isLocallySaved ? ' ✓' : ''}
-                              </button>
-                            );
-                          })}
-                        </div>
-                      </td>
-                      <td className="px-4 py-3 font-mono text-[11px] text-neutral-400">{student.lastUpdated}</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
+        {/* ── 常见问题与方向分析（开放两列布局） ── */}
+        <section className="pt-10 grid grid-cols-1 md:grid-cols-2 gap-12 lg:gap-16">
+          <div>
+            <div className="mb-6">
+              <span className="text-xs font-mono uppercase tracking-widest text-neutral-400 block">
+                Analysis
+              </span>
+              <h3 className="mt-1 text-base font-bold text-neutral-950">
+                常见硬伤 Top 6
+              </h3>
             </div>
-          </SectionCard>
-        </div>
-
-        {/* Charts & Distributions */}
-        <div className="mt-8 grid gap-6 lg:grid-cols-2">
-          <SectionCard title="就业准备度分布">
-            <div className="space-y-3">
-              {data.readinessDistribution.map((item) => (
-                <div key={item.label} className="flex items-center justify-between border-b border-neutral-100 pb-2.5 last:border-b-0 last:pb-0">
-                  <span className="text-xs text-neutral-600">{item.label}</span>
-                  <span className="text-base font-bold font-mono text-neutral-950">{item.count}</span>
+            <div className="space-y-4">
+              {data.topIssues.map((item) => (
+                <div key={item.name}>
+                  <div className="flex items-baseline justify-between text-xs mb-1.5">
+                    <span className="text-neutral-700">{item.name}</span>
+                    <span className="font-mono font-bold text-neutral-950">{item.count} 人次</span>
+                  </div>
+                  <div className="h-1 w-full bg-neutral-100 overflow-hidden">
+                    <div className="h-full bg-neutral-950" style={{ width: `${Math.max((item.count / 80) * 100, 8)}%` }} />
+                  </div>
                 </div>
               ))}
             </div>
-          </SectionCard>
+          </div>
 
-          <SectionCard title="投递转化漏斗">
-            <div className="space-y-3">
-              {data.funnel.map((item) => (
-                <div key={item.stage} className="flex items-center justify-between border-b border-neutral-100 pb-2.5 last:border-b-0 last:pb-0">
-                  <span className="text-xs text-neutral-600">{item.label}</span>
-                  <span className="text-base font-bold font-mono text-neutral-950">{item.count}</span>
+          <div>
+            <div className="mb-6">
+              <span className="text-xs font-mono uppercase tracking-widest text-neutral-400 block">
+                Roles
+              </span>
+              <h3 className="mt-1 text-base font-bold text-neutral-950">
+                热门求职方向
+              </h3>
+            </div>
+            <div className="space-y-4">
+              {data.roleGaps.map((item) => (
+                <div key={item.name}>
+                  <div className="flex items-baseline justify-between text-xs mb-1.5">
+                    <span className="text-neutral-700">{item.name}</span>
+                    <span className="font-mono font-bold text-neutral-950">{item.count} 人</span>
+                  </div>
+                  <div className="h-1 w-full bg-neutral-100 overflow-hidden">
+                    <div className="h-full bg-neutral-950" style={{ width: `${Math.max((item.count / 50) * 100, 8)}%` }} />
+                  </div>
                 </div>
               ))}
             </div>
-          </SectionCard>
+          </div>
+        </section>
 
-          <SectionCard title="常见问题 Top 6">
-            <CountList items={data.topIssues} emptyText="暂无诊断问题数据" />
-          </SectionCard>
-
-          <SectionCard title="目标岗位分布">
-            <CountList items={data.roleGaps} emptyText="暂无岗位方向数据" />
-          </SectionCard>
-        </div>
-
-        <div className="mt-8">
-          <SectionCard title="高风险学生样例">
-            {data.highRiskSamples.length === 0 ? (
-              <p className="text-xs font-mono text-neutral-400">暂无 60 分以下样例。</p>
-            ) : (
-              <div className="overflow-x-auto rounded-none border border-neutral-200">
-                <table className="w-full border-collapse text-left text-xs">
-                  <thead className="bg-neutral-50 text-neutral-500 font-mono">
-                    <tr>
-                      <th className="px-4 py-3 font-semibold">学生</th>
-                      <th className="px-4 py-3 font-semibold">目标岗位</th>
-                      <th className="px-4 py-3 font-semibold">分数</th>
-                      <th className="px-4 py-3 font-semibold">主要问题</th>
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y divide-neutral-100">
-                    {data.highRiskSamples.map((student) => (
-                      <tr key={student.id} className="bg-white">
-                        <td className="px-4 py-3 font-mono text-neutral-600">{student.id}</td>
-                        <td className="px-4 py-3 font-medium text-neutral-900">{student.targetRole}</td>
-                        <td className="px-4 py-3 font-bold font-mono text-red-600">{student.score}</td>
-                        <td className="px-4 py-3 text-neutral-600">{student.issue}</td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            )}
-          </SectionCard>
-        </div>
       </main>
     </div>
   );
