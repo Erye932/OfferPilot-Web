@@ -104,89 +104,86 @@ export default function AuthModal({
     >
       {/* Backdrop */}
       <div
-        className="absolute inset-0 bg-neutral-900/20"
+        className="absolute inset-0 bg-neutral-950/30 backdrop-blur-[2px]"
         onClick={handleClose}
       />
 
-      {/* Card */}
+      {/* Card: 纯粹方正纸片质感，去除多余线条与圆弧 */}
       <div
         ref={dialogRef}
-        className="relative z-10 w-full max-w-[400px] overflow-hidden bg-white border border-neutral-300"
+        className="relative z-10 w-full max-w-[380px] bg-white border border-neutral-200 shadow-2xl rounded-none"
         onMouseMove={handleMouseMove}
         onMouseLeave={handleMouseLeave}
       >
         {/* ── Top: eye zone ── */}
         <div
-          className="relative flex items-center justify-center h-[200px] cursor-default bg-neutral-100"
+          className="relative flex items-center justify-center h-[180px] cursor-default bg-neutral-50 border-b border-neutral-100"
         >
-          {/* Close button — top right */}
+          {/* Close button */}
           <button
             onClick={handleClose}
             aria-label="关闭"
-            className="absolute right-4 top-4 flex h-7 w-7 items-center justify-center border border-neutral-300 bg-white hover:bg-neutral-100 transition rounded text-neutral-600 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
+            className="absolute right-4 top-4 flex h-7 w-7 items-center justify-center text-neutral-400 hover:text-neutral-900 transition-colors"
           >
-            <svg viewBox="0 0 24 24" className="h-3.5 w-3.5" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+            <svg viewBox="0 0 24 24" className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
               <path d="M18 6 6 18" /><path d="m6 6 12 12" />
             </svg>
           </button>
 
           {/* Two eyes */}
           <div className="flex items-center" style={{ gap: 16 }}>
-            <EyeBall dx={eyePosition.x} dy={eyePosition.y} size={110} />
-            <EyeBall dx={eyePosition.x} dy={eyePosition.y} size={110} />
+            <EyeBall dx={eyePosition.x} dy={eyePosition.y} size={96} />
+            <EyeBall dx={eyePosition.x} dy={eyePosition.y} size={96} />
           </div>
         </div>
 
         {/* ── Bottom: form zone ── */}
-        <div className="px-6 pb-6 pt-4 bg-white">
-          {/* Brand label */}
-          <div className="border-b border-neutral-300 pb-3 mb-4">
-            <div className="text-3xl font-black tracking-tight text-neutral-900">
-              #0062AD
+        <div className="p-7 bg-white space-y-5">
+          {/* Brand & Mode tabs */}
+          <div className="flex items-center justify-between">
+            <div className="flex items-baseline gap-4">
+              {(["login", "register"] as const).map((m) => (
+                <button
+                  key={m}
+                  onClick={() => setMode(m)}
+                  className={`text-sm tracking-wider uppercase transition-colors ${
+                    mode === m 
+                      ? 'font-bold text-neutral-950' 
+                      : 'font-normal text-neutral-400 hover:text-neutral-600'
+                  }`}
+                >
+                  {m === "login" ? "登录" : "注册"}
+                </button>
+              ))}
             </div>
-            <div className="mt-0.5 text-xs font-semibold tracking-[0.2em] uppercase text-neutral-600">
-              OFFERPILOT
-            </div>
+            <span className="text-[11px] font-mono tracking-widest text-neutral-400 uppercase">
+              OfferPilot
+            </span>
           </div>
 
-          {/* Mode tabs */}
-          <div className="mb-4 flex gap-0 border-b border-neutral-300">
-            {(["login", "register"] as const).map((m) => (
-              <button
-                key={m}
-                onClick={() => setMode(m)}
-                className={`pb-2 pr-4 text-xs font-black tracking-[0.18em] uppercase transition ${mode === m ? 'text-neutral-900 border-b-2 border-neutral-900' : 'text-neutral-500 border-b-2 border-transparent hover:text-neutral-700'}`}
-                style={{
-                  marginBottom: -2,
-                  background: "transparent",
-                }}
-              >
-                {m === "login" ? "登录" : "注册"}
-              </button>
-            ))}
-          </div>
-
-          {/* Inputs */}
+          {/* Inputs: 极简 1px 细线，无圆弧，去除蓝底厚环 */}
           <div className="space-y-3">
             <FlatInput type="email" placeholder="邮箱地址" />
             <FlatInput type="password" placeholder="密码" />
             {mode === "register" && <FlatInput type="password" placeholder="确认密码" />}
           </div>
 
-          {/* Primary button */}
-          <button
-            className="mt-4 w-full py-3 text-xs font-black tracking-[0.2em] uppercase transition bg-neutral-900 text-white hover:bg-neutral-800 rounded-md focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
-          >
-            {mode === "login" ? "立即登录" : "创建账号"}
-          </button>
+          {/* Actions */}
+          <div className="space-y-3 pt-1">
+            <button
+              className="w-full py-3 text-xs font-bold tracking-widest uppercase bg-neutral-950 text-white hover:bg-neutral-800 transition-colors rounded-none"
+            >
+              {mode === "login" ? "立即登录" : "创建账号"}
+            </button>
 
-          {/* Anonymous */}
-          <button
-            onClick={handleClose}
-            className="mt-2 w-full py-2 text-xs font-semibold tracking-widest uppercase transition border border-neutral-300 text-neutral-600 hover:border-neutral-500 hover:text-neutral-800 rounded-md focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
-          >
-            先匿名体验
-          </button>
+            {/* Anonymous: 纯文本链接，去除多余按钮线框 */}
+            <button
+              onClick={handleClose}
+              className="w-full py-1.5 text-xs text-neutral-500 hover:text-neutral-900 transition-colors text-center font-medium block"
+            >
+              先匿名体验 ➔
+            </button>
+          </div>
         </div>
       </div>
     </div>
@@ -199,7 +196,7 @@ export default function AuthModal({
         onClick={() => setOpen(true)}
         className={
           buttonClassName ??
-          "rounded-md border border-neutral-300 bg-white px-4 py-2 text-sm font-medium text-neutral-700 transition hover:border-neutral-500 hover:text-neutral-900 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
+          "rounded-none border border-neutral-300 bg-white px-4 py-1.5 text-xs font-medium text-neutral-700 transition hover:border-neutral-900 hover:text-neutral-950"
         }
       >
         {buttonLabel}
@@ -209,24 +206,24 @@ export default function AuthModal({
   );
 }
 
-// ─── Flat input — modern SaaS style ────────────────────
+// ─── Flat input — 纯净极简输入框（无圆弧，单层轻量细线，无多余外圈蓝线） ───────────────
 function FlatInput({ type, placeholder }: { type: string; placeholder: string }) {
   return (
     <input
       type={type}
       placeholder={placeholder}
-      className="w-full rounded-md border border-primary bg-white px-3 py-2 text-sm text-neutral-900 transition focus:border-primary focus:ring-2 focus:ring-primary focus:ring-offset-0 outline-none"
+      className="w-full rounded-none border border-neutral-200 bg-white px-3.5 py-2.5 text-xs text-neutral-900 placeholder:text-neutral-400 focus:border-neutral-950 outline-none transition-colors"
+      style={{ outline: "none", boxShadow: "none" }}
     />
   );
 }
 
 // ─── Eyeball ─────────────────────────────────────────────────
 function EyeBall({ dx, dy, size }: { dx: number; dy: number; size: number }) {
-  const w = size * 0.88; // slightly oval — taller than wide
+  const w = size * 0.88;
   const h = size;
   const pupilW = w * 0.33;
   const pupilH = h * 0.38;
-  // generous travel so the effect is clearly visible
   const maxTravelX = w * 0.32;
   const maxTravelY = h * 0.28;
   const dist = Math.sqrt(dx * dx + dy * dy);
@@ -242,7 +239,7 @@ function EyeBall({ dx, dy, size }: { dx: number; dy: number; size: number }) {
         height: h,
         borderRadius: "50%",
         background: "#FFFFFF",
-        boxShadow: "inset 0 1px 2px rgba(0,0,0,0.05)",
+        border: "1px solid #E5E5E5",
         flexShrink: 0,
         position: "relative",
         overflow: "hidden",
