@@ -42,7 +42,6 @@ type WorkflowStatus = 'done' | 'active' | 'pending';
 interface WorkflowStep {
   label: string;
   status: WorkflowStatus;
-  description: string;
 }
 
 type ReviewStatus = 'not_submitted' | 'submitted' | 'needs_revision' | 'passed' | 'key_guidance';
@@ -205,7 +204,7 @@ function applySingleReviewStatus(data: SchoolDashboardData, studentId: string, s
 
   const reviewQueue = data.reviewQueue.map((student) =>
     student.id === studentId
-      ? { ...student, status, lastUpdated: '刚刚更新' }
+      ? { ...student, status, lastUpdated: '刚刚' }
       : student
   );
 
@@ -328,7 +327,7 @@ export default function SchoolDashboardPage() {
       <div className="min-h-screen bg-white text-neutral-900">
         <AppTopNav current="diagnose" />
         <main className="mx-auto max-w-6xl px-6 py-20 text-xs font-mono text-neutral-400">
-          正在加载学校工作台数据...
+          加载中...
         </main>
       </div>
     );
@@ -339,7 +338,7 @@ export default function SchoolDashboardPage() {
       <div className="min-h-screen bg-white text-neutral-900">
         <AppTopNav current="diagnose" />
         <main className="mx-auto max-w-6xl px-6 py-20">
-          <p className="text-xs font-mono text-neutral-500">学校看板暂时不可用。</p>
+          <p className="text-xs font-mono text-neutral-500">暂无数据</p>
         </main>
       </div>
     );
@@ -351,33 +350,25 @@ export default function SchoolDashboardPage() {
 
       <main className="mx-auto max-w-6xl px-6 sm:px-8 pt-10 sm:pt-14">
         
-        {/* ── 顶部标题栏（开阔通透、纯净呼吸感） ── */}
+        {/* ── 顶部标题栏（纯粹、无废话解释） ── */}
         <div className="flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between pb-8 border-b border-neutral-200">
           <div>
-            <div className="flex items-center gap-2 text-xs font-mono text-neutral-400 mb-3">
-              <span className="h-1.5 w-1.5 bg-blue-600" />
-              <span>{data.dataMode === 'demo' ? 'DEMO DATA' : 'LIVE DATA'} · {new Date(data.generatedAt).toLocaleDateString('zh-CN')}</span>
-            </div>
             <h1 className="text-3xl font-extrabold tracking-tight text-neutral-950 sm:text-4xl">
               就业材料质量管理工作台
             </h1>
-            <p className="mt-2.5 max-w-2xl text-xs sm:text-sm leading-relaxed text-neutral-500">
-              面向学校与老师的任务制闭环：追踪学生提交、审核 AI 诊断报告，并导出班级质量分析。
-            </p>
           </div>
 
-          {/* 顶部操作链接 */}
-          <div className="flex flex-wrap items-center gap-4 text-xs font-medium">
+          <div className="flex flex-wrap items-center gap-5 text-xs font-medium">
             <Link
               href="/school/task/submit"
-              className="text-neutral-600 hover:text-neutral-950 hover:underline underline-offset-4 transition-colors"
+              className="text-neutral-600 hover:text-neutral-950 transition-colors"
             >
               学生提交入口 ↗
             </Link>
             <button
               type="button"
               onClick={() => downloadQualityReport(data)}
-              className="text-neutral-600 hover:text-neutral-950 hover:underline underline-offset-4 transition-colors"
+              className="text-neutral-600 hover:text-neutral-950 transition-colors"
             >
               导出质量报告 ↗
             </button>
@@ -390,61 +381,59 @@ export default function SchoolDashboardPage() {
           </div>
         </div>
 
-        {/* ── 核心任务大看板（开放式排版，拒绝冰冷格子） ── */}
+        {/* ── 核心任务看板 ── */}
         <section className="pt-10 pb-12 border-b border-neutral-200">
-          <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-4">
-            <div>
-              <div className="flex items-center gap-3">
-                <span className="font-mono text-xs font-semibold text-neutral-400">
-                  {data.activeTask.id}
-                </span>
-                <span className="text-[11px] font-mono font-medium text-emerald-700 bg-emerald-50 px-2 py-0.5">
-                  {data.activeTask.status}
-                </span>
-              </div>
-              <h2 className="mt-2 text-2xl font-bold tracking-tight text-neutral-950 sm:text-3xl">
-                {data.activeTask.title}
-              </h2>
-              <div className="mt-2.5 flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-neutral-500 font-mono">
-                <span>{data.activeTask.cohort}</span>
-                <span>•</span>
-                <span>负责老师：{data.activeTask.owner}</span>
-                <span>•</span>
-                <span>截止时间：{data.activeTask.deadline}</span>
-              </div>
+          <div>
+            <div className="flex items-center gap-3">
+              <span className="font-mono text-xs font-semibold text-neutral-400">
+                {data.activeTask.id}
+              </span>
+              <span className="text-[11px] font-mono font-medium text-emerald-700 bg-emerald-50 px-2 py-0.5">
+                {data.activeTask.status}
+              </span>
+            </div>
+            <h2 className="mt-2 text-2xl font-bold tracking-tight text-neutral-950 sm:text-3xl">
+              {data.activeTask.title}
+            </h2>
+            <div className="mt-2 flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-neutral-500 font-mono">
+              <span>{data.activeTask.cohort}</span>
+              <span>•</span>
+              <span>{data.activeTask.owner}</span>
+              <span>•</span>
+              <span>截止 {data.activeTask.deadline}</span>
             </div>
           </div>
 
-          {/* 4 项关键指标（开放排列，轻量发丝分割） */}
-          <div className="mt-10 grid grid-cols-2 md:grid-cols-4 gap-8 pt-8 border-t border-neutral-100">
+          {/* 4 项关键数据 */}
+          <div className="mt-8 grid grid-cols-2 md:grid-cols-4 gap-8 pt-8 border-t border-neutral-100">
             <div>
-              <span className="text-xs font-mono text-neutral-400 block">任务学生数</span>
+              <span className="text-xs font-mono text-neutral-400 block">学生数</span>
               <span className="mt-1 block text-3xl font-extrabold font-mono tracking-tight text-neutral-950">
                 {data.activeTask.studentTotal}
               </span>
             </div>
             <div>
-              <span className="text-xs font-mono text-neutral-400 block">已提交材料</span>
+              <span className="text-xs font-mono text-neutral-400 block">已提交</span>
               <span className="mt-1 block text-3xl font-extrabold font-mono tracking-tight text-neutral-950">
                 {data.activeTask.submittedCount}
               </span>
             </div>
             <div>
-              <span className="text-xs font-mono text-neutral-400 block">已修改经历</span>
+              <span className="text-xs font-mono text-neutral-400 block">已修改</span>
               <span className="mt-1 block text-3xl font-extrabold font-mono tracking-tight text-neutral-950">
                 {data.activeTask.revisedCount}
               </span>
             </div>
             <div>
-              <span className="text-xs font-mono text-neutral-400 block">达到通过标准</span>
+              <span className="text-xs font-mono text-neutral-400 block">已通过</span>
               <span className="mt-1 block text-3xl font-extrabold font-mono tracking-tight text-neutral-950">
                 {data.activeTask.passedCount}
               </span>
             </div>
           </div>
 
-          {/* 3 条轻薄进度 */}
-          <div className="mt-10 grid grid-cols-1 md:grid-cols-3 gap-8 pt-8 border-t border-neutral-100">
+          {/* 3 条进度条（去除重复文本） */}
+          <div className="mt-8 grid grid-cols-1 md:grid-cols-3 gap-8 pt-8 border-t border-neutral-100">
             <div>
               <div className="flex items-baseline justify-between text-xs mb-2">
                 <span className="text-neutral-500">提交率</span>
@@ -453,9 +442,6 @@ export default function SchoolDashboardPage() {
               <div className="h-1 w-full bg-neutral-100 overflow-hidden">
                 <div className="h-full bg-neutral-950" style={{ width: `${data.taskMetrics.submissionRate}%` }} />
               </div>
-              <span className="mt-2 block text-[11px] font-mono text-neutral-400">
-                {data.activeTask.submittedCount} / {data.activeTask.studentTotal} 人已提交
-              </span>
             </div>
 
             <div>
@@ -466,9 +452,6 @@ export default function SchoolDashboardPage() {
               <div className="h-1 w-full bg-neutral-100 overflow-hidden">
                 <div className="h-full bg-neutral-950" style={{ width: `${data.taskMetrics.revisionRate}%` }} />
               </div>
-              <span className="mt-2 block text-[11px] font-mono text-neutral-400">
-                {data.activeTask.revisedCount} 人完成至少一轮修改
-              </span>
             </div>
 
             <div>
@@ -479,117 +462,95 @@ export default function SchoolDashboardPage() {
               <div className="h-1 w-full bg-neutral-100 overflow-hidden">
                 <div className="h-full bg-neutral-950" style={{ width: `${data.taskMetrics.passRate}%` }} />
               </div>
-              <span className="mt-2 block text-[11px] font-mono text-neutral-400">
-                {data.activeTask.passedCount} 人达到投递标准
-              </span>
             </div>
           </div>
         </section>
 
-        {/* ── B2B2C 闭环流程（优雅平铺时间轴，彻底消除 7 个拥挤小框） ── */}
+        {/* ── 闭环流程（纯净节点，删除多余废话解释） ── */}
         <section className="pt-10 pb-12 border-b border-neutral-200">
-          <div className="mb-8">
-            <span className="text-xs font-mono uppercase tracking-widest text-neutral-400 block">
-              Workflow
-            </span>
-            <h3 className="mt-1 text-lg font-bold text-neutral-950">
-              B2B2C 任务闭环流程
-            </h3>
-          </div>
+          <h3 className="mb-6 text-sm font-bold text-neutral-950">
+            任务闭环流程
+          </h3>
 
           <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-7 gap-6">
             {data.workflow.map((step, index) => {
               return (
-                <div key={`${step.label}-${index}`} className="space-y-1.5">
+                <div key={`${step.label}-${index}`} className="space-y-1">
                   <div className="flex items-center gap-1.5 font-mono text-xs">
-                    <span className="font-bold text-neutral-400">0{index + 1}</span>
-                    <span className="text-neutral-300">/</span>
-                    <span className={`text-[11px] ${step.status === 'done' ? 'text-emerald-700 font-medium' : step.status === 'active' ? 'text-neutral-950 font-bold' : 'text-neutral-400'}`}>
+                    <span className="font-bold text-neutral-300">0{index + 1}</span>
+                    <span className={`text-[11px] ${step.status === 'done' ? 'text-emerald-700 font-medium' : step.status === 'active' ? 'text-neutral-950 font-bold' : 'text-neutral-300'}`}>
                       {step.status === 'done' ? '完成' : step.status === 'active' ? '当前' : '未开始'}
                     </span>
                   </div>
-                  <h4 className="text-xs font-bold text-neutral-950 pt-1">
+                  <h4 className="text-xs font-bold text-neutral-950">
                     {step.label}
                   </h4>
-                  <p className="text-[11px] leading-relaxed text-neutral-500">
-                    {step.description}
-                  </p>
                 </div>
               );
             })}
           </div>
         </section>
 
-        {/* ── 全局质量全景与提升（开放数据行） ── */}
+        {/* ── 全局数据与提分变化 ── */}
         <section className="pt-10 pb-12 border-b border-neutral-200">
-          <div className="mb-8">
-            <span className="text-xs font-mono uppercase tracking-widest text-neutral-400 block">
-              Overview
-            </span>
-            <h3 className="mt-1 text-lg font-bold text-neutral-950">
-              全景数据与提分变化
-            </h3>
-          </div>
+          <h3 className="mb-6 text-sm font-bold text-neutral-950">
+            质量与提分指标
+          </h3>
 
           <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-8">
             <div>
-              <span className="text-xs font-mono text-neutral-400 block">服务学生数</span>
+              <span className="text-xs font-mono text-neutral-400 block">学生数</span>
               <span className="mt-1 block text-2xl font-bold font-mono text-neutral-950">{data.metrics.studentCount}</span>
             </div>
             <div>
-              <span className="text-xs font-mono text-neutral-400 block">累计诊断报告</span>
+              <span className="text-xs font-mono text-neutral-400 block">报告数</span>
               <span className="mt-1 block text-2xl font-bold font-mono text-neutral-950">{data.metrics.reportCount}</span>
             </div>
             <div>
-              <span className="text-xs font-mono text-neutral-400 block">待审核学生</span>
+              <span className="text-xs font-mono text-neutral-400 block">待审核</span>
               <span className="mt-1 block text-2xl font-bold font-mono text-sky-700">{data.taskMetrics.pendingReviewCount}</span>
             </div>
             <div>
-              <span className="text-xs font-mono text-neutral-400 block">需重点辅导</span>
+              <span className="text-xs font-mono text-neutral-400 block">需辅导</span>
               <span className="mt-1 block text-2xl font-bold font-mono text-amber-700">{data.taskMetrics.needsRevisionCount}</span>
             </div>
             <div>
-              <span className="text-xs font-mono text-neutral-400 block">改前平均分</span>
+              <span className="text-xs font-mono text-neutral-400 block">改前均分</span>
               <span className="mt-1 block text-2xl font-bold font-mono text-neutral-500">{data.metrics.averageScoreBefore ?? '-'}</span>
             </div>
             <div>
-              <span className="text-xs font-mono text-neutral-400 block">改后提升</span>
+              <span className="text-xs font-mono text-neutral-400 block">提升幅度</span>
               <span className="mt-1 block text-2xl font-bold font-mono text-emerald-700">
-                {improvement === null ? '-' : `+${improvement} 分`}
+                {improvement === null ? '-' : `+${improvement}`}
               </span>
             </div>
           </div>
         </section>
 
-        {/* ── 老师审核队列（优雅开阔的极简数据表） ── */}
+        {/* ── 老师审核队列 ── */}
         <section className="pt-10 pb-12 border-b border-neutral-200">
-          <div className="flex flex-col sm:flex-row sm:items-baseline sm:justify-between mb-6 gap-2">
-            <div>
-              <span className="text-xs font-mono uppercase tracking-widest text-neutral-400 block">
-                Queue
-              </span>
-              <h3 className="mt-1 text-lg font-bold text-neutral-950">
-                老师审核队列
-              </h3>
-            </div>
+          <div className="flex items-baseline justify-between mb-6">
+            <h3 className="text-sm font-bold text-neutral-950">
+              审核队列
+            </h3>
             <span className="text-xs font-mono text-neutral-400">
-              共 {data.reviewQueue.length} 位学生待跟踪
+              {data.reviewQueue.length}
             </span>
           </div>
 
           <div className="overflow-x-auto">
-            <table className="w-full min-w-[900px] text-left text-xs border-collapse">
+            <table className="w-full min-w-[840px] text-left text-xs border-collapse">
               <thead>
                 <tr className="border-b border-neutral-200 text-neutral-400 font-mono">
-                  <th className="py-3 pr-4 font-normal">学生 / 学号</th>
+                  <th className="py-3 pr-4 font-normal">学生</th>
                   <th className="py-3 pr-4 font-normal">班级</th>
-                  <th className="py-3 pr-4 font-normal">求职意向</th>
+                  <th className="py-3 pr-4 font-normal">意向</th>
                   <th className="py-3 pr-4 font-normal">状态</th>
-                  <th className="py-3 pr-4 font-normal">评分</th>
+                  <th className="py-3 pr-4 font-normal">分数</th>
                   <th className="py-3 pr-4 font-normal">轮次</th>
-                  <th className="py-3 pr-4 font-normal">核心痛点</th>
-                  <th className="py-3 pr-4 font-normal">快速操作</th>
-                  <th className="py-3 font-normal text-right">更新时间</th>
+                  <th className="py-3 pr-4 font-normal">主要问题</th>
+                  <th className="py-3 pr-4 font-normal">操作</th>
+                  <th className="py-3 font-normal text-right">时间</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-neutral-100">
@@ -611,7 +572,7 @@ export default function SchoolDashboardPage() {
                         {student.score}
                       </span>
                     </td>
-                    <td className="py-3.5 pr-4 font-mono text-neutral-500">R{student.revisionCount}</td>
+                    <td className="py-3.5 pr-4 font-mono text-neutral-500">{student.revisionCount}</td>
                     <td className="py-3.5 pr-4 text-neutral-600 max-w-[220px] truncate">{student.issue}</td>
                     <td className="py-3.5 pr-4">
                       <div className="flex items-center gap-1">
@@ -642,23 +603,18 @@ export default function SchoolDashboardPage() {
           </div>
         </section>
 
-        {/* ── 常见问题与方向分析（开放两列布局） ── */}
+        {/* ── 常见问题与方向分析 ── */}
         <section className="pt-10 grid grid-cols-1 md:grid-cols-2 gap-12 lg:gap-16">
           <div>
-            <div className="mb-6">
-              <span className="text-xs font-mono uppercase tracking-widest text-neutral-400 block">
-                Analysis
-              </span>
-              <h3 className="mt-1 text-base font-bold text-neutral-950">
-                常见硬伤 Top 6
-              </h3>
-            </div>
+            <h3 className="mb-6 text-sm font-bold text-neutral-950">
+              常见问题 Top 6
+            </h3>
             <div className="space-y-4">
               {data.topIssues.map((item) => (
                 <div key={item.name}>
                   <div className="flex items-baseline justify-between text-xs mb-1.5">
                     <span className="text-neutral-700">{item.name}</span>
-                    <span className="font-mono font-bold text-neutral-950">{item.count} 人次</span>
+                    <span className="font-mono font-bold text-neutral-950">{item.count}</span>
                   </div>
                   <div className="h-1 w-full bg-neutral-100 overflow-hidden">
                     <div className="h-full bg-neutral-950" style={{ width: `${Math.max((item.count / 80) * 100, 8)}%` }} />
@@ -669,20 +625,15 @@ export default function SchoolDashboardPage() {
           </div>
 
           <div>
-            <div className="mb-6">
-              <span className="text-xs font-mono uppercase tracking-widest text-neutral-400 block">
-                Roles
-              </span>
-              <h3 className="mt-1 text-base font-bold text-neutral-950">
-                热门求职方向
-              </h3>
-            </div>
+            <h3 className="mb-6 text-sm font-bold text-neutral-950">
+              岗位分布
+            </h3>
             <div className="space-y-4">
               {data.roleGaps.map((item) => (
                 <div key={item.name}>
                   <div className="flex items-baseline justify-between text-xs mb-1.5">
                     <span className="text-neutral-700">{item.name}</span>
-                    <span className="font-mono font-bold text-neutral-950">{item.count} 人</span>
+                    <span className="font-mono font-bold text-neutral-950">{item.count}</span>
                   </div>
                   <div className="h-1 w-full bg-neutral-100 overflow-hidden">
                     <div className="h-full bg-neutral-950" style={{ width: `${Math.max((item.count / 50) * 100, 8)}%` }} />
