@@ -158,109 +158,112 @@ export default function SchoolTaskSubmitPage() {
   };
 
   return (
-    <div className="min-h-screen bg-neutral-50 text-neutral-900">
+    <div className="min-h-screen bg-white text-neutral-900 font-sans">
       <AppTopNav current="diagnose" />
-      <main className="mx-auto max-w-6xl px-4 py-8 sm:px-6 lg:px-8 lg:py-10">
+      <main className="mx-auto max-w-6xl px-4 py-8 sm:px-6 lg:px-8 lg:py-12">
         <header className="flex flex-col gap-6 border-b border-neutral-200 pb-8 lg:flex-row lg:items-end lg:justify-between">
           <div>
-            <div className="mb-4 inline-flex rounded-full border border-neutral-200 bg-white px-3 py-1 text-xs text-neutral-500">
-              学生端任务入口 · {DEFAULT_SCHOOL_TASK_ID}
+            <div className="mb-3 inline-flex items-center gap-2 text-xs font-mono text-neutral-400">
+              <span className="h-1.5 w-1.5 bg-blue-600" />
+              <span>STUDENT SUBMISSION · {DEFAULT_SCHOOL_TASK_ID}</span>
             </div>
-            <h1 className="text-4xl font-semibold tracking-tight text-neutral-950 sm:text-5xl">提交就业材料诊断任务</h1>
-            <p className="mt-4 max-w-3xl text-base leading-7 text-neutral-500">
+            <h1 className="text-3xl font-extrabold tracking-tight text-neutral-950 sm:text-4xl">
+              提交就业材料诊断任务
+            </h1>
+            <p className="mt-3 max-w-3xl text-xs sm:text-sm leading-relaxed text-neutral-500">
               学生填写班级、姓名、岗位方向并提交简历。老师端看板会即时看到该学生进入待审核队列。
             </p>
           </div>
-          <div className="flex flex-col gap-3 sm:flex-row">
+          <div className="flex flex-wrap items-center gap-3">
             <button
               type="button"
               onClick={fillDemo}
-              className="inline-flex items-center justify-center rounded-xl border border-neutral-300 bg-white px-5 py-3 text-sm font-medium text-neutral-800 transition hover:border-neutral-500"
+              className="inline-flex h-9 items-center justify-center rounded-none border border-neutral-300 bg-white px-4 text-xs font-medium text-neutral-800 transition hover:border-neutral-900 hover:text-neutral-950"
             >
               填入演示学生
             </button>
             <Link
               href="/school/dashboard"
-              className="inline-flex items-center justify-center rounded-xl bg-neutral-950 px-5 py-3 text-sm font-medium text-white transition hover:bg-neutral-700"
+              className="inline-flex h-9 items-center justify-center rounded-none bg-neutral-950 px-5 text-xs font-bold text-white transition hover:bg-neutral-800"
             >
-              查看老师看板
+              查看老师看板 ➔
             </Link>
           </div>
         </header>
 
         <div className="mt-8 grid gap-6 lg:grid-cols-[1.2fr_0.8fr]">
-          <form onSubmit={handleSubmit} className="rounded-3xl border border-neutral-200 bg-white p-6 shadow-sm">
+          <form onSubmit={handleSubmit} className="rounded-none border border-neutral-200 bg-white p-6 sm:p-8">
             <div className="grid gap-4 sm:grid-cols-2">
               <label className="block">
-                <span className="text-sm font-medium text-neutral-700">任务编号</span>
+                <span className="text-xs font-mono text-neutral-500">任务编号</span>
                 <input
                   value={form.taskId}
                   onChange={(event) => updateField('taskId', event.target.value)}
-                  className="mt-2 w-full rounded-xl border border-neutral-200 px-4 py-3 text-sm outline-none transition focus:border-neutral-900"
+                  className="mt-1.5 w-full rounded-none border border-neutral-200 bg-white px-3.5 py-2.5 text-xs text-neutral-900 outline-none transition focus:border-neutral-950"
                 />
               </label>
               <label className="block">
-                <span className="text-sm font-medium text-neutral-700">班级</span>
+                <span className="text-xs font-mono text-neutral-500">班级</span>
                 <input
                   value={form.className}
                   onChange={(event) => updateField('className', event.target.value)}
-                  className="mt-2 w-full rounded-xl border border-neutral-200 px-4 py-3 text-sm outline-none transition focus:border-neutral-900"
+                  className="mt-1.5 w-full rounded-none border border-neutral-200 bg-white px-3.5 py-2.5 text-xs text-neutral-900 outline-none transition focus:border-neutral-950"
                 />
               </label>
               <label className="block">
-                <span className="text-sm font-medium text-neutral-700">姓名</span>
+                <span className="text-xs font-mono text-neutral-500">姓名</span>
                 <input
                   value={form.studentName}
                   onChange={(event) => updateField('studentName', event.target.value)}
                   placeholder="例如：李同学"
-                  className="mt-2 w-full rounded-xl border border-neutral-200 px-4 py-3 text-sm outline-none transition focus:border-neutral-900"
+                  className="mt-1.5 w-full rounded-none border border-neutral-200 bg-white px-3.5 py-2.5 text-xs text-neutral-900 outline-none transition focus:border-neutral-950"
                 />
               </label>
               <label className="block">
-                <span className="text-sm font-medium text-neutral-700">学号</span>
+                <span className="text-xs font-mono text-neutral-500">学号</span>
                 <input
                   value={form.studentCode}
                   onChange={(event) => updateField('studentCode', event.target.value)}
                   placeholder="例如：S-2026-128"
-                  className="mt-2 w-full rounded-xl border border-neutral-200 px-4 py-3 text-sm outline-none transition focus:border-neutral-900"
+                  className="mt-1.5 w-full rounded-none border border-neutral-200 bg-white px-3.5 py-2.5 text-xs text-neutral-900 outline-none transition focus:border-neutral-950"
                 />
               </label>
             </div>
 
             <label className="mt-4 block">
-              <span className="text-sm font-medium text-neutral-700">目标岗位</span>
+              <span className="text-xs font-mono text-neutral-500">目标岗位</span>
               <input
                 value={form.targetRole}
                 onChange={(event) => updateField('targetRole', event.target.value)}
                 placeholder="例如：前端开发实习生 / 产品助理 / 数据分析实习生"
-                className="mt-2 w-full rounded-xl border border-neutral-200 px-4 py-3 text-sm outline-none transition focus:border-neutral-900"
+                className="mt-1.5 w-full rounded-none border border-neutral-200 bg-white px-3.5 py-2.5 text-xs text-neutral-900 outline-none transition focus:border-neutral-950"
               />
             </label>
 
             <label className="mt-4 block">
-              <span className="text-sm font-medium text-neutral-700">岗位 JD（可选）</span>
+              <span className="text-xs font-mono text-neutral-500">岗位 JD（可选）</span>
               <textarea
                 value={form.jobDescription}
                 onChange={(event) => updateField('jobDescription', event.target.value)}
                 rows={4}
                 placeholder="粘贴岗位职责和任职要求，系统会结合岗位匹配度分析。"
-                className="mt-2 w-full resize-y rounded-xl border border-neutral-200 px-4 py-3 text-sm leading-6 outline-none transition focus:border-neutral-900"
+                className="mt-1.5 w-full resize-y rounded-none border border-neutral-200 bg-white px-3.5 py-2.5 text-xs leading-5 outline-none transition focus:border-neutral-950"
               />
             </label>
 
             <label className="mt-4 block">
-              <span className="text-sm font-medium text-neutral-700">简历文本</span>
+              <span className="text-xs font-mono text-neutral-500">简历文本</span>
               <textarea
                 value={form.resumeText}
                 onChange={(event) => updateField('resumeText', event.target.value)}
                 rows={12}
                 placeholder="请粘贴简历文本，至少 100 字。"
-                className="mt-2 w-full resize-y rounded-xl border border-neutral-200 px-4 py-3 text-sm leading-6 outline-none transition focus:border-neutral-900"
+                className="mt-1.5 w-full resize-y rounded-none border border-neutral-200 bg-white px-3.5 py-2.5 text-xs leading-5 font-mono outline-none transition focus:border-neutral-950"
               />
             </label>
 
             {error && (
-              <div className="mt-4 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+              <div className="mt-4 rounded-none border border-red-200 bg-red-50 p-3 text-xs text-red-700">
                 {error}
               </div>
             )}
@@ -269,7 +272,7 @@ export default function SchoolTaskSubmitPage() {
               <button
                 type="submit"
                 disabled={!canSubmit}
-                className="inline-flex flex-1 items-center justify-center rounded-xl bg-neutral-950 px-5 py-3 text-sm font-medium text-white transition hover:bg-neutral-700 disabled:cursor-not-allowed disabled:bg-neutral-300"
+                className="inline-flex h-10 flex-1 items-center justify-center rounded-none bg-neutral-950 px-5 text-xs font-bold text-white transition hover:bg-neutral-800 disabled:cursor-not-allowed disabled:bg-neutral-300"
               >
                 提交给老师
               </button>
@@ -277,35 +280,35 @@ export default function SchoolTaskSubmitPage() {
                 type="button"
                 onClick={() => saveSubmission(true)}
                 disabled={!canSubmit}
-                className="inline-flex flex-1 items-center justify-center rounded-xl border border-neutral-300 bg-white px-5 py-3 text-sm font-medium text-neutral-800 transition hover:border-neutral-500 disabled:cursor-not-allowed disabled:text-neutral-300"
+                className="inline-flex h-10 flex-1 items-center justify-center rounded-none border border-neutral-300 bg-white px-5 text-xs font-medium text-neutral-800 transition hover:border-neutral-900 hover:text-neutral-950 disabled:cursor-not-allowed disabled:text-neutral-300"
               >
-                提交并开始 AI 诊断
+                提交并开始 AI 诊断 ➔
               </button>
             </div>
           </form>
 
-          <aside className="space-y-4">
-            <section className="rounded-3xl border border-neutral-200 bg-white p-6 shadow-sm">
-              <h2 className="text-lg font-semibold tracking-tight text-neutral-950">提交后老师看到什么？</h2>
-              <div className="mt-5 space-y-3 text-sm text-neutral-600">
-                <div className="rounded-2xl bg-neutral-50 p-4">学生进入老师审核队列，状态为待审核。</div>
-                <div className="rounded-2xl bg-neutral-50 p-4">提交率、待审核人数会实时更新。</div>
-                <div className="rounded-2xl bg-neutral-50 p-4">老师可标记通过、需修改或重点辅导。</div>
-                <div className="rounded-2xl bg-neutral-50 p-4">质量报告导出会包含最新审核状态。</div>
+          <aside className="space-y-6">
+            <section className="rounded-none border border-neutral-200 bg-white p-6">
+              <h2 className="text-sm font-bold tracking-tight text-neutral-950">提交后老师看到什么？</h2>
+              <div className="mt-4 space-y-3 text-xs text-neutral-600">
+                <div className="border-l border-neutral-900 pl-3 py-1">学生进入老师审核队列，状态为待审核。</div>
+                <div className="border-l border-neutral-200 pl-3 py-1">提交率、待审核人数会实时更新。</div>
+                <div className="border-l border-neutral-200 pl-3 py-1">老师可标记通过、需修改或重点辅导。</div>
+                <div className="border-l border-neutral-200 pl-3 py-1">质量报告导出会包含最新审核状态。</div>
               </div>
             </section>
 
             {savedSubmission && (
-              <section className="rounded-3xl border border-emerald-200 bg-emerald-50 p-6 shadow-sm">
-                <h2 className="text-lg font-semibold tracking-tight text-emerald-950">提交成功</h2>
-                <p className="mt-3 text-sm leading-6 text-emerald-800">
+              <section className="rounded-none border border-emerald-300 bg-emerald-50/60 p-6">
+                <h2 className="text-sm font-bold tracking-tight text-emerald-950">提交成功</h2>
+                <p className="mt-2 text-xs leading-relaxed text-emerald-800">
                   {savedSubmission.studentName} 已进入 {savedSubmission.taskId} 的待审核队列。
                 </p>
                 <Link
                   href="/school/dashboard"
-                  className="mt-5 inline-flex rounded-xl bg-emerald-700 px-4 py-2 text-sm font-medium text-white transition hover:bg-emerald-800"
+                  className="mt-4 inline-flex h-8 items-center justify-center rounded-none bg-emerald-800 px-4 text-xs font-bold text-white transition hover:bg-emerald-900"
                 >
-                  去老师看板查看
+                  去老师看板查看 ➔
                 </Link>
               </section>
             )}
