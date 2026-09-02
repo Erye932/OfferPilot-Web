@@ -21,7 +21,6 @@ export interface CommonNavProps {
 
 const DEFAULT_NAV_ITEMS: NavItem[] = [
   { key: "diagnose", label: "开始诊断", href: "/diagnose" },
-  { key: "sample", label: "诊断样例", href: "/demo/result" },
   { label: "学校端", href: "/school/dashboard" },
 ];
 

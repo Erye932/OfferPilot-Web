@@ -60,7 +60,6 @@ export default function LandingHero() {
           { label: "首页", href: "/" },
           { label: "岗位推荐", href: "/recommendations" },
           { label: "面试追问", href: "/interview" },
-          { label: "示例结果", href: "/demo/result" },
         ]}
       />
 
@@ -94,19 +93,12 @@ export default function LandingHero() {
           帮你判断问题更偏表达、匹配还是方向
         </p>
 
-        <div className="mt-8 flex flex-col items-center gap-6 sm:flex-row animate-in fade-in duration-500 delay-700">
+        <div className="mt-8 flex flex-col items-center justify-center animate-in fade-in duration-500 delay-700">
           <Link
             href="/diagnose"
-            className="inline-flex h-12 min-w-[160px] items-center justify-center rounded-none bg-neutral-900 px-6 text-sm font-medium text-white transition hover:bg-neutral-800"
+            className="inline-flex h-12 min-w-[160px] items-center justify-center rounded-none bg-neutral-900 px-8 text-sm font-medium text-white transition hover:bg-neutral-800"
           >
-            开始诊断
-          </Link>
-
-          <Link
-            href="/demo/result"
-            className="text-sm font-medium text-neutral-600 transition hover:text-neutral-900"
-          >
-            查看示例结果
+            开始诊断 ➔
           </Link>
         </div>
       </div>
